@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import ApiService from '../../service/ApiService';
@@ -30,9 +30,9 @@ const ManageBookingsPage = () => {
 
     useEffect(() => {
         filterBookings(searchTerm);
-    }, [searchTerm, bookings]);
+    }, [searchTerm, bookings, filterBookings]);
 
-    const filterBookings = (term) => {
+    const filterBookings = useCallback((term) => {
         if (term === '') {
             setFilteredBookings(bookings);
         } else {
@@ -42,7 +42,7 @@ const ManageBookingsPage = () => {
             setFilteredBookings(filtered);
         }
         setCurrentPage(1);
-    };
+    }, [bookings]);
 
     const handleSearchChange = (e) => {
         setSearchTerm(e.target.value);
