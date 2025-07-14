@@ -56,3 +56,6 @@ Thumbs.db
 
 # Public assets (optional, ако качваш само production assets)
 # /frontend/public/assets/
+
+# Spring Boot application properties
+backend/src/main/resources/application.properties
