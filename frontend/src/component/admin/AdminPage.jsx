@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import ApiService from '../../service/ApiService';
+import { useTranslation } from 'react-i18next';
 
 const AdminPage = () => {
+    const { t } = useTranslation();
     const [adminName, setAdminName] = useState('');
     const navigate = useNavigate();
 
@@ -21,13 +23,13 @@ const AdminPage = () => {
 
     return (
         <div className="admin-page">
-            <h1 className="welcome-message">Welcome, {adminName}</h1>
+            <h1 className="welcome-message">{t('admin.welcome', { name: adminName })}</h1>
             <div className="admin-actions">
                 <button className="admin-button" onClick={() => navigate('/admin/manage-rooms')}>
-                    Manage Rooms
+                    {t('admin.manageRooms')}
                 </button>
                 <button className="admin-button" onClick={() => navigate('/admin/manage-bookings')}>
-                    Manage Bookings
+                    {t('admin.manageBookings')}
                 </button>
             </div>
         </div>

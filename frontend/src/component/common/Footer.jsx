@@ -1,10 +1,11 @@
+import { useTranslation } from 'react-i18next';
+
 const FooterComponent = () => {
-
-
+    const { t } = useTranslation();
     return (
         <footer>
             <span className="my-footer">
-                Phegon Hotel | All Right Reserved &copy; {new Date().getFullYear()}
+                {t('footer.copyright')} &copy; {new Date().getFullYear()}
             </span>
         </footer>
     );

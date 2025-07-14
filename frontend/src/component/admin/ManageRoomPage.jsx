@@ -3,8 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import ApiService from '../../service/ApiService';
 import Pagination from '../common/Pagination';
 import RoomResult from '../common/RoomResult';
+import { useTranslation } from 'react-i18next';
 
 const ManageRoomPage = () => {
+  const { t } = useTranslation();
   const [rooms, setRooms] = useState([]);
   const [filteredRooms, setFilteredRooms] = useState([]);
   const [roomTypes, setRoomTypes] = useState([]);
@@ -63,12 +65,12 @@ const ManageRoomPage = () => {
 
   return (
     <div className='all-rooms'>
-      <h2>All Rooms</h2>
+      <h2>{t('rooms.allRooms')}</h2>
       <div className='all-room-filter-div' style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div className='filter-select-div'>
-          <label>Filter by Room Type:</label>
+          <label>{t('rooms.filterByType')}</label>
           <select value={selectedRoomType} onChange={handleRoomTypeChange}>
-            <option value="">All</option>
+            <option value="">{t('rooms.all')}</option>
             {roomTypes.map((type) => (
               <option key={type} value={type}>
                 {type}
@@ -76,7 +78,7 @@ const ManageRoomPage = () => {
             ))}
           </select>
           <button className='add-room-button' onClick={() => navigate('/admin/add-room')}>
-            Add Room
+            {t('admin.addRoom')}
           </button>
         </div>
       </div>

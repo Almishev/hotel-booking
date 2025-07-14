@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import ApiService from '../../service/ApiService';
+import { useTranslation } from 'react-i18next';
 
 const RoomSearch = ({ handleSearchResult }) => {
+  const { t } = useTranslation();
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [roomType, setRoomType] = useState('');
@@ -33,7 +35,7 @@ const RoomSearch = ({ handleSearchResult }) => {
   /**THis is going to be used to fetch avaailabe rooms from database base on seach data that'll be passed in */
   const handleInternalSearch = async () => {
     if (!startDate || !endDate || !roomType) {
-      showError('Please select all fields');
+      showError(t('login.fillAllFields'));
       return false;
     }
     try {
@@ -46,14 +48,14 @@ const RoomSearch = ({ handleSearchResult }) => {
       // Check if the response is successful
       if (response.statusCode === 200) {
         if (response.roomList.length === 0) {
-          showError('Room not currently available for this date range on the selected rom type.');
+          showError(t('rooms.noRooms'));
           return
         }
         handleSearchResult(response.roomList);
         setError('');
       }
     } catch (error) {
-      showError("Unown error occured: " + error.response.data.message);
+      showError(t('rooms.loading') + ': ' + error.response.data.message);
     }
   };
 
@@ -61,29 +63,29 @@ const RoomSearch = ({ handleSearchResult }) => {
     <section>
       <div className="search-container">
         <div className="search-field">
-          <label>Check-in Date</label>
+          <label>{t('rooms.selectCheckIn')}</label>
           <DatePicker
             selected={startDate}
             onChange={(date) => setStartDate(date)}
             dateFormat="dd/MM/yyyy"
-            placeholderText="Select Check-in Date"
+            placeholderText={t('rooms.selectCheckIn')}
           />
         </div>
         <div className="search-field">
-          <label>Check-out Date</label>
+          <label>{t('rooms.selectCheckOut')}</label>
           <DatePicker
             selected={endDate}
             onChange={(date) => setEndDate(date)}
             dateFormat="dd/MM/yyyy"
-            placeholderText="Select Check-out Date"
+            placeholderText={t('rooms.selectCheckOut')}
           />
         </div>
 
         <div className="search-field">
-          <label>Room Type</label>
+          <label>{t('rooms.selectRoomType')}</label>
           <select value={roomType} onChange={(e) => setRoomType(e.target.value)}>
             <option disabled value="">
-              Select Room Type
+              {t('rooms.selectRoomType')}
             </option>
             {roomTypes.map((roomType) => (
               <option key={roomType} value={roomType}>
@@ -93,7 +95,7 @@ const RoomSearch = ({ handleSearchResult }) => {
           </select>
         </div>
         <button className="home-search-button" onClick={handleInternalSearch}>
-          Search Rooms
+          {t('rooms.searchRooms')}
         </button>
       </div>
       {error && <p className="error-message">{error}</p>}

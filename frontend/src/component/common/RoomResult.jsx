@@ -1,8 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import ApiService from '../../service/ApiService';
+import { useTranslation } from 'react-i18next';
 
 const RoomResult = ({ roomSearchResults }) => {
+    const { t } = useTranslation();
     const navigate = useNavigate(); // Initialize useNavigate hook
     const isAdmin = ApiService.isAdmin();
     return (
@@ -14,8 +16,8 @@ const RoomResult = ({ roomSearchResults }) => {
                             <img className='room-list-item-image' src={room.roomPhotoUrl} alt={room.roomType} />
                             <div className="room-details">
                                 <h3>{room.roomType}</h3>
-                                <p>Price: ${room.roomPrice} / night</p>
-                                <p>Description: {room.roomDescription}</p>
+                                <p>{t('rooms.price')}: ${room.roomPrice} {t('rooms.perNight')}</p>
+                                <p>{t('rooms.description')}: {room.roomDescription}</p>
                             </div>
 
                             <div className='book-now-div'>
@@ -24,14 +26,14 @@ const RoomResult = ({ roomSearchResults }) => {
                                         className="edit-room-button"
                                         onClick={() => navigate(`/admin/edit-room/${room.id}`)} // Navigate to edit room with room ID
                                     >
-                                        Edit Room
+                                        {t('rooms.editRoom')}
                                     </button>
                                 ) : (
                                     <button
                                         className="book-now-button"
                                         onClick={() => navigate(`/room-details-book/${room.id}`)} // Navigate to book room with room ID
                                     >
-                                        View/Book Now
+                                        {t('rooms.viewBookNow')}
                                     </button>
                                 )}
                             </div>

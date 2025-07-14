@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import ApiService from '../../service/ApiService';
 import Pagination from '../common/Pagination';
 
 const ManageBookingsPage = () => {
+    const { t } = useTranslation();
     const [bookings, setBookings] = useState([]);
     const [filteredBookings, setFilteredBookings] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -54,28 +56,28 @@ const ManageBookingsPage = () => {
 
     return (
         <div className='bookings-container'>
-            <h2>All Bookings</h2>
+            <h2>{t('admin.allBookings')}</h2>
             <div className='search-div'>
-                <label>Filter by Booking Number:</label>
+                <label>{t('admin.filterByBookingNumber')}</label>
                 <input
                     type="text"
                     value={searchTerm}
                     onChange={handleSearchChange}
-                    placeholder="Enter booking number"
+                    placeholder={t('admin.enterBookingNumber')}
                 />
             </div>
 
             <div className="booking-results">
                 {currentBookings.map((booking) => (
                     <div key={booking.id} className="booking-result-item">
-                        <p><strong>Booking Code:</strong> {booking.bookingConfirmationCode}</p>
-                        <p><strong>Check In Date:</strong> {booking.checkInDate}</p>
-                        <p><strong>Check out Date:</strong> {booking.checkOutDate}</p>
-                        <p><strong>Total Guests:</strong> {booking.totalNumOfGuest}</p>
+                        <p><strong>{t('admin.bookingCode')}:</strong> {booking.bookingConfirmationCode}</p>
+                        <p><strong>{t('admin.checkInDate')}:</strong> {booking.checkInDate}</p>
+                        <p><strong>{t('admin.checkOutDate')}:</strong> {booking.checkOutDate}</p>
+                        <p><strong>{t('admin.totalGuests')}:</strong> {booking.totalNumOfGuest}</p>
                         <button
                             className="edit-room-button"
                             onClick={() => navigate(`/admin/edit-booking/${booking.bookingConfirmationCode}`)}
-                        >Manage Booking</button>
+                        >{t('admin.manageBooking')}</button>
                     </div>
                 ))}
             </div>

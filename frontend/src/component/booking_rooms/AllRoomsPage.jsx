@@ -3,10 +3,10 @@ import ApiService from '../../service/ApiService';
 import Pagination from '../common/Pagination';
 import RoomResult from '../common/RoomResult';
 import RoomSearch from '../common/RoomSearch';
-
-
+import { useTranslation } from 'react-i18next';
 
 const AllRoomsPage = () => {
+  const { t } = useTranslation();
   const [rooms, setRooms] = useState([]);
   const [filteredRooms, setFilteredRooms] = useState([]);
   const [roomTypes, setRoomTypes] = useState([]);
@@ -19,7 +19,6 @@ const AllRoomsPage = () => {
     setRooms(results);
     setFilteredRooms(results);
   };
-
 
   useEffect(() => {
     const fetchRooms = async () => {
@@ -71,11 +70,11 @@ const AllRoomsPage = () => {
 
   return (
     <div className='all-rooms'>
-      <h2>All Rooms</h2>
+      <h2>{t('rooms.allRooms')}</h2>
       <div className='all-room-filter-div'>
-        <label>Filter by Room Type:</label>
+        <label>{t('rooms.filterByType')}</label>
         <select value={selectedRoomType} onChange={handleRoomTypeChange}>
-          <option value="">All</option>
+          <option value="">{t('rooms.all')}</option>
           {roomTypes.map((type) => (
             <option key={type} value={type}>
               {type}

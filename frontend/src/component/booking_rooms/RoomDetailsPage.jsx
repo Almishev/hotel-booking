@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ApiService from '../../service/ApiService'; // Assuming your service is in a file called ApiService.js
 import DatePicker from 'react-datepicker';
+import { useTranslation } from 'react-i18next';
 // import 'react-datepicker/dist/react-datepicker.css';
 
 const RoomDetailsPage = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate(); // Access the navigate function to navigate
   const { roomId } = useParams(); // Get room ID from URL parameters
   const [roomDetails, setRoomDetails] = useState(null);
@@ -43,14 +45,14 @@ const RoomDetailsPage = () => {
   const handleConfirmBooking = async () => {
     // Check if check-in and check-out dates are selected
     if (!checkInDate || !checkOutDate) {
-      setErrorMessage('Please select check-in and check-out dates.');
+      setErrorMessage(t('rooms.selectCheckIn') + ' / ' + t('rooms.selectCheckOut'));
       setTimeout(() => setErrorMessage(''), 5000); // Clear error message after 5 seconds
       return;
     }
 
     // Check if number of adults and children are valid
     if (isNaN(numAdults) || numAdults < 1 || isNaN(numChildren) || numChildren < 0) {
-      setErrorMessage('Please enter valid numbers for adults and children.');
+      setErrorMessage(t('rooms.booking') + ': ' + t('login.fillAllFields'));
       setTimeout(() => setErrorMessage(''), 5000); // Clear error message after 5 seconds
       return;
     }
@@ -74,24 +76,12 @@ const RoomDetailsPage = () => {
 
   const acceptBooking = async () => {
     try {
-
       // Ensure checkInDate and checkOutDate are Date objects
       const startDate = new Date(checkInDate);
       const endDate = new Date(checkOutDate);
-
-      // Log the original dates for debugging
-      console.log("Original Check-in Date:", startDate);
-      console.log("Original Check-out Date:", endDate);
-
       // Convert dates to YYYY-MM-DD format, adjusting for time zone differences
       const formattedCheckInDate = new Date(startDate.getTime() - (startDate.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
       const formattedCheckOutDate = new Date(endDate.getTime() - (endDate.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
-
-
-      // Log the original dates for debugging
-      console.log("Formated Check-in Date:", formattedCheckInDate);
-      console.log("Formated Check-out Date:", formattedCheckOutDate);
-
       // Create booking object
       const booking = {
         checkInDate: formattedCheckInDate,
@@ -99,9 +89,6 @@ const RoomDetailsPage = () => {
         numOfAdults: numAdults,
         numOfChildren: numChildren
       };
-      console.log(booking)
-      console.log(checkOutDate)
-
       // Make booking
       const response = await ApiService.bookRoom(roomId, userId, booking);
       if (response.statusCode === 200) {
@@ -120,7 +107,7 @@ const RoomDetailsPage = () => {
   };
 
   if (isLoading) {
-    return <p className='room-detail-loading'>Loading room details...</p>;
+    return <p className='room-detail-loading'>{t('rooms.loading')}</p>;
   }
 
   if (error) {
@@ -128,7 +115,7 @@ const RoomDetailsPage = () => {
   }
 
   if (!roomDetails) {
-    return <p className='room-detail-loading'>Room not found.</p>;
+    return <p className='room-detail-loading'>{t('rooms.notFound')}</p>;
   }
 
   const { roomType, roomPrice, roomPhotoUrl, description, bookings } = roomDetails;
@@ -137,7 +124,7 @@ const RoomDetailsPage = () => {
     <div className="room-details-booking">
       {showMessage && (
         <p className="booking-success-message">
-          Booking successful! Confirmation code: {confirmationCode}. An SMS and email of your booking details have been sent to you.
+          {t('rooms.bookingSuccess', { code: confirmationCode })}
         </p>
       )}
       {errorMessage && (
@@ -145,23 +132,23 @@ const RoomDetailsPage = () => {
           {errorMessage}
         </p>
       )}
-      <h2>Room Details</h2>
+      <h2>{t('rooms.roomDetails')}</h2>
       <br />
       <img src={roomPhotoUrl} alt={roomType} className="room-details-image" />
       <div className="room-details-info">
         <h3>{roomType}</h3>
-        <p>Price: ${roomPrice} / night</p>
-        <p>{description}</p>
+        <p>{t('rooms.price')}: ${roomPrice} {t('rooms.perNight')}</p>
+        <p>{t('rooms.description')}: {description}</p>
       </div>
       {bookings && bookings.length > 0 && (
         <div>
-          <h3>Existing Booking Details</h3>
+          <h3>{t('rooms.existingBookings')}</h3>
           <ul className="booking-list">
             {bookings.map((booking, index) => (
               <li key={booking.id} className="booking-item">
-                <span className="booking-number">Booking {index + 1} </span>
-                <span className="booking-text">Check-in: {booking.checkInDate} </span>
-                <span className="booking-text">Out: {booking.checkOutDate}</span>
+                <span className="booking-number">{t('rooms.booking')} {index + 1} </span>
+                <span className="booking-text">{t('rooms.checkIn')}: {booking.checkInDate} </span>
+                <span className="booking-text">{t('rooms.checkOut')}: {booking.checkOutDate}</span>
               </li>
             ))}
           </ul>
@@ -169,8 +156,8 @@ const RoomDetailsPage = () => {
       )}
       <div className="booking-info">
         <div className="book-now-div">
-          <button className="book-now-button" onClick={() => setShowDatePicker(true)}>Book Now</button>
-          <button className="go-back-button" onClick={() => setShowDatePicker(false)}>Go Back</button>
+          <button className="book-now-button" onClick={() => setShowDatePicker(true)}>{t('rooms.bookNow')}</button>
+          <button className="go-back-button" onClick={() => setShowDatePicker(false)}>{t('rooms.goBack')}</button>
         </div>
         {showDatePicker && (
           <div className="date-picker-container">
@@ -181,9 +168,8 @@ const RoomDetailsPage = () => {
               selectsStart
               startDate={checkInDate}
               endDate={checkOutDate}
-              placeholderText="Check-in Date"
+              placeholderText={t('rooms.selectCheckIn')}
               dateFormat="dd/MM/yyyy"
-              // dateFormat="yyyy-MM-dd"
             />
             <DatePicker
               className="detail-search-field"
@@ -193,44 +179,37 @@ const RoomDetailsPage = () => {
               startDate={checkInDate}
               endDate={checkOutDate}
               minDate={checkInDate}
-              placeholderText="Check-out Date"
-              // dateFormat="yyyy-MM-dd"
+              placeholderText={t('rooms.selectCheckOut')}
               dateFormat="dd/MM/yyyy"
             />
-
-            <div className='guest-container'>
-              <div className="guest-div">
-                <label>Adults:</label>
-                <input
-                  type="number"
-                  min="1"
-                  value={numAdults}
-                  onChange={(e) => setNumAdults(parseInt(e.target.value))}
-                />
-              </div>
-              <div className="guest-div">
-                <label>Children:</label>
-                <input
-                  type="number"
-                  min="0"
-                  value={numChildren}
-                  onChange={(e) => setNumChildren(parseInt(e.target.value))}
-                />
-              </div>
-              <button className="confirm-booking" onClick={handleConfirmBooking}>Confirm Booking</button>
+            <div className="guests-inputs">
+              <label>{t('rooms.booking')}:</label>
+              <input
+                type="number"
+                min="1"
+                value={numAdults}
+                onChange={(e) => setNumAdults(Number(e.target.value))}
+                placeholder="Adults"
+              />
+              <input
+                type="number"
+                min="0"
+                value={numChildren}
+                onChange={(e) => setNumChildren(Number(e.target.value))}
+                placeholder="Children"
+              />
             </div>
-          </div>
-        )}
-        {totalPrice > 0 && (
-          <div className="total-price">
-            <p>Total Price: ${totalPrice}</p>
-            <p>Total Guests: {totalGuests}</p>
-            <button onClick={acceptBooking} className="accept-booking">Accept Booking</button>
+            <button className="confirm-booking-button" onClick={handleConfirmBooking}>{t('rooms.bookNow')}</button>
+            <button className="accept-booking-button" onClick={acceptBooking}>{t('rooms.booking')}</button>
+            <div className="total-price-guests">
+              <span>{t('rooms.price')}: ${totalPrice}</span>
+              <span>{t('rooms.booking')}: {totalGuests}</span>
+            </div>
           </div>
         )}
       </div>
     </div>
   );
-};
+}
 
 export default RoomDetailsPage;

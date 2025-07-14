@@ -1,0 +1,6 @@
+/* Центриране на флаговете в мобилното меню */
+.navbar-ul.open .navbar-flags {
+  justify-content: center !important;
+  width: 100%;
+  display: flex !important;
+}

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ApiService from '../../service/ApiService';
-
+import { useTranslation } from 'react-i18next';
 
 const AddRoomPage = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const [roomDetails, setRoomDetails] = useState({
         roomPhotoUrl: '',
@@ -18,7 +19,6 @@ const AddRoomPage = () => {
     const [roomTypes, setRoomTypes] = useState([]);
     const [newRoomType, setNewRoomType] = useState(false);
 
-
     useEffect(() => {
         const fetchRoomTypes = async () => {
             try {
@@ -31,8 +31,6 @@ const AddRoomPage = () => {
         fetchRoomTypes();
     }, []);
 
-
-
     const handleChange = (e) => {
         const { name, value } = e.target;
         setRoomDetails(prevState => ({
@@ -40,7 +38,6 @@ const AddRoomPage = () => {
             [name]: value,
         }));
     };
-
 
     const handleRoomTypeChange = (e) => {
         if (e.target.value === 'new') {
@@ -51,7 +48,6 @@ const AddRoomPage = () => {
             setRoomDetails(prevState => ({ ...prevState, roomType: e.target.value }));
         }
     };
-
 
     const handleFileChange = (e) => {
         const selectedFile = e.target.files[0];
@@ -64,15 +60,14 @@ const AddRoomPage = () => {
         }
     };
 
-
     const addRoom = async () => {
         if (!roomDetails.roomType || !roomDetails.roomPrice || !roomDetails.roomDescription) {
-            setError('All room details must be provided.');
+            setError(t('admin.errorFill'));
             setTimeout(() => setError(''), 5000);
             return;
         }
 
-        if (!window.confirm('Do you want to add this room?')) {
+        if (!window.confirm(t('admin.addRoom') + '?')) {
             return
         }
 
@@ -88,8 +83,7 @@ const AddRoomPage = () => {
 
             const result = await ApiService.addRoom(formData);
             if (result.statusCode === 200) {
-                setSuccess('Room Added successfully.');
-                
+                setSuccess(t('admin.successAdd'));
                 setTimeout(() => {
                     setSuccess('');
                     navigate('/admin/manage-rooms');
@@ -103,7 +97,7 @@ const AddRoomPage = () => {
 
     return (
         <div className="edit-room-container">
-            <h2>Add New Room</h2>
+            <h2>{t('admin.addRoom')}</h2>
             {error && <p className="error-message">{error}</p>}
             {success && <p className="success-message">{success}</p>}
             <div className="edit-room-form">
@@ -119,26 +113,26 @@ const AddRoomPage = () => {
                 </div>
 
                 <div className="form-group">
-                    <label>Room Type</label>
+                    <label>{t('admin.roomType')}</label>
                     <select value={roomDetails.roomType} onChange={handleRoomTypeChange}>
-                        <option value="">Select a room type</option>
+                        <option value="">{t('admin.selectRoomType')}</option>
                         {roomTypes.map(type => (
                             <option key={type} value={type}>{type}</option>
                         ))}
-                        <option value="new">Other (please specify)</option>
+                        <option value="new">{t('admin.otherRoomType')}</option>
                     </select>
                     {newRoomType && (
                         <input
                             type="text"
                             name="roomType"
-                            placeholder="Enter new room type"
+                            placeholder={t('admin.enterNewRoomType')}
                             value={roomDetails.roomType}
                             onChange={handleChange}
                         />
                     )}
                 </div>
                 <div className="form-group">
-                    <label>Room Price</label>
+                    <label>{t('admin.roomPrice')}</label>
                     <input
                         type="text"
                         name="roomPrice"
@@ -147,14 +141,14 @@ const AddRoomPage = () => {
                     />
                 </div>
                 <div className="form-group">
-                    <label>Room Description</label>
+                    <label>{t('admin.roomDescription')}</label>
                     <textarea
                         name="roomDescription"
                         value={roomDetails.roomDescription}
                         onChange={handleChange}
                     ></textarea>
                 </div>
-                <button className="update-button" onClick={addRoom}>Add Room</button>
+                <button className="update-button" onClick={addRoom}>{t('admin.add')}</button>
             </div>
         </div>
     );
