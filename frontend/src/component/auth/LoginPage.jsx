@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate,useLocation } from "react-router-dom";
+import { useNavigate,useLocation, Link } from "react-router-dom";
 import ApiService from "../../service/ApiService";
 import { useTranslation } from 'react-i18next';
 
@@ -62,7 +62,7 @@ function LoginPage() {
             </form>
 
             <p className="register-link">
-                {t('login.noAccount')} <a href="/register">{t('navbar.register')}</a>
+                {t('login.noAccount')} <Link to={"/register"} >{t('navbar.register')}</Link>
             </p>
         </div>
     );
