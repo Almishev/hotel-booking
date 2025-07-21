@@ -38,13 +38,13 @@ function Navbar() {
                 {menuOpen ? '✖' : '☰'}
             </button>
             <ul className={`navbar-ul${menuOpen ? ' open' : ''}`}>
-                <li><NavLink to="/home" activeclassname="active" onClick={handleNavClick}>{t('navbar.home')}</NavLink></li>
-                <li><NavLink to="/rooms" activeclassname="active" onClick={handleNavClick}>{t('navbar.rooms')}</NavLink></li>
-                <li><NavLink to="/find-booking" activeclassname="active" onClick={handleNavClick}>{t('navbar.findBooking')}</NavLink></li>
-                {isUser && <li><NavLink to="/profile" activeclassname="active" onClick={handleNavClick}>{t('navbar.profile')}</NavLink></li>}
-                {isAdmin && <li><NavLink to="/admin" activeclassname="active" onClick={handleNavClick}>{t('navbar.admin')}</NavLink></li>}
-                {!isAuthenticated && <li><NavLink to="/login" activeclassname="active" onClick={handleNavClick}>{t('navbar.login')}</NavLink></li>}
-                {/* {!isAuthenticated && <li><NavLink to="/register" activeclassname="active" onClick={handleNavClick}>{t('navbar.register')}</NavLink></li>} */}
+                <li><NavLink to="/home" activeClassName="active" onClick={handleNavClick}>{t('navbar.home')}</NavLink></li>
+                <li><NavLink to="/rooms" activeClassName="active" onClick={handleNavClick}>{t('navbar.rooms')}</NavLink></li>
+                <li><NavLink to="/find-booking" activeClassName="active" onClick={handleNavClick}>{t('navbar.findBooking')}</NavLink></li>
+                {isUser && <li><NavLink to="/profile" activeClassName="active" onClick={handleNavClick}>{t('navbar.profile')}</NavLink></li>}
+                {isAdmin && <li><NavLink to="/admin" activeClassName="active" onClick={handleNavClick}>{t('navbar.admin')}</NavLink></li>}
+                {!isAuthenticated && <li><NavLink to="/login" activeClassName="active" onClick={handleNavClick}>{t('navbar.login')}</NavLink></li>}
+                {/* {!isAuthenticated && <li><NavLink to="/register" activeClassName="active" onClick={handleNavClick}>{t('navbar.register')}</NavLink></li>} */}
                 {isAuthenticated && <li onClick={() => { handleLogout(); handleNavClick(); }} style={{cursor:'pointer'}}>{t('navbar.logout')}</li>}
                 <li className="navbar-flags" style={{marginLeft: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
                     <span style={{background: i18n.language === 'bg' ? '#e0f2f1' : '#f5f5f5', padding: '2px 6px', borderRadius: 5, border: i18n.language === 'bg' ? '2px solid #00796b' : '1px solid #ccc', display: 'flex', alignItems: 'center', cursor: 'pointer'}} onClick={() => changeLanguage('bg')}>

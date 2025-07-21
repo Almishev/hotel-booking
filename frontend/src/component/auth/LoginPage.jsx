@@ -24,12 +24,16 @@ function LoginPage() {
 
         try {
             const response = await ApiService.loginUser({email, password});
+            console.log("Login response:", response);
             if (response.statusCode === 200) {
+                console.log("Setting token:", response.token);
+                console.log("Setting role:", response.role);
                 localStorage.setItem('token', response.token);
                 localStorage.setItem('role', response.role);
                 navigate(from, { replace: true });
             }
         } catch (error) {
+            console.error("Login error:", error);
             setError(error.response?.data?.message || error.message);
             setTimeout(() => setError(''), 5000);
         }

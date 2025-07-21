@@ -432,7 +432,13 @@ i18n
     fallbackLng: 'bg',
     interpolation: {
       escapeValue: false
+    },
+    debug: true, // Enable debug mode
+    react: {
+      useSuspense: false
     }
   });
+
+console.log("i18n initialized with language:", i18n.language);
 
 export default i18n; 

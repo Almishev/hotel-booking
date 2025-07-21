@@ -12,12 +12,17 @@ const ProfilePage = () => {
     useEffect(() => {
         const fetchUserProfile = async () => {
             try {
+                console.log("Fetching user profile...");
                 const response = await ApiService.getUserProfile();
+                console.log("User profile response:", response);
                 // Fetch user bookings using the fetched user ID
                 const userPlusBookings = await ApiService.getUserBookings(response.user.id);
+                console.log("User bookings response:", userPlusBookings);
                 setUser(userPlusBookings.user)
 
             } catch (error) {
+                console.error("Error fetching profile:", error);
+                console.error("Error response:", error.response);
                 setError(error.response?.data?.message || error.message);
             }
         };

@@ -2,7 +2,7 @@
 
 // src/App.js
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './component/common/Navbar';
 import FooterComponent from './component/common/Footer';
 import LoginPage from './component/auth/LoginPage';
@@ -23,7 +23,7 @@ import { ProtectedRoute, AdminRoute } from './service/guard';
 
 function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <div className="App">
         <Navbar />
         <div className="content">
@@ -72,7 +72,7 @@ function App() {
         </div>
         <FooterComponent />
       </div>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import RoomResult from "../common/RoomResult";
 import RoomSearch from "../common/RoomSearch";
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 
 const HomePage = () => {
     const { t } = useTranslation();
@@ -32,7 +33,7 @@ const HomePage = () => {
             <RoomSearch handleSearchResult={handleSearchResult} />
             <RoomResult roomSearchResults={roomSearchResults} />
 
-            <h4><a className="view-rooms-home" href="/rooms">{t('home.allRooms')}</a></h4>
+            <h4><Link className="view-rooms-home" to="/rooms">{t('home.allRooms')}</Link></h4>
 
             <h2 className="home-services">{t('home.services')} <span className="phegon-color">Phegon Hotel</span></h2>
 

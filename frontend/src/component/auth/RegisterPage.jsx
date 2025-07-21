@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import ApiService from '../../service/ApiService';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 function RegisterPage() {
@@ -88,7 +88,7 @@ function RegisterPage() {
                 <button type="submit">{t('register.submit')}</button>
             </form>
             <p className="register-link">
-                {t('register.alreadyAccount') || 'Already have an account?'} <a href="/login">{t('navbar.login')}</a>
+                {t('register.alreadyAccount') || 'Already have an account?'} <Link to="/login">{t('navbar.login')}</Link>
             </p>
         </div>
     );

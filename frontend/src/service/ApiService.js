@@ -1,6 +1,6 @@
 import axios from "axios"
 
-const BASE_URL = process.env.REACT_APP_API_URL;
+const BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8081";
 
 export default class ApiService {
 
@@ -8,10 +8,13 @@ export default class ApiService {
 
     static getHeader() {
         const token = localStorage.getItem("token");
-        return {
+        console.log("ApiService - Token from localStorage:", token ? token.substring(0, 20) + "..." : "null");
+        const headers = {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json"
         };
+        console.log("ApiService - Request headers:", headers);
+        return headers;
     }
 
     /**AUTH */
@@ -175,20 +178,26 @@ export default class ApiService {
     static logout() {
         localStorage.removeItem('token')
         localStorage.removeItem('role')
+        localStorage.removeItem('jwt') // Clear any old JWT tokens
+        console.log("Logged out - cleared all authentication data")
     }
 
     static isAuthenticated() {
         const token = localStorage.getItem('token')
+        console.log("ApiService - isAuthenticated check:", !!token)
+        console.log("ApiService - Token value:", token ? token.substring(0, 20) + "..." : "null")
         return !!token
     }
 
     static isAdmin() {
         const role = localStorage.getItem('role')
+        console.log("ApiService - isAdmin check:", role === 'ADMIN')
         return role === 'ADMIN'
     }
 
     static isUser() {
         const role = localStorage.getItem('role')
+        console.log("ApiService - isUser check:", role === 'USER')
         return role === 'USER'
     }
 }

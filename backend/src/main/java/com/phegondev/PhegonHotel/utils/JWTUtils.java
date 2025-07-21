@@ -23,34 +23,71 @@ public class JWTUtils {
 
     public JWTUtils() {
         String secreteString = "843567893696976453275974432697R634976R738467TR678T34865R6834R8763T478378637664538745673865783678548735687R3";
-        byte[] keyBytes = Base64.getDecoder().decode(secreteString.getBytes(StandardCharsets.UTF_8));
+        byte[] keyBytes = secreteString.getBytes(StandardCharsets.UTF_8);
         this.Key = new SecretKeySpec(keyBytes, "HmacSHA256");
 
     }
 
     public String generateToken(UserDetails userDetails) {
-        return Jwts.builder()
-                .subject(userDetails.getUsername())
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .signWith(Key)
-                .compact();
+        try {
+            String token = Jwts.builder()
+                    .subject(userDetails.getUsername())
+                    .issuedAt(new Date(System.currentTimeMillis()))
+                    .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                    .signWith(Key)
+                    .compact();
+            System.out.println("JWTUtils - Generated token for user: " + userDetails.getUsername());
+            System.out.println("JWTUtils - Token starts with: " + token.substring(0, Math.min(20, token.length())));
+            return token;
+        } catch (Exception e) {
+            System.out.println("JWTUtils - Error generating token: " + e.getMessage());
+            throw e;
+        }
     }
 
     public String extractUsername(String token) {
-        return extractClaims(token, Claims::getSubject);
+        try {
+            String username = extractClaims(token, Claims::getSubject);
+            System.out.println("JWTUtils - Extracted username: " + username);
+            return username;
+        } catch (Exception e) {
+            System.out.println("JWTUtils - Error extracting username: " + e.getMessage());
+            return null;
+        }
     }
 
     private <T> T extractClaims(String token, Function<Claims, T> claimsTFunction) {
-        return claimsTFunction.apply(Jwts.parser().verifyWith(Key).build().parseSignedClaims(token).getPayload());
+        try {
+            T result = claimsTFunction.apply(Jwts.parser().verifyWith(Key).build().parseSignedClaims(token).getPayload());
+            System.out.println("JWTUtils - Successfully extracted claims");
+            return result;
+        } catch (Exception e) {
+            System.out.println("JWTUtils - Error extracting claims: " + e.getMessage());
+            throw e;
+        }
     }
 
     public boolean isValidToken(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        try {
+            final String username = extractUsername(token);
+            boolean isExpired = isTokenExpired(token);
+            boolean isValid = username.equals(userDetails.getUsername()) && !isExpired;
+            System.out.println("JWTUtils - Token validation: username=" + username + ", expected=" + userDetails.getUsername() + ", expired=" + isExpired + ", valid=" + isValid);
+            return isValid;
+        } catch (Exception e) {
+            System.out.println("JWTUtils - Error validating token: " + e.getMessage());
+            return false;
+        }
     }
 
     private boolean isTokenExpired(String token) {
-        return extractClaims(token, Claims::getExpiration).before(new Date());
+        try {
+            boolean expired = extractClaims(token, Claims::getExpiration).before(new Date());
+            System.out.println("JWTUtils - Token expired check: " + expired);
+            return expired;
+        } catch (Exception e) {
+            System.out.println("JWTUtils - Error checking token expiration: " + e.getMessage());
+            return true; // Consider expired if we can't check
+        }
     }
 }
