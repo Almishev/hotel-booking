@@ -97,8 +97,7 @@ export default class ApiService {
     /* This  gets all availavle by dates rooms from the database with a given date and a room type */
     static async getAvailableRoomsByDateAndType(checkInDate, checkOutDate, roomType) {
         const result = await axios.get(
-            `${this.BASE_URL}/rooms/available-rooms-by-date-and-type?checkInDate=${checkInDate}
-		&checkOutDate=${checkOutDate}&roomType=${roomType}`
+            `${this.BASE_URL}/rooms/available-rooms-by-date-and-type?checkInDate=${checkInDate}&checkOutDate=${checkOutDate}&roomType=${roomType}`
         )
         return result.data
     }

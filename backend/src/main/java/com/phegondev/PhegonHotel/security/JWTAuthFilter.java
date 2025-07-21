@@ -43,6 +43,7 @@ public class JWTAuthFilter extends OncePerRequestFilter {
             requestURI.equals("/rooms/all") ||
             requestURI.equals("/rooms/all-available-rooms") ||
             requestURI.equals("/rooms/types") ||
+            requestURI.equals("/rooms/available-rooms-by-date-and-type") ||
             requestURI.startsWith("/rooms/room-by-id/") ||
             requestURI.startsWith("/bookings/get-by-confirmation-code/") ||
             requestURI.startsWith("/users/get-by-id/") ||

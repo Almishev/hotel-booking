@@ -13,6 +13,19 @@ const ManageBookingsPage = () => {
     const [bookingsPerPage] = useState(6);
     const navigate = useNavigate();
 
+    // Преместено НАД useEffect
+    const filterBookings = useCallback((term) => {
+        if (term === '') {
+            setFilteredBookings(bookings);
+        } else {
+            const filtered = bookings.filter((booking) =>
+                booking.bookingConfirmationCode && booking.bookingConfirmationCode.toLowerCase().includes(term.toLowerCase())
+            );
+            setFilteredBookings(filtered);
+        }
+        setCurrentPage(1);
+    }, [bookings]);
+
     useEffect(() => {
         const fetchBookings = async () => {
             try {
@@ -31,18 +44,6 @@ const ManageBookingsPage = () => {
     useEffect(() => {
         filterBookings(searchTerm);
     }, [searchTerm, bookings, filterBookings]);
-
-    const filterBookings = useCallback((term) => {
-        if (term === '') {
-            setFilteredBookings(bookings);
-        } else {
-            const filtered = bookings.filter((booking) =>
-                booking.bookingConfirmationCode && booking.bookingConfirmationCode.toLowerCase().includes(term.toLowerCase())
-            );
-            setFilteredBookings(filtered);
-        }
-        setCurrentPage(1);
-    }, [bookings]);
 
     const handleSearchChange = (e) => {
         setSearchTerm(e.target.value);
