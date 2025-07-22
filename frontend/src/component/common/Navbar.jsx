@@ -38,12 +38,12 @@ function Navbar() {
                 {menuOpen ? '✖' : '☰'}
             </button>
             <ul className={`navbar-ul${menuOpen ? ' open' : ''}`}>
-                <li><NavLink to="/home" activeClassName="active" onClick={handleNavClick}>{t('navbar.home')}</NavLink></li>
-                <li><NavLink to="/rooms" activeClassName="active" onClick={handleNavClick}>{t('navbar.rooms')}</NavLink></li>
-                <li><NavLink to="/find-booking" activeClassName="active" onClick={handleNavClick}>{t('navbar.findBooking')}</NavLink></li>
-                {isUser && <li><NavLink to="/profile" activeClassName="active" onClick={handleNavClick}>{t('navbar.profile')}</NavLink></li>}
-                {isAdmin && <li><NavLink to="/admin" activeClassName="active" onClick={handleNavClick}>{t('navbar.admin')}</NavLink></li>}
-                {!isAuthenticated && <li><NavLink to="/login" activeClassName="active" onClick={handleNavClick}>{t('navbar.login')}</NavLink></li>}
+                <li><NavLink to="/home" className={({ isActive }) => isActive ? "active" : ""} onClick={handleNavClick}>{t('navbar.home')}</NavLink></li>
+                <li><NavLink to="/rooms" className={({ isActive }) => isActive ? "active" : ""} onClick={handleNavClick}>{t('navbar.rooms')}</NavLink></li>
+                <li><NavLink to="/find-booking" className={({ isActive }) => isActive ? "active" : ""} onClick={handleNavClick}>{t('navbar.findBooking')}</NavLink></li>
+                {isUser && <li><NavLink to="/profile" className={({ isActive }) => isActive ? "active" : ""} onClick={handleNavClick}>{t('navbar.profile')}</NavLink></li>}
+                {isAdmin && <li><NavLink to="/admin" className={({ isActive }) => isActive ? "active" : ""} onClick={handleNavClick}>{t('navbar.admin')}</NavLink></li>}
+                {!isAuthenticated && <li><NavLink to="/login" className={({ isActive }) => isActive ? "active" : ""} onClick={handleNavClick}>{t('navbar.login')}</NavLink></li>}
                 {/* {!isAuthenticated && <li><NavLink to="/register" activeClassName="active" onClick={handleNavClick}>{t('navbar.register')}</NavLink></li>} */}
                 {isAuthenticated && <li onClick={() => { handleLogout(); handleNavClick(); }} style={{cursor:'pointer'}}>{t('navbar.logout')}</li>}
                 <li className="navbar-flags" style={{marginLeft: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem'}}>

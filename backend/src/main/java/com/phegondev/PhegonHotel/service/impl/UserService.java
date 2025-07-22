@@ -180,7 +180,7 @@ public class UserService implements IUserService {
 
         try {
             User user = userRepository.findByEmail(email).orElseThrow(() -> new OurException("User Not Found"));
-            UserDTO userDTO = Utils.mapUserEntityToUserDTO(user);
+            UserDTO userDTO = Utils.mapUserEntityToUserDTOPlusUserBookingsAndRoom(user);
             response.setStatusCode(200);
             response.setMessage("successful");
             response.setUser(userDTO);

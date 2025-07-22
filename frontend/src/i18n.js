@@ -105,7 +105,10 @@ const resources = {
         checkOutDate: 'Дата на освобождаване',
         totalGuests: 'Общ брой гости',
         roomType: 'Тип стая',
-        noBookings: 'Няма намерени резервации.'
+        noBookings: 'Няма намерени резервации.',
+        deleteProfile: 'Изтрий профил',
+        confirmDelete: 'Сигурни ли сте, че искате да изтриете профила си?',
+        name: 'Име',
       },
       admin: {
         welcome: 'Добре дошъл, {{name}}',
@@ -245,7 +248,10 @@ const resources = {
         checkOutDate: 'Ημερομηνία αναχώρησης',
         totalGuests: 'Σύνολο επισκεπτών',
         roomType: 'Τύπος δωματίου',
-        noBookings: 'Δεν βρέθηκαν κρατήσεις.'
+        noBookings: 'Δεν βρέθηκαν κρατήσεις.',
+        deleteProfile: 'Διαγραφή προφίλ',
+        confirmDelete: 'Είστε σίγουροι ότι θέλετε να διαγράψετε το προφίλ σας;',
+        name: 'Όνομα',
       },
       admin: {
         welcome: 'Καλώς ήρθατε, {{name}}',
@@ -385,7 +391,10 @@ const resources = {
         checkOutDate: 'Check-out Date',
         totalGuests: 'Total Guests',
         roomType: 'Room Type',
-        noBookings: 'No bookings found.'
+        noBookings: 'No bookings found.',
+        deleteProfile: 'Delete Profile',
+        confirmDelete: 'Are you sure you want to delete your account?',
+        name: 'Name',
       },
       admin: {
         welcome: 'Welcome, {{name}}',

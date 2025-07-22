@@ -42,13 +42,8 @@ public class UserController {
     @GetMapping("/get-logged-in-profile-info")
     @PreAuthorize("hasAuthority('USER') or hasAuthority('ADMIN')")
     public ResponseEntity<Response> getLoggedInUserProfile() {
-
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
-        System.out.println("UserController - Authentication: " + authentication);
-        System.out.println("UserController - Email: " + email);
-        System.out.println("UserController - Authorities: " + authentication.getAuthorities());
-        Response response = userService.getMyInfo(email);
+        Response response = userService.getMyInfo(authentication.getName());
         return ResponseEntity.status(response.getStatusCode()).body(response);
     }
 

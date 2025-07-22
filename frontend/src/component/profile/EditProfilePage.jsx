@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ApiService from '../../service/ApiService';
+import { useTranslation } from 'react-i18next';
 
 const EditProfilePage = () => {
+    const { t } = useTranslation();
     const [user, setUser] = useState(null);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
@@ -21,7 +23,7 @@ const EditProfilePage = () => {
     }, []);
 
     const handleDeleteProfile = async () => {
-        if (!window.confirm('Are you sure you want to delete your account?')) {
+        if (!window.confirm(t('profile.confirmDelete'))) {
             return;
         }
         try {
@@ -34,14 +36,14 @@ const EditProfilePage = () => {
 
     return (
         <div className="edit-profile-page">
-            <h2>Edit Profile</h2>
+            <h2>{t('profile.editProfile')}</h2>
             {error && <p className="error-message">{error}</p>}
             {user && (
                 <div className="profile-details">
-                    <p><strong>Name:</strong> {user.name}</p>
-                    <p><strong>Email:</strong> {user.email}</p>
-                    <p><strong>Phone Number:</strong> {user.phoneNumber}</p>
-                    <button className="delete-profile-button" onClick={handleDeleteProfile}>Delete Profile</button>
+                    <p><strong>{t('profile.name')}:</strong> {user.name}</p>
+                    <p><strong>{t('profile.email')}:</strong> {user.email}</p>
+                    <p><strong>{t('profile.phoneNumber')}:</strong> {user.phoneNumber}</p>
+                    <button className="delete-profile-button" onClick={handleDeleteProfile}>{t('profile.deleteProfile')}</button>
                 </div>
             )}
         </div>
