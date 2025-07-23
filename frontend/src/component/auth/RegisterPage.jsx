@@ -38,12 +38,12 @@ function RegisterPage() {
             return;
         }
         try {
-            // Call the register method from ApiService
+            
             const response = await ApiService.registerUser(formData);
 
-            // Check if the response is successful
+           
             if (response.statusCode === 200) {
-                // Clear the form fields after successful registration
+                
                 setFormData({
                     name: '',
                     email: '',

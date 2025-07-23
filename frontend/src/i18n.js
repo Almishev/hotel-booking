@@ -138,7 +138,13 @@ const resources = {
         checkInDate: 'Дата на настаняване',
         checkOutDate: 'Дата на освобождаване',
         totalGuests: 'Общ брой гости',
-        manageBooking: 'Управлявай резервация'
+        manageBooking: 'Управлявай резервация',
+        editBooking: 'Редактирай резервация',
+        bookingDetails: 'Детайли за резервацията',
+        bookerDetails: 'Данни за клиента',
+        acheiveBooking: 'Анулирай резервация',
+        confirmAcheive: 'Сигурни ли сте, че искате да анулирате тази резервация?',
+        successAcheive: 'Резервацията беше успешно анулирана!',
       },
       footer: {
         copyright: 'Phegon Hotel | Всички права запазени'
@@ -281,7 +287,13 @@ const resources = {
         checkInDate: 'Ημερομηνία άφιξης',
         checkOutDate: 'Ημερομηνία αναχώρησης',
         totalGuests: 'Σύνολο επισκεπτών',
-        manageBooking: 'Διαχείριση κράτησης'
+        manageBooking: 'Διαχείριση κράτησης',
+        editBooking: 'Επεξεργασία κράτησης',
+        bookingDetails: 'Λεπτομέρειες κράτησης',
+        bookerDetails: 'Στοιχεία πελάτη',
+        acheiveBooking: 'Ακύρωση κράτησης',
+        confirmAcheive: 'Είστε σίγουροι ότι θέλετε να ακυρώσετε αυτήν την κράτηση;',
+        successAcheive: 'Η κράτηση ακυρώθηκε με επιτυχία!',
       },
       footer: {
         copyright: 'Phegon Hotel | Όλα τα δικαιώματα διατηρούνται'
@@ -424,7 +436,13 @@ const resources = {
         checkInDate: 'Check In Date',
         checkOutDate: 'Check out Date',
         totalGuests: 'Total Guests',
-        manageBooking: 'Manage Booking'
+        manageBooking: 'Manage Booking',
+        editBooking: 'Edit Booking',
+        bookingDetails: 'Booking Details',
+        bookerDetails: 'Booker Details',
+        acheiveBooking: 'Cancel Booking',
+        confirmAcheive: 'Are you sure you want to cancel this booking?',
+        successAcheive: 'The booking was successfully cancelled!',
       },
       footer: {
         copyright: 'Phegon Hotel | All Right Reserved'

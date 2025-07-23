@@ -10,7 +10,6 @@ import com.phegondev.PhegonHotel.repo.BookingRepository;
 import com.phegondev.PhegonHotel.repo.RoomRepository;
 import com.phegondev.PhegonHotel.repo.UserRepository;
 import com.phegondev.PhegonHotel.service.interfac.IBookingService;
-import com.phegondev.PhegonHotel.service.interfac.IRoomService;
 import com.phegondev.PhegonHotel.service.EmailService;
 import com.phegondev.PhegonHotel.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +23,6 @@ public class BookingService implements IBookingService {
 
     @Autowired
     private BookingRepository bookingRepository;
-    @Autowired
-    private IRoomService roomService;
     @Autowired
     private RoomRepository roomRepository;
     @Autowired

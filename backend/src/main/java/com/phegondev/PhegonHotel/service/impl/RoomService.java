@@ -4,7 +4,6 @@ import com.phegondev.PhegonHotel.dto.Response;
 import com.phegondev.PhegonHotel.dto.RoomDTO;
 import com.phegondev.PhegonHotel.entity.Room;
 import com.phegondev.PhegonHotel.exception.OurException;
-import com.phegondev.PhegonHotel.repo.BookingRepository;
 import com.phegondev.PhegonHotel.repo.RoomRepository;
 import com.phegondev.PhegonHotel.service.CloudinaryService;
 import com.phegondev.PhegonHotel.service.interfac.IRoomService;
@@ -24,8 +23,6 @@ public class RoomService implements IRoomService {
 
     @Autowired
     private RoomRepository roomRepository;
-    @Autowired
-    private BookingRepository bookingRepository;
     @Autowired
     private CloudinaryService cloudinaryService;
 

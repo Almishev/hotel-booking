@@ -2,7 +2,6 @@ package com.phegondev.PhegonHotel.controller;
 
 
 import com.phegondev.PhegonHotel.dto.Response;
-import com.phegondev.PhegonHotel.service.interfac.IBookingService;
 import com.phegondev.PhegonHotel.service.interfac.IRoomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -21,8 +20,6 @@ public class RoomController {
 
     @Autowired
     private IRoomService roomService;
-    @Autowired
-    private IBookingService iBookingService;
 
 
     @PostMapping("/add")

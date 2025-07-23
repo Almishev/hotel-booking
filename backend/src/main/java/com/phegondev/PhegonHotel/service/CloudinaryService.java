@@ -24,14 +24,20 @@ public class CloudinaryService { // Може да преименуваш на Cl
                 "api_secret", apiSecret));
     }
 
+    @SuppressWarnings("unchecked")
     public String saveImageToCloudinary(MultipartFile photo) {
         try {
-            Map uploadResult = cloudinary.uploader().upload(photo.getBytes(), ObjectUtils.emptyMap());
+            Map<String, Object> uploadResult = cloudinary.uploader().upload(photo.getBytes(), ObjectUtils.emptyMap());
             return uploadResult.get("secure_url").toString();
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException("Unable to upload image to Cloudinary: " + e.getMessage());
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> uploadFile(MultipartFile file) throws IOException {
+        return cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
     }
 }
 
