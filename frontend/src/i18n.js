@@ -71,7 +71,15 @@ const resources = {
         noRooms: 'Няма намерени стаи.',
         loading: 'Зареждане...',
         notFound: 'Стаята не е намерена.',
-        bookingSuccess: 'Успешна резервация! Код за потвърждение: {{code}}. Ще получите SMS и имейл с детайли.'
+        bookingSuccess: 'Успешна резервация! Код за потвърждение: {{code}}. Ще получите SMS и имейл с детайли.',
+        selectDates: 'Избери дати',
+        guests: 'Гости',
+        adults: 'Възрастни',
+        children: 'Деца',
+        totalPrice: 'Обща цена',
+        totalGuests: 'Общ брой гости',
+        confirmBooking: 'Потвърди резервация',
+        noDescription: 'Няма описание'
       },
       findBooking: {
         findBooking: 'Намери резервация',
@@ -220,7 +228,15 @@ const resources = {
         noRooms: 'Δεν βρέθηκαν δωμάτια.',
         loading: 'Φόρτωση...',
         notFound: 'Το δωμάτιο δεν βρέθηκε.',
-        bookingSuccess: 'Επιτυχής κράτηση! Κωδικός επιβεβαίωσης: {{code}}. Θα λάβετε SMS και email με λεπτομέρειες.'
+        bookingSuccess: 'Επιτυχής κράτηση! Κωδικός επιβεβαίωσης: {{code}}. Θα λάβετε SMS και email με λεπτομέρειες.',
+        selectDates: 'Επιλέξτε ημερομηνίες',
+        guests: 'Επισκέπτες',
+        adults: 'Ενήλικες',
+        children: 'Παιδιά',
+        totalPrice: 'Συνολική τιμή',
+        totalGuests: 'Σύνολο επισκεπτών',
+        confirmBooking: 'Επιβεβαίωση κράτησης',
+        noDescription: 'Δεν υπάρχει περιγραφή'
       },
       findBooking: {
         findBooking: 'Εύρεση κράτησης',
@@ -369,7 +385,15 @@ const resources = {
         noRooms: 'No rooms found.',
         loading: 'Loading...',
         notFound: 'Room not found.',
-        bookingSuccess: 'Booking successful! Confirmation code: {{code}}. An SMS and email of your booking details have been sent to you.'
+        bookingSuccess: 'Booking successful! Confirmation code: {{code}}. An SMS and email of your booking details have been sent to you.',
+        selectDates: 'Select Dates',
+        guests: 'Guests',
+        adults: 'Adults',
+        children: 'Children',
+        totalPrice: 'Total Price',
+        totalGuests: 'Total Guests',
+        confirmBooking: 'Confirm Booking',
+        noDescription: 'No description available'
       },
       findBooking: {
         findBooking: 'Find Booking',

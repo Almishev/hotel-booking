@@ -41,8 +41,28 @@ const RoomDetailsPage = () => {
     fetchData();
   }, [roomId]); // Re-run effect when roomId changes
 
+  // Calculate price and guests whenever dates or guest numbers change
+  useEffect(() => {
+    if (checkInDate && checkOutDate && roomDetails) {
+      // Calculate total number of days
+      const oneDay = 24 * 60 * 60 * 1000; // hours * minutes * seconds * milliseconds
+      const startDate = new Date(checkInDate);
+      const endDate = new Date(checkOutDate);
+      const totalDays = Math.round(Math.abs((endDate - startDate) / oneDay)) + 1;
 
-  const handleConfirmBooking = async () => {
+      // Calculate total number of guests
+      const totalGuests = numAdults + numChildren;
+
+      // Calculate total price
+      const roomPricePerNight = roomDetails.roomPrice;
+      const totalPrice = roomPricePerNight * totalDays;
+
+      setTotalPrice(totalPrice);
+      setTotalGuests(totalGuests);
+    }
+  }, [checkInDate, checkOutDate, numAdults, numChildren, roomDetails]);
+
+  const acceptBooking = async () => {
     // Check if check-in and check-out dates are selected
     if (!checkInDate || !checkOutDate) {
       setErrorMessage(t('rooms.selectCheckIn') + ' / ' + t('rooms.selectCheckOut'));
@@ -57,24 +77,6 @@ const RoomDetailsPage = () => {
       return;
     }
 
-    // Calculate total number of days
-    const oneDay = 24 * 60 * 60 * 1000; // hours * minutes * seconds * milliseconds
-    const startDate = new Date(checkInDate);
-    const endDate = new Date(checkOutDate);
-    const totalDays = Math.round(Math.abs((endDate - startDate) / oneDay)) + 1;
-
-    // Calculate total number of guests
-    const totalGuests = numAdults + numChildren;
-
-    // Calculate total price
-    const roomPricePerNight = roomDetails.roomPrice;
-    const totalPrice = roomPricePerNight * totalDays;
-
-    setTotalPrice(totalPrice);
-    setTotalGuests(totalGuests);
-  };
-
-  const acceptBooking = async () => {
     try {
       // Ensure checkInDate and checkOutDate are Date objects
       const startDate = new Date(checkInDate);
@@ -118,7 +120,7 @@ const RoomDetailsPage = () => {
     return <p className='room-detail-loading'>{t('rooms.notFound')}</p>;
   }
 
-  const { roomType, roomPrice, roomPhotoUrl, description, bookings } = roomDetails;
+  const { roomType, roomPrice, roomPhotoUrl, roomDescription, bookings } = roomDetails;
 
   return (
     <div className="room-details-booking">
@@ -138,7 +140,11 @@ const RoomDetailsPage = () => {
       <div className="room-details-info">
         <h3>{roomType}</h3>
         <p>{t('rooms.price')}: ${roomPrice} {t('rooms.perNight')}</p>
-        <p>{t('rooms.description')}: {description}</p>
+        {roomDescription && roomDescription.trim() !== '' ? (
+          <p><strong>{t('rooms.description')}:</strong> {roomDescription}</p>
+        ) : (
+          <p><strong>{t('rooms.description')}:</strong> <em>{t('rooms.noDescription')}</em></p>
+        )}
       </div>
       {bookings && bookings.length > 0 && (
         <div>
@@ -161,50 +167,71 @@ const RoomDetailsPage = () => {
         </div>
         {showDatePicker && (
           <div className="date-picker-container">
-            <DatePicker
-              className="detail-search-field"
-              selected={checkInDate}
-              onChange={(date) => setCheckInDate(date)}
-              selectsStart
-              startDate={checkInDate}
-              endDate={checkOutDate}
-              placeholderText={t('rooms.selectCheckIn')}
-              dateFormat="dd/MM/yyyy"
-            />
-            <DatePicker
-              className="detail-search-field"
-              selected={checkOutDate}
-              onChange={(date) => setCheckOutDate(date)}
-              selectsEnd
-              startDate={checkInDate}
-              endDate={checkOutDate}
-              minDate={checkInDate}
-              placeholderText={t('rooms.selectCheckOut')}
-              dateFormat="dd/MM/yyyy"
-            />
-            <div className="guests-inputs">
-              <label>{t('rooms.booking')}:</label>
-              <input
-                type="number"
-                min="1"
-                value={numAdults}
-                onChange={(e) => setNumAdults(Number(e.target.value))}
-                placeholder="Adults"
-              />
-              <input
-                type="number"
-                min="0"
-                value={numChildren}
-                onChange={(e) => setNumChildren(Number(e.target.value))}
-                placeholder="Children"
-              />
+            <div className="booking-form-section">
+              <h4>{t('rooms.selectDates')}</h4>
+              <div className="date-inputs">
+                <DatePicker
+                  className="detail-search-field"
+                  selected={checkInDate}
+                  onChange={(date) => setCheckInDate(date)}
+                  selectsStart
+                  startDate={checkInDate}
+                  endDate={checkOutDate}
+                  placeholderText={t('rooms.selectCheckIn')}
+                  dateFormat="dd/MM/yyyy"
+                  minDate={new Date()}
+                />
+                <DatePicker
+                  className="detail-search-field"
+                  selected={checkOutDate}
+                  onChange={(date) => setCheckOutDate(date)}
+                  selectsEnd
+                  startDate={checkInDate}
+                  endDate={checkOutDate}
+                  minDate={checkInDate}
+                  placeholderText={t('rooms.selectCheckOut')}
+                  dateFormat="dd/MM/yyyy"
+                />
+              </div>
             </div>
-            <button className="confirm-booking-button" onClick={handleConfirmBooking}>{t('rooms.bookNow')}</button>
-            <button className="accept-booking-button" onClick={acceptBooking}>{t('rooms.booking')}</button>
-            <div className="total-price-guests">
-              <span>{t('rooms.price')}: ${totalPrice}</span>
-              <span>{t('rooms.booking')}: {totalGuests}</span>
+            
+            <div className="booking-form-section">
+              <h4>{t('rooms.guests')}</h4>
+              <div className="guests-inputs">
+                <div className="guest-input-group">
+                  <label>{t('rooms.adults')}:</label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={numAdults}
+                    onChange={(e) => setNumAdults(Number(e.target.value))}
+                    placeholder="1"
+                  />
+                </div>
+                <div className="guest-input-group">
+                  <label>{t('rooms.children')}:</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={numChildren}
+                    onChange={(e) => setNumChildren(Number(e.target.value))}
+                    placeholder="0"
+                  />
+                </div>
+              </div>
             </div>
+
+            {(checkInDate && checkOutDate) && (
+              <div className="booking-summary">
+                <div className="total-price-guests">
+                  <span className="price-display">{t('rooms.totalPrice')}: ${totalPrice}</span>
+                  <span className="guests-display">{t('rooms.totalGuests')}: {totalGuests}</span>
+                </div>
+                <button className="confirm-booking-button" onClick={acceptBooking}>
+                  {t('rooms.confirmBooking')}
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>
