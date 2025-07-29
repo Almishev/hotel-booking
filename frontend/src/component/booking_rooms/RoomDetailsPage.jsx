@@ -203,14 +203,14 @@ const RoomDetailsPage = () => {
                 <div className="guest-input-group">
                   <label>{t('rooms.adults')}:</label>
                   <input
-                    type="text"
-                    inputMode="numeric"
-                    pattern="[0-9]*"
+                    type="number"
+                    min="1"
+                    max="10"
                     value={numAdults}
                     onChange={(e) => {
-                      const value = e.target.value;
-                      if (value === '' || (parseInt(value) >= 1 && parseInt(value) <= 10)) {
-                        setNumAdults(value === '' ? 1 : parseInt(value));
+                      const value = parseInt(e.target.value) || 1;
+                      if (value >= 1 && value <= 10) {
+                        setNumAdults(value);
                       }
                     }}
                     placeholder="1"
@@ -219,14 +219,14 @@ const RoomDetailsPage = () => {
                 <div className="guest-input-group">
                   <label>{t('rooms.children')}:</label>
                   <input
-                    type="text"
-                    inputMode="numeric"
-                    pattern="[0-9]*"
+                    type="number"
+                    min="0"
+                    max="10"
                     value={numChildren}
                     onChange={(e) => {
-                      const value = e.target.value;
-                      if (value === '' || (parseInt(value) >= 0 && parseInt(value) <= 10)) {
-                        setNumChildren(value === '' ? 0 : parseInt(value));
+                      const value = parseInt(e.target.value) || 0;
+                      if (value >= 0 && value <= 10) {
+                        setNumChildren(value);
                       }
                     }}
                     placeholder="0"
