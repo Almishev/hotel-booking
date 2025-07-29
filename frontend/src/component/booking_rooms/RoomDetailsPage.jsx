@@ -171,7 +171,7 @@ const RoomDetailsPage = () => {
               <h4>{t('rooms.selectDates')}</h4>
               <div className="date-inputs">
                 <DatePicker
-                  className="detail-search-field"
+                  className="detail-search-field datepicker-input"
                   selected={checkInDate}
                   onChange={(date) => setCheckInDate(date)}
                   selectsStart
@@ -180,9 +180,10 @@ const RoomDetailsPage = () => {
                   placeholderText={t('rooms.selectCheckIn')}
                   dateFormat="dd/MM/yyyy"
                   minDate={new Date()}
+                  wrapperClassName="datepicker-wrapper"
                 />
                 <DatePicker
-                  className="detail-search-field"
+                  className="detail-search-field datepicker-input"
                   selected={checkOutDate}
                   onChange={(date) => setCheckOutDate(date)}
                   selectsEnd
@@ -191,6 +192,7 @@ const RoomDetailsPage = () => {
                   minDate={checkInDate}
                   placeholderText={t('rooms.selectCheckOut')}
                   dateFormat="dd/MM/yyyy"
+                  wrapperClassName="datepicker-wrapper"
                 />
               </div>
             </div>
@@ -201,20 +203,32 @@ const RoomDetailsPage = () => {
                 <div className="guest-input-group">
                   <label>{t('rooms.adults')}:</label>
                   <input
-                    type="number"
-                    min="1"
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     value={numAdults}
-                    onChange={(e) => setNumAdults(Number(e.target.value))}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value === '' || (parseInt(value) >= 1 && parseInt(value) <= 10)) {
+                        setNumAdults(value === '' ? 1 : parseInt(value));
+                      }
+                    }}
                     placeholder="1"
                   />
                 </div>
                 <div className="guest-input-group">
                   <label>{t('rooms.children')}:</label>
                   <input
-                    type="number"
-                    min="0"
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     value={numChildren}
-                    onChange={(e) => setNumChildren(Number(e.target.value))}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value === '' || (parseInt(value) >= 0 && parseInt(value) <= 10)) {
+                        setNumChildren(value === '' ? 0 : parseInt(value));
+                      }
+                    }}
                     placeholder="0"
                   />
                 </div>

@@ -77,7 +77,12 @@ const ManageBookingsPage = () => {
 
     // Filter bookings
     const filterBookings = () => {
-        console.log('filterBookings called with:', { bookings: bookings.length, filters });
+        console.log('filterBookings called with:', { 
+            bookings: bookings.length, 
+            filters,
+            hasBookings: bookings.length > 0,
+            firstBooking: bookings[0]
+        });
         let filtered = [...bookings];
 
         // Search by booking code
@@ -136,6 +141,7 @@ const ManageBookingsPage = () => {
         }
 
         console.log('Filtered result:', filtered.length);
+        console.log('Setting filteredBookings to:', filtered);
         setFilteredBookings(filtered);
         setCurrentPage(1);
     };
@@ -180,6 +186,11 @@ const ManageBookingsPage = () => {
 
     // Export data
     const exportData = () => {
+        if (!filteredBookings || filteredBookings.length === 0) {
+            alert('No data to export. Please apply filters or wait for data to load.');
+            return;
+        }
+
         const data = filteredBookings.map(booking => ({
             'Booking Code': booking.bookingConfirmationCode,
             'Guest Name': booking.user?.name || 'N/A',
@@ -192,6 +203,11 @@ const ManageBookingsPage = () => {
             'Room Type': booking.room?.roomType || 'N/A',
             'Status': getBookingStatus(booking)
         }));
+
+        if (data.length === 0) {
+            alert('No data to export.');
+            return;
+        }
 
         const csvContent = "data:text/csv;charset=utf-8," 
             + Object.keys(data[0]).join(",") + "\n"
@@ -257,6 +273,11 @@ const ManageBookingsPage = () => {
     }, [calculateStats]);
 
     useEffect(() => {
+        console.log('useEffect triggered:', { 
+            bookingsLength: bookings.length, 
+            filters,
+            hasBookings: bookings.length > 0 
+        });
         if (bookings.length > 0) {
             filterBookings();
         }
