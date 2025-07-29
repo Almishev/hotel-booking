@@ -27,7 +27,8 @@ const resources = {
         parking: 'Паркинг',
         parkingDesc: 'На разположение е паркинг. Попитайте за възможност за валет паркиране.',
         wifi: 'WiFi',
-        wifiDesc: 'Безплатен високоскоростен Wi-Fi във всички стаи и общи части.'
+        wifiDesc: 'Безплатен високоскоростен Wi-Fi във всички стаи и общи части.',
+        checkAvailability: 'Провери за наличност'
       },
       login: {
         title: 'Вход',
@@ -153,6 +154,36 @@ const resources = {
         acheiveBooking: 'Анулирай резервация',
         confirmAcheive: 'Сигурни ли сте, че искате да анулирате тази резервация?',
         successAcheive: 'Резервацията беше успешно анулирана!',
+        dashboardTitle: 'Админски Дашбоард',
+        totalBookings: 'Общо резервации',
+        totalRevenue: 'Общо приходи',
+        activeBookings: 'Активни резервации',
+        analytics: 'Анализи',
+        dateFrom: 'Дата от',
+        dateTo: 'Дата до',
+        periodBookings: 'Резервации за периода',
+        periodAdults: 'Възрастни за периода',
+        periodChildren: 'Деца за периода',
+        periodTotalGuests: 'Общо гости за периода',
+        filters: 'Филтри',
+        search: 'Търсене',
+        searchPlaceholder: 'Търси по код на резервация, име на гост или имейл',
+        allRoomTypes: 'Всички типове стаи',
+        guestCount: 'Брой гости',
+        allGuests: 'Всички гости',
+        status: 'Статус',
+        allStatuses: 'Всички статуси',
+        active: 'Активни',
+        current: 'Текущи',
+        completed: 'Завършени',
+        exportData: 'Експорт на данни',
+        bookingsList: 'Списък с резервации',
+        guestName: 'Име на гост',
+        guests: 'Гости',
+        actions: 'Действия',
+        manage: 'Управлявай',
+        adults: 'Възрастни',
+        children: 'Деца'
       },
       footer: {
         copyright: 'Phegon Hotel | Всички права запазени'
@@ -184,7 +215,8 @@ const resources = {
         parking: 'Πάρκινγκ',
         parkingDesc: 'Διατίθεται πάρκινγκ. Ρωτήστε για υπηρεσία παρκαδόρου.',
         wifi: 'WiFi',
-        wifiDesc: 'Δωρεάν υψηλής ταχύτητας Wi-Fi σε όλα τα δωμάτια και τους κοινόχρηστους χώρους.'
+        wifiDesc: 'Δωρεάν υψηλής ταχύτητας Wi-Fi σε όλα τα δωμάτια και τους κοινόχρηστους χώρους.',
+        checkAvailability: 'Ελέγξτε διαθεσιμότητα'
       },
       login: {
         title: 'Είσοδος',
@@ -310,6 +342,36 @@ const resources = {
         acheiveBooking: 'Ακύρωση κράτησης',
         confirmAcheive: 'Είστε σίγουροι ότι θέλετε να ακυρώσετε αυτήν την κράτηση;',
         successAcheive: 'Η κράτηση ακυρώθηκε με επιτυχία!',
+        dashboardTitle: 'Πίνακας Διαχείρισης',
+        totalBookings: 'Σύνολο Κρατήσεων',
+        totalRevenue: 'Σύνολο Εσόδων',
+        activeBookings: 'Ενεργές Κρατήσεις',
+        analytics: 'Αναλυτικά',
+        dateFrom: 'Ημερομηνία από',
+        dateTo: 'Ημερομηνία έως',
+        periodBookings: 'Κρατήσεις Περιόδου',
+        periodAdults: 'Ενήλικοι Περιόδου',
+        periodChildren: 'Παιδιά Περιόδου',
+        periodTotalGuests: 'Σύνολο Επισκεπτών Περιόδου',
+        filters: 'Φίλτρα',
+        search: 'Αναζήτηση',
+        searchPlaceholder: 'Αναζήτηση με κωδικό κράτησης, όνομα επισκέπτη ή email',
+        allRoomTypes: 'Όλοι οι Τύποι Δωματίων',
+        guestCount: 'Αριθμός Επισκεπτών',
+        allGuests: 'Όλοι οι Επισκέπτες',
+        status: 'Κατάσταση',
+        allStatuses: 'Όλες οι Καταστάσεις',
+        active: 'Ενεργές',
+        current: 'Τρέχουσες',
+        completed: 'Ολοκληρωμένες',
+        exportData: 'Εξαγωγή Δεδομένων',
+        bookingsList: 'Λίστα Κρατήσεων',
+        guestName: 'Όνομα Επισκέπτη',
+        guests: 'Επισκέπτες',
+        actions: 'Ενέργειες',
+        manage: 'Διαχείριση',
+        adults: 'Ενήλικοι',
+        children: 'Παιδιά'
       },
       footer: {
         copyright: 'Phegon Hotel | Όλα τα δικαιώματα διατηρούνται'
@@ -341,7 +403,8 @@ const resources = {
         parking: 'Parking',
         parkingDesc: 'We offer on-site parking for your convenience. Please inquire about valet parking options if available.',
         wifi: 'WiFi',
-        wifiDesc: 'Stay connected throughout your stay with complimentary high-speed Wi-Fi access available in all guest rooms and public areas.'
+        wifiDesc: 'Stay connected throughout your stay with complimentary high-speed Wi-Fi access available in all guest rooms and public areas.',
+        checkAvailability: 'Check Availability'
       },
       login: {
         title: 'Login',
@@ -467,6 +530,37 @@ const resources = {
         acheiveBooking: 'Cancel Booking',
         confirmAcheive: 'Are you sure you want to cancel this booking?',
         successAcheive: 'The booking was successfully cancelled!',
+        dashboardTitle: 'Admin Dashboard',
+        totalBookings: 'Total Bookings',
+        totalRevenue: 'Total Revenue',
+        activeBookings: 'Active Bookings',
+        analytics: 'Analytics',
+        dateFrom: 'Date From',
+        dateTo: 'Date To',
+        periodBookings: 'Period Bookings',
+        periodAdults: 'Period Adults',
+        periodChildren: 'Period Children',
+        periodTotalGuests: 'Period Total Guests',
+        filters: 'Filters',
+        search: 'Search',
+        searchPlaceholder: 'Search by booking code, guest name or email',
+        allRoomTypes: 'All Room Types',
+        guestCount: 'Guest Count',
+        allGuests: 'All Guests',
+        status: 'Status',
+        allStatuses: 'All Statuses',
+        active: 'Active',
+        current: 'Current',
+        completed: 'Completed',
+        exportData: 'Export Data',
+        bookingsList: 'Bookings List',
+        bookingCode: 'Booking Code',
+        guestName: 'Guest Name',
+        guests: 'Guests',
+        actions: 'Actions',
+        manage: 'Manage',
+        adults: 'Adults',
+        children: 'Children'
       },
       footer: {
         copyright: 'Phegon Hotel | All Right Reserved'
@@ -479,17 +573,17 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: 'bg',
-    fallbackLng: 'bg',
+    lng: 'en',
+    fallbackLng: 'en',
     interpolation: {
       escapeValue: false
     },
-    debug: true, // Enable debug mode
+    debug: false,
     react: {
       useSuspense: false
     }
   });
 
-console.log("i18n initialized with language:", i18n.language);
+
 
 export default i18n; 

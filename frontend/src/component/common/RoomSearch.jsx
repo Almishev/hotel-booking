@@ -72,6 +72,7 @@ const RoomSearch = ({ handleSearchResult }) => {
 
   return (
     <section>
+      <h3 className="search-section-title">{t('home.checkAvailability')}</h3>
       <div className="search-container">
         <div className="search-field">
           <label>{t('rooms.selectCheckIn')}</label>

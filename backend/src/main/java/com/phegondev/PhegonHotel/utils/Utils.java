@@ -130,7 +130,7 @@ public class Utils {
     }
 
     public static List<BookingDTO> mapBookingListEntityToBookingListDTO(List<Booking> bookingList) {
-        return bookingList.stream().map(Utils::mapBookingEntityToBookingDTO).collect(Collectors.toList());
+        return bookingList.stream().map(booking -> mapBookingEntityToBookingDTOPlusBookedRooms(booking, true)).collect(Collectors.toList());
     }
 
 
