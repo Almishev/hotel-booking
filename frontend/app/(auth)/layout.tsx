@@ -1,9 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: {
-    default: "Authentication",
-  },
+  title: "Authentication",
   robots: {
     index: false,
     follow: false,
