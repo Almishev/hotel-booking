@@ -554,7 +554,6 @@ const resources = {
         completed: 'Completed',
         exportData: 'Export Data',
         bookingsList: 'Bookings List',
-        bookingCode: 'Booking Code',
         guestName: 'Guest Name',
         guests: 'Guests',
         actions: 'Actions',
