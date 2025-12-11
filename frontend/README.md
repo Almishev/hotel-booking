@@ -1,70 +1,130 @@
-# Getting Started with Create React App
+# Phegon Hotel - Next.js Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This is the Next.js version of the Phegon Hotel booking system, migrated from React.js.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- **Multi-language support**: Bulgarian, Greek, and English
+- **User authentication**: Login and registration
+- **Room management**: Browse, search, and book rooms
+- **Admin panel**: Manage rooms and bookings
+- **Protected routes**: User and admin route protection
+- **Responsive design**: Mobile-friendly interface
 
-### `npm start`
+## Project Structure
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+```
+app/
+├── (auth)/          # Authentication pages
+│   ├── login/
+│   └── register/
+├── (public)/        # Public pages
+│   ├── home/
+│   ├── rooms/
+│   └── find-booking/
+├── (protected)/     # Protected user pages
+│   ├── profile/
+│   └── room-details-book/[roomId]/
+└── (admin)/         # Admin pages
+    └── admin/
+        ├── manage-rooms/
+        ├── manage-bookings/
+        ├── add-room/
+        ├── edit-room/[roomId]/
+        └── edit-booking/[bookingCode]/
+```
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Getting Started
 
-### `npm test`
+### Prerequisites
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- Node.js >= 16.0.0
+- npm >= 8.0.0
 
-### `npm run build`
+### Installation
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+1. Install dependencies:
+```bash
+npm install
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+2. Create a `.env.local` file:
+```bash
+cp .env.example .env.local
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+3. Update the API URL in `.env.local` if needed:
+```
+NEXT_PUBLIC_API_URL=http://localhost:8081
+```
 
-### `npm run eject`
+### Development
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Run the development server:
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```bash
+npm run dev
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### Build
 
-## Learn More
+Build for production:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```bash
+npm run build
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Start production server:
 
-### Code Splitting
+```bash
+npm start
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## Technologies Used
 
-### Analyzing the Bundle Size
+- **Next.js 16** - React framework with App Router
+- **TypeScript** - Type safety
+- **Tailwind CSS** - Utility-first CSS framework
+- **i18next** - Internationalization
+- **Axios** - HTTP client
+- **react-datepicker** - Date picker component
+- **date-fns** - Date utilities
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## API Integration
 
-### Making a Progressive Web App
+The application connects to a backend API. Configure the API URL in `.env.local`:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+```
+NEXT_PUBLIC_API_URL=http://localhost:8081
+```
 
-### Advanced Configuration
+## Route Groups
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+This project uses Next.js route groups:
+- `(auth)` - Authentication routes
+- `(public)` - Public routes
+- `(protected)` - Protected user routes
+- `(admin)` - Admin routes
 
-### Deployment
+Route groups are used for organization and don't affect the URL structure.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+## Authentication
 
-### `npm run build` fails to minify
+- User authentication is handled via JWT tokens stored in localStorage
+- Protected routes use the `ProtectedRoute` component
+- Admin routes use the `AdminRoute` component
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## Internationalization
+
+The app supports three languages:
+- English (en) - Default
+- Bulgarian (bg)
+- Greek (el)
+
+Language can be changed via the language selector in the navbar.
+
+## License
+
+Private project - All rights reserved

@@ -1,0 +1,34 @@
+'use client';
+
+interface PaginationProps {
+  roomsPerPage: number;
+  totalRooms: number;
+  currentPage: number;
+  paginate: (pageNumber: number) => void;
+}
+
+export default function Pagination({ roomsPerPage, totalRooms, currentPage, paginate }: PaginationProps) {
+  const pageNumbers = [];
+
+  for (let i = 1; i <= Math.ceil(totalRooms / roomsPerPage); i++) {
+    pageNumbers.push(i);
+  }
+
+  return (
+    <div className='pagination-nav'>
+      <ul className="pagination-ul">
+        {pageNumbers.map((number) => (
+          <li key={number} className="pagination-li">
+            <button 
+              onClick={() => paginate(number)} 
+              className={`pagination-button ${currentPage === number ? 'current-page' : ''}`}
+            >
+              {number}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
