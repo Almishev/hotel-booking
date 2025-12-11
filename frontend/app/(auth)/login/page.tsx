@@ -1,13 +1,13 @@
 'use client';
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import ApiService from "@/lib/service/ApiService";
 import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
 import '@/lib/i18n';
 
-export default function LoginPage() {
+function LoginForm() {
     const { t } = useTranslation();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -82,6 +82,18 @@ export default function LoginPage() {
                 {t('login.noAccount')} <Link href="/register">{t('navbar.register')}</Link>
             </p>
         </div>
+    );
+}
+
+export default function LoginPage() {
+    return (
+        <Suspense fallback={
+            <div className="auth-container">
+                <h2>Loading...</h2>
+            </div>
+        }>
+            <LoginForm />
+        </Suspense>
     );
 }
 
