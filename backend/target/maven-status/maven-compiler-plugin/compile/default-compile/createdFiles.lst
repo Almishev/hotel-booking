@@ -1,6 +1,5 @@
 com\phegondev\PhegonHotel\service\CloudinaryService.class
 com\phegondev\PhegonHotel\controller\AuthController.class
-com\phegondev\PhegonHotel\security\CorsConfig$1.class
 com\phegondev\PhegonHotel\exception\OurException.class
 com\phegondev\PhegonHotel\service\CustomUserDetailsService.class
 com\phegondev\PhegonHotel\controller\UserController.class
