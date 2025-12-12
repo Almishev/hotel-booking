@@ -11,6 +11,7 @@ import com.phegondev.PhegonHotel.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
@@ -56,6 +57,7 @@ public class RoomService implements IRoomService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Response getAllRooms() {
         Response response = new Response();
 
@@ -68,7 +70,7 @@ public class RoomService implements IRoomService {
 
         } catch (Exception e) {
             response.setStatusCode(500);
-            response.setMessage("Error saving a room " + e.getMessage());
+            response.setMessage("Error fetching rooms: " + e.getMessage());
         }
         return response;
     }

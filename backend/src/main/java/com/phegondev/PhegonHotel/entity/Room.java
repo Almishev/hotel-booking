@@ -4,12 +4,16 @@ package com.phegondev.PhegonHotel.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
+import lombok.EqualsAndHashCode;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 @Data
+@ToString(exclude = "bookings")
+@EqualsAndHashCode(exclude = "bookings")
 @Entity
 @Table(name = "rooms")
 public class Room {
@@ -27,16 +31,4 @@ public class Room {
     @OneToMany(mappedBy = "room", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Booking> bookings = new ArrayList<>();
-
-
-    @Override
-    public String toString() {
-        return "Room{" +
-                "id=" + id +
-                ", roomType='" + roomType + '\'' +
-                ", roomPrice=" + roomPrice +
-                ", roomPhotoUrl='" + roomPhotoUrl + '\'' +
-                ", roomDescription='" + roomDescription + '\'' +
-                '}';
-    }
 }
