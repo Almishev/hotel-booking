@@ -15,7 +15,7 @@ public class CorsConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of(
-                "https://hotel-booking-frontend-pzau.onrender.com",
+                "https://hotel-booking-frontend-cbk1.onrender.com",
                 "http://localhost:3000",
                 "http://127.0.0.1:3000"
         ));
