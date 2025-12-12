@@ -86,42 +86,46 @@ SPRING_MAIL_PASSWORD=ylnppaqssnyjftcc
 
 ## 🌐 Стъпка 3: Deploy Frontend в Render
 
-### 3.1 Създаване на Static Site или Web Service
+### 3.1 Създаване на Web Service (Задължително за Next.js)
 
-**Опция A: Static Site (Препоръчително)**
-- По-бързо и по-евтино
-- Подходящо за React приложения
+**Важно:** Next.js приложенията **ТРЯБВА** да се deploy-ват като **Web Service**, не като Static Site, защото използват server-side rendering и нуждаят от Node.js сървър.
 
-**Опция B: Web Service**
-- Ако имате нужда от server-side rendering
-- По-скъпо
-
-### 3.2 Настройки за Static Site
+### 3.2 Настройки за Web Service
 
 1. Отидете в [Render Dashboard](https://dashboard.render.com)
-2. Кликнете **New** → **Static Site**
+2. Кликнете **New** → **Web Service**
 3. Свържете вашия GitHub repository
 4. Изберете `frontend` директорията като **Root Directory**
 
 **Настройки:**
-- **Name**: `phegon-hotel-frontend`
+- **Name**: `phegon-hotel-frontend` (или каквото предпочитате)
+- **Environment**: `Node`
 - **Build Command**: `npm install && npm run build`
-- **Publish Directory**: `build`
+- **Start Command**: `npm start`
+
+**Важно:** 
+- Уверете се, че използвате **Web Service**, не Static Site
+- `next.config.ts` трябва да има `output: 'standalone'` (вече е добавено)
+- Start командата трябва да е `npm start`, което стартира `next start`
 
 ### 3.3 Environment Variables за Frontend
 
-Добавете environment variable:
+Добавете environment variables:
 
 ```
-REACT_APP_API_URL=https://phegon-hotel-backend.onrender.com
+NEXT_PUBLIC_API_URL=https://phegon-hotel-backend.onrender.com
+PORT=10000
 ```
 
-**Важно:** Заменете с вашия backend URL от Стъпка 2.4
+**Важно:** 
+- Заменете `NEXT_PUBLIC_API_URL` с вашия backend URL от Стъпка 2.4
+- `PORT` трябва да е `10000` за Render (или каквото Render назначи)
+- Next.js използва `NEXT_PUBLIC_` prefix за client-side environment variables
 
 ### 3.4 Deploy
 
-1. Кликнете **Create Static Site**
-2. Изчакайте build процеса
+1. Кликнете **Create Web Service**
+2. Изчакайте build и deploy процеса
 3. Запишете URL-а на frontend (напр. `https://phegon-hotel-frontend.onrender.com`)
 
 ## 🔒 Стъпка 4: Обновяване на CORS
