@@ -521,9 +521,16 @@ p {
 }
 
 .error-message {
-    color: red;
+    color: #d32f2f;
     text-align: center;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
+    font-size: 1.3rem;
+    font-weight: 700;
+    padding: 12px 20px;
+    background-color: #ffebee;
+    border: 2px solid #d32f2f;
+    border-radius: 8px;
+    margin-top: 10px;
 }
 
 .success-message {

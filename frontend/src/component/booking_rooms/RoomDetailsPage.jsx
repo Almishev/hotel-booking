@@ -44,18 +44,19 @@ const RoomDetailsPage = () => {
   // Calculate price and guests whenever dates or guest numbers change
   useEffect(() => {
     if (checkInDate && checkOutDate && roomDetails) {
-      // Calculate total number of days
+      // Calculate total number of nights (not days) - check-in to check-out
+      // Example: 24/12 to 26/12 = 2 nights (24-25 and 25-26)
       const oneDay = 24 * 60 * 60 * 1000; // hours * minutes * seconds * milliseconds
       const startDate = new Date(checkInDate);
       const endDate = new Date(checkOutDate);
-      const totalDays = Math.round(Math.abs((endDate - startDate) / oneDay)) + 1;
+      const totalNights = Math.round(Math.abs((endDate - startDate) / oneDay));
 
       // Calculate total number of guests
       const totalGuests = numAdults + numChildren;
 
       // Calculate total price
       const roomPricePerNight = roomDetails.roomPrice;
-      const totalPrice = roomPricePerNight * totalDays;
+      const totalPrice = roomPricePerNight * totalNights;
 
       setTotalPrice(totalPrice);
       setTotalGuests(totalGuests);
@@ -139,7 +140,7 @@ const RoomDetailsPage = () => {
       <img src={roomPhotoUrl} alt={roomType} className="room-details-image" />
       <div className="room-details-info">
         <h3>{roomType}</h3>
-        <p>{t('rooms.price')}: ${roomPrice} {t('rooms.perNight')}</p>
+        <p>{t('rooms.price')}: €{roomPrice} {t('rooms.perNight')}</p>
         {roomDescription && roomDescription.trim() !== '' ? (
           <p><strong>{t('rooms.description')}:</strong> {roomDescription}</p>
         ) : (
@@ -238,7 +239,7 @@ const RoomDetailsPage = () => {
             {(checkInDate && checkOutDate) && (
               <div className="booking-summary">
                 <div className="total-price-guests">
-                  <span className="price-display">{t('rooms.totalPrice')}: ${totalPrice}</span>
+                  <span className="price-display">{t('rooms.totalPrice')}: €{totalPrice}</span>
                   <span className="guests-display">{t('rooms.totalGuests')}: {totalGuests}</span>
                 </div>
                 <button className="confirm-booking-button" onClick={acceptBooking}>

@@ -88,7 +88,7 @@ export default function EditBookingPage() {
                         <h3>{t('rooms.roomDetails')}</h3>
                         <div>
                             <p>{t('rooms.roomType')}: {booking.room.roomType}</p>
-                            <p>{t('rooms.price')}: ${booking.room.roomPrice}</p>
+                            <p>{t('rooms.price')}: €{booking.room.roomPrice}</p>
                             <p>{t('rooms.description')}: {booking.room.roomDescription}</p>
                             <img src={booking.room.roomPhotoUrl} alt={booking.room.roomType} />
                         </div>

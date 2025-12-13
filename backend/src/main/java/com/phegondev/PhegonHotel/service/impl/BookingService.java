@@ -13,7 +13,6 @@ import com.phegondev.PhegonHotel.service.interfac.IBookingService;
 import com.phegondev.PhegonHotel.service.EmailService;
 import com.phegondev.PhegonHotel.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,7 +31,7 @@ public class BookingService implements IBookingService {
 
 
     @Override
-    public Response saveBooking(Long roomId, Long userId, Booking bookingRequest) {
+    public Response saveBooking(Long roomId, Long userId, Booking bookingRequest, String language) {
 
         Response response = new Response();
 
@@ -51,8 +50,16 @@ public class BookingService implements IBookingService {
 
             bookingRequest.setRoom(room);
             bookingRequest.setUser(user);
+            bookingRequest.setBookingDate(java.time.LocalDateTime.now());
             String bookingConfirmationCode = Utils.generateRandomConfirmationCode(10);
             bookingRequest.setBookingConfirmationCode(bookingConfirmationCode);
+            
+            // Update user's preferred language if provided
+            if (language != null && !language.isEmpty()) {
+                user.setPreferredLanguage(language);
+                userRepository.save(user);
+            }
+            
             Booking savedBooking = bookingRepository.save(bookingRequest);
             
             // Send confirmation email
@@ -105,7 +112,9 @@ public class BookingService implements IBookingService {
         Response response = new Response();
 
         try {
-            List<Booking> bookingList = bookingRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
+            List<Booking> bookingList = bookingRepository.findAllWithRoomAndUser();
+            // Sort by id descending manually since we're using custom query
+            bookingList.sort((a, b) -> Long.compare(b.getId(), a.getId()));
             List<BookingDTO> bookingDTOList = Utils.mapBookingListEntityToBookingListDTO(bookingList);
             response.setStatusCode(200);
             response.setMessage("successful");

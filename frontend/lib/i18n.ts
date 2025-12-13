@@ -47,7 +47,8 @@ const resources = {
         fillAllFields: 'Моля, попълнете всички полета.',
         success: 'Успешна регистрация!',
         alreadyAccount: 'Вече имате акаунт?',
-        phoneNumber: 'Телефонен номер'
+        phoneNumber: 'Телефонен номер',
+        emailExists: 'Този имейл вече съществува.'
       },
       rooms: {
         allRooms: 'Всички стаи',
@@ -81,7 +82,15 @@ const resources = {
         totalGuests: 'Общ брой гости',
         confirmBooking: 'Потвърди резервация',
         noDescription: 'Няма описание',
-        pleaseLoginToBook: 'Моля, влезте в профила си, за да резервирате стая.'
+        pleaseLoginToBook: 'Моля, влезте в профила си, за да резервирате стая.',
+        roomNotAvailable: 'Стаята не е налична за избрания период.',
+        bookingFailed: 'Резервацията не беше успешна.',
+        errorCreatingBooking: 'Грешка при създаване на резервация. Моля, опитайте отново.',
+        errorFetchingProfile: 'Грешка при зареждане на профил.',
+        roomNotFound: 'Стаята не е намерена.',
+        userNotFound: 'Потребителят не е намерен.',
+        emailExists: 'Този имейл вече съществува.',
+        invalidDates: 'Датата на настаняване трябва да е преди датата на освобождаване.'
       },
       findBooking: {
         findBooking: 'Намери резервация',
@@ -145,6 +154,7 @@ const resources = {
         filterByBookingNumber: 'Филтрирай по номер на резервация:',
         enterBookingNumber: 'Въведете номер на резервация',
         bookingCode: 'Код на резервация',
+        bookingDate: 'Дата на резервиране',
         checkInDate: 'Дата на настаняване',
         checkOutDate: 'Дата на освобождаване',
         totalGuests: 'Общ брой гости',
@@ -181,6 +191,7 @@ const resources = {
         bookingsList: 'Списък с резервации',
         guestName: 'Име на гост',
         guests: 'Гости',
+        totalPrice: 'Обща цена',
         actions: 'Действия',
         manage: 'Управлявай',
         adults: 'Възрастни',
@@ -236,7 +247,8 @@ const resources = {
         fillAllFields: 'Παρακαλώ συμπληρώστε όλα τα πεδία.',
         success: 'Επιτυχής εγγραφή!',
         alreadyAccount: 'Έχετε ήδη λογαριασμό;',
-        phoneNumber: 'Τηλέφωνο'
+        phoneNumber: 'Τηλέφωνο',
+        emailExists: 'Αυτό το email υπάρχει ήδη.'
       },
       rooms: {
         allRooms: 'Όλα τα δωμάτια',
@@ -270,7 +282,15 @@ const resources = {
         totalGuests: 'Σύνολο επισκεπτών',
         confirmBooking: 'Επιβεβαίωση κράτησης',
         noDescription: 'Δεν υπάρχει περιγραφή',
-        pleaseLoginToBook: 'Παρακαλώ συνδεθείτε για να κάνετε κράτηση.'
+        pleaseLoginToBook: 'Παρακαλώ συνδεθείτε για να κάνετε κράτηση.',
+        roomNotAvailable: 'Το δωμάτιο δεν είναι διαθέσιμο για την επιλεγμένη περίοδο.',
+        bookingFailed: 'Η κράτηση δεν ήταν επιτυχής.',
+        errorCreatingBooking: 'Σφάλμα κατά τη δημιουργία κράτησης. Παρακαλώ δοκιμάστε ξανά.',
+        errorFetchingProfile: 'Σφάλμα κατά τη φόρτωση προφίλ.',
+        roomNotFound: 'Το δωμάτιο δεν βρέθηκε.',
+        userNotFound: 'Ο χρήστης δεν βρέθηκε.',
+        emailExists: 'Αυτό το email υπάρχει ήδη.',
+        invalidDates: 'Η ημερομηνία άφιξης πρέπει να είναι πριν από την ημερομηνία αναχώρησης.'
       },
       findBooking: {
         findBooking: 'Εύρεση κράτησης',
@@ -334,6 +354,7 @@ const resources = {
         filterByBookingNumber: 'Φίλτρο ανά αριθμό κράτησης:',
         enterBookingNumber: 'Εισάγετε αριθμό κράτησης',
         bookingCode: 'Κωδικός κράτησης',
+        bookingDate: 'Ημερομηνία κράτησης',
         checkInDate: 'Ημερομηνία άφιξης',
         checkOutDate: 'Ημερομηνία αναχώρησης',
         totalGuests: 'Σύνολο επισκεπτών',
@@ -370,6 +391,7 @@ const resources = {
         bookingsList: 'Λίστα Κρατήσεων',
         guestName: 'Όνομα Επισκέπτη',
         guests: 'Επισκέπτες',
+        totalPrice: 'Συνολική τιμή',
         actions: 'Ενέργειες',
         manage: 'Διαχείριση',
         adults: 'Ενήλικοι',
@@ -425,7 +447,8 @@ const resources = {
         fillAllFields: 'Please fill all the fields.',
         success: 'User registered successfully',
         alreadyAccount: 'Already have an account?',
-        phoneNumber: 'Phone Number'
+        phoneNumber: 'Phone Number',
+        emailExists: 'This email already exists.'
       },
       rooms: {
         allRooms: 'All Rooms',
@@ -458,7 +481,16 @@ const resources = {
         totalPrice: 'Total Price',
         totalGuests: 'Total Guests',
         confirmBooking: 'Confirm Booking',
-        noDescription: 'No description available'
+        noDescription: 'No description available',
+        pleaseLoginToBook: 'Please login to book a room.',
+        roomNotAvailable: 'Room not available for selected date range.',
+        bookingFailed: 'Booking failed.',
+        errorCreatingBooking: 'Error creating booking. Please try again.',
+        errorFetchingProfile: 'Error fetching user profile.',
+        roomNotFound: 'Room not found.',
+        userNotFound: 'User not found.',
+        emailExists: 'This email already exists.',
+        invalidDates: 'Check-in date must be before check-out date.'
       },
       findBooking: {
         findBooking: 'Find Booking',
@@ -522,6 +554,7 @@ const resources = {
         filterByBookingNumber: 'Filter by Booking Number:',
         enterBookingNumber: 'Enter booking number',
         bookingCode: 'Booking Code',
+        bookingDate: 'Booking Date',
         checkInDate: 'Check In Date',
         checkOutDate: 'Check out Date',
         totalGuests: 'Total Guests',
@@ -558,6 +591,7 @@ const resources = {
         bookingsList: 'Bookings List',
         guestName: 'Guest Name',
         guests: 'Guests',
+        totalPrice: 'Total Price',
         actions: 'Actions',
         manage: 'Manage',
         adults: 'Adults',

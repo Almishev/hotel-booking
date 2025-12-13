@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import ApiService from '@/lib/service/ApiService';
 import { AdminRoute } from '@/lib/service/guard';
@@ -62,7 +62,8 @@ export default function ManageBookingsPage() {
             const checkIn = new Date(booking.checkInDate);
             const checkOut = new Date(booking.checkOutDate);
             const nights = Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24));
-            stats.totalRevenue += nights * 100;
+            const roomPricePerNight = booking.room?.roomPrice || 0;
+            stats.totalRevenue += nights * roomPricePerNight;
 
             if (new Date(booking.checkInDate) > new Date()) {
                 stats.activeBookings++;
@@ -72,93 +73,7 @@ export default function ManageBookingsPage() {
         setStats(stats);
     }, []);
 
-    const filterBookings = useCallback(() => {
-        let filtered = [...bookings];
 
-        if (filters.searchTerm) {
-            filtered = filtered.filter(booking =>
-                booking.bookingConfirmationCode?.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
-                booking.user?.name?.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
-                booking.user?.email?.toLowerCase().includes(filters.searchTerm.toLowerCase())
-            );
-        }
-
-        if (filters.dateFrom) {
-            filtered = filtered.filter(booking => 
-                new Date(booking.checkInDate) >= new Date(filters.dateFrom)
-            );
-        }
-        if (filters.dateTo) {
-            filtered = filtered.filter(booking => 
-                new Date(booking.checkInDate) <= new Date(filters.dateTo)
-            );
-        }
-
-        if (filters.roomType && filters.roomType !== 'all') {
-            filtered = filtered.filter(booking => 
-                booking.room?.roomType === filters.roomType
-            );
-        }
-
-        if (filters.guestCount && filters.guestCount !== 'all') {
-            filtered = filtered.filter(booking => 
-                booking.totalNumOfGuest === parseInt(filters.guestCount)
-            );
-        }
-
-        if (filters.status !== 'all') {
-            const today = new Date();
-            if (filters.status === 'active') {
-                filtered = filtered.filter(booking => 
-                    new Date(booking.checkInDate) > today
-                );
-            } else if (filters.status === 'completed') {
-                filtered = filtered.filter(booking => 
-                    new Date(booking.checkOutDate) < today
-                );
-            } else if (filters.status === 'current') {
-                filtered = filtered.filter(booking => {
-                    const checkIn = new Date(booking.checkInDate);
-                    const checkOut = new Date(booking.checkOutDate);
-                    return checkIn <= today && checkOut >= today;
-                });
-            }
-        }
-
-        setFilteredBookings(filtered);
-        setCurrentPage(1);
-    }, [bookings, filters]);
-
-    const sortBookings = useCallback(() => {
-        const sorted = [...filteredBookings].sort((a, b) => {
-            let aValue: any = a[sortConfig.key as keyof typeof a];
-            let bValue: any = b[sortConfig.key as keyof typeof b];
-
-            if (sortConfig.key === 'user.name') {
-                aValue = a.user?.name || '';
-                bValue = b.user?.name || '';
-            }
-
-            if (sortConfig.key.includes('Date')) {
-                aValue = new Date(aValue);
-                bValue = new Date(bValue);
-            }
-
-            if (typeof aValue === 'number' && typeof bValue === 'number') {
-                return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue;
-            }
-
-            if (typeof aValue === 'string' && typeof bValue === 'string') {
-                return sortConfig.direction === 'asc' 
-                    ? aValue.localeCompare(bValue) 
-                    : bValue.localeCompare(aValue);
-            }
-
-            return 0;
-        });
-
-        setFilteredBookings(sorted);
-    }, [filteredBookings, sortConfig]);
 
     const handleSort = (key: string) => {
         setSortConfig(prev => ({
@@ -168,20 +83,22 @@ export default function ManageBookingsPage() {
     };
 
     const exportData = () => {
-        if (!filteredBookings || filteredBookings.length === 0) {
+        if (!sortedBookings || sortedBookings.length === 0) {
             alert('No data to export. Please apply filters or wait for data to load.');
             return;
         }
 
-        const data = filteredBookings.map(booking => ({
+        const data = sortedBookings.map(booking => ({
             'Booking Code': booking.bookingConfirmationCode,
             'Guest Name': booking.user?.name || 'N/A',
             'Email': booking.user?.email || 'N/A',
+            'Booking Date': booking.bookingDate ? new Date(booking.bookingDate).toLocaleString() : 'N/A',
             'Check-in': booking.checkInDate,
             'Check-out': booking.checkOutDate,
             'Adults': booking.numOfAdults,
             'Children': booking.numOfChildren,
             'Total Guests': booking.totalNumOfGuest,
+            'Total Price': `€${calculateBookingTotalPrice(booking).toFixed(2)}`,
             'Room Type': booking.room?.roomType || 'N/A',
             'Status': getBookingStatus(booking)
         }));
@@ -242,23 +159,144 @@ export default function ManageBookingsPage() {
         fetchBookings();
     }, [calculateStats]);
 
-    useEffect(() => {
-        if (bookings.length > 0) {
-            filterBookings();
-        }
-    }, [bookings, filters, filterBookings]);
+    // Use useMemo for filtering to avoid infinite loops
+    const filteredBookingsMemo = useMemo(() => {
+        let filtered = [...bookings];
 
-    useEffect(() => {
-        if (filteredBookings.length > 0) {
-            sortBookings();
+        if (filters.searchTerm) {
+            filtered = filtered.filter(booking =>
+                booking.bookingConfirmationCode?.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
+                booking.user?.name?.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
+                booking.user?.email?.toLowerCase().includes(filters.searchTerm.toLowerCase())
+            );
         }
-    }, [sortConfig, sortBookings]);
+
+        if (filters.dateFrom) {
+            filtered = filtered.filter(booking => 
+                new Date(booking.checkInDate) >= new Date(filters.dateFrom)
+            );
+        }
+        if (filters.dateTo) {
+            filtered = filtered.filter(booking => 
+                new Date(booking.checkInDate) <= new Date(filters.dateTo)
+            );
+        }
+
+        if (filters.roomType && filters.roomType !== 'all') {
+            filtered = filtered.filter(booking => 
+                booking.room?.roomType === filters.roomType
+            );
+        }
+
+        if (filters.guestCount && filters.guestCount !== 'all') {
+            filtered = filtered.filter(booking => 
+                booking.totalNumOfGuest === parseInt(filters.guestCount)
+            );
+        }
+
+        if (filters.status !== 'all') {
+            const today = new Date();
+            if (filters.status === 'active') {
+                filtered = filtered.filter(booking => 
+                    new Date(booking.checkInDate) > today
+                );
+            } else if (filters.status === 'completed') {
+                filtered = filtered.filter(booking => 
+                    new Date(booking.checkOutDate) < today
+                );
+            } else if (filters.status === 'current') {
+                filtered = filtered.filter(booking => {
+                    const checkIn = new Date(booking.checkInDate);
+                    const checkOut = new Date(booking.checkOutDate);
+                    return checkIn <= today && checkOut >= today;
+                });
+            }
+        }
+
+        return filtered;
+    }, [bookings, filters]);
+
+    // Use useMemo for sorting instead of useCallback to avoid infinite loops
+    const sortedBookings = useMemo(() => {
+        const sorted = [...filteredBookingsMemo].sort((a, b) => {
+            let aValue: any = a[sortConfig.key as keyof typeof a];
+            let bValue: any = b[sortConfig.key as keyof typeof b];
+
+            if (sortConfig.key === 'user.name') {
+                aValue = a.user?.name || '';
+                bValue = b.user?.name || '';
+            }
+
+            if (sortConfig.key.includes('Date')) {
+                aValue = new Date(aValue);
+                bValue = new Date(bValue);
+            }
+
+            if (typeof aValue === 'number' && typeof bValue === 'number') {
+                return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue;
+            }
+
+            if (typeof aValue === 'string' && typeof bValue === 'string') {
+                return sortConfig.direction === 'asc' 
+                    ? aValue.localeCompare(bValue) 
+                    : bValue.localeCompare(aValue);
+            }
+
+            return 0;
+        });
+
+        return sorted;
+    }, [filteredBookingsMemo, sortConfig]);
+
+    // Update filteredBookings state when memoized value changes (for backward compatibility)
+    useEffect(() => {
+        setFilteredBookings(filteredBookingsMemo);
+        setCurrentPage(1);
+    }, [filteredBookingsMemo]);
 
     const indexOfLastBooking = currentPage * bookingsPerPage;
     const indexOfFirstBooking = indexOfLastBooking - bookingsPerPage;
-    const currentBookings = filteredBookings.slice(indexOfFirstBooking, indexOfLastBooking);
+    const currentBookings = sortedBookings.slice(indexOfFirstBooking, indexOfLastBooking);
 
     const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
+    const formatDateTime = (dateTimeString: string | null | undefined) => {
+        if (!dateTimeString) return 'N/A';
+        try {
+            const date = new Date(dateTimeString);
+            return date.toLocaleString('bg-BG', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        } catch (e) {
+            return dateTimeString;
+        }
+    };
+
+    const calculateBookingTotalPrice = (booking: any) => {
+        // Check if we have all required data
+        if (!booking.checkInDate || !booking.checkOutDate) {
+            return 0;
+        }
+        
+        // Try to get room price from booking.room.roomPrice
+        let roomPricePerNight = 0;
+        if (booking.room?.roomPrice) {
+            roomPricePerNight = booking.room.roomPrice;
+        } else {
+            // If room data is not available, return 0
+            return 0;
+        }
+        
+        const checkIn = new Date(booking.checkInDate);
+        const checkOut = new Date(booking.checkOutDate);
+        const nights = Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24));
+        
+        return nights * roomPricePerNight;
+    };
 
     const analytics = getAnalytics();
 
@@ -279,7 +317,7 @@ export default function ManageBookingsPage() {
                     </div>
                     <div className="stat-card">
                         <h3>{t('admin.totalRevenue')}</h3>
-                        <p className="stat-number">${stats.totalRevenue.toLocaleString()}</p>
+                        <p className="stat-number">€{stats.totalRevenue.toLocaleString()}</p>
                     </div>
                     <div className="stat-card">
                         <h3>{t('admin.activeBookings')}</h3>
@@ -396,6 +434,9 @@ export default function ManageBookingsPage() {
                                 <th onClick={() => handleSort('user.name')}>
                                     {t('admin.guestName')} {sortConfig.key === 'user.name' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                                 </th>
+                                <th onClick={() => handleSort('bookingDate')}>
+                                    {t('admin.bookingDate')} {sortConfig.key === 'bookingDate' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                                </th>
                                 <th onClick={() => handleSort('checkInDate')}>
                                     {t('admin.checkInDate')} {sortConfig.key === 'checkInDate' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                                 </th>
@@ -405,6 +446,7 @@ export default function ManageBookingsPage() {
                                 <th onClick={() => handleSort('totalNumOfGuest')}>
                                     {t('admin.guests')} {sortConfig.key === 'totalNumOfGuest' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                                 </th>
+                                <th>{t('admin.totalPrice')}</th>
                                 <th>{t('admin.status')}</th>
                                 <th>{t('admin.actions')}</th>
                             </tr>
@@ -414,10 +456,17 @@ export default function ManageBookingsPage() {
                                 <tr key={booking.id}>
                                     <td>{booking.bookingConfirmationCode}</td>
                                     <td>{booking.user?.name || 'N/A'}</td>
+                                    <td>{formatDateTime(booking.bookingDate)}</td>
                                     <td>{booking.checkInDate}</td>
                                     <td>{booking.checkOutDate}</td>
                                     <td>
                                         {booking.numOfAdults || 0} {t('admin.adults')}, {booking.numOfChildren || 0} {t('admin.children')}
+                                    </td>
+                                    <td>
+                                        {(() => {
+                                            const totalPrice = calculateBookingTotalPrice(booking);
+                                            return totalPrice > 0 ? `€${totalPrice.toFixed(2)}` : 'N/A';
+                                        })()}
                                     </td>
                                     <td>
                                         <span className={`status-badge status-${getBookingStatus(booking).toLowerCase()}`}>
@@ -440,7 +489,7 @@ export default function ManageBookingsPage() {
 
                 <Pagination
                     roomsPerPage={bookingsPerPage}
-                    totalRooms={filteredBookings.length}
+                    totalRooms={sortedBookings.length}
                     currentPage={currentPage}
                     paginate={paginate}
                 />

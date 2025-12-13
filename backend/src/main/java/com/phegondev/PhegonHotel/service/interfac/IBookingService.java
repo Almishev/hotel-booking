@@ -5,7 +5,7 @@ import com.phegondev.PhegonHotel.entity.Booking;
 
 public interface IBookingService {
 
-    Response saveBooking(Long roomId, Long userId, Booking bookingRequest);
+    Response saveBooking(Long roomId, Long userId, Booking bookingRequest, String language);
 
     Response findBookingByConfirmationCode(String confirmationCode);
 

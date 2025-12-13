@@ -58,7 +58,13 @@ export default function RegisterPage() {
                 }, 3000);
             }
         } catch (error: any) {
-            setErrorMessage(error.response?.data?.message || error.message);
+            const backendMessage = error.response?.data?.message || error.message || '';
+            // Map backend error messages to translations
+            if (backendMessage.toLowerCase().includes('already exists') || backendMessage.toLowerCase().includes('exists')) {
+                setErrorMessage(t('register.emailExists') || backendMessage);
+            } else {
+                setErrorMessage(backendMessage);
+            }
             setTimeout(() => setErrorMessage(''), 5000);
         }
     };

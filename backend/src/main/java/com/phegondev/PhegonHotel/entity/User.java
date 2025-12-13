@@ -35,6 +35,8 @@ public class User implements UserDetails {
 
     private String role;
 
+    private String preferredLanguage = "en"; // Default to English
+
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Booking> bookings = new ArrayList<>();
 

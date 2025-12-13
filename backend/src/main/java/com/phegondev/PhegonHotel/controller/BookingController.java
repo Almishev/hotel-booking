@@ -21,10 +21,11 @@ public class BookingController {
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
     public ResponseEntity<Response> saveBookings(@PathVariable Long roomId,
                                                  @PathVariable Long userId,
-                                                 @RequestBody Booking bookingRequest) {
+                                                 @RequestBody Booking bookingRequest,
+                                                 @RequestParam(required = false) String language) {
 
 
-        Response response = bookingService.saveBooking(roomId, userId, bookingRequest);
+        Response response = bookingService.saveBooking(roomId, userId, bookingRequest, language);
         return ResponseEntity.status(response.getStatusCode()).body(response);
 
     }

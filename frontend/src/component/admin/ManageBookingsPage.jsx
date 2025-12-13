@@ -60,7 +60,7 @@ const ManageBookingsPage = () => {
             stats.totalAdults += booking.numOfAdults || 0;
             stats.totalChildren += booking.numOfChildren || 0;
             
-            // Calculate revenue (assuming $100 per night as average)
+            // Calculate revenue (assuming €100 per night as average)
             const checkIn = new Date(booking.checkInDate);
             const checkOut = new Date(booking.checkOutDate);
             const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
@@ -315,7 +315,7 @@ const ManageBookingsPage = () => {
                 </div>
                 <div className="stat-card">
                     <h3>{t('admin.totalRevenue')}</h3>
-                    <p className="stat-number">${stats.totalRevenue.toLocaleString()}</p>
+                    <p className="stat-number">€{stats.totalRevenue.toLocaleString()}</p>
                 </div>
                 <div className="stat-card">
                     <h3>{t('admin.activeBookings')}</h3>

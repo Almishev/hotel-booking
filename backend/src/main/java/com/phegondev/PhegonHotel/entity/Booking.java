@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -33,6 +34,8 @@ public class Booking {
     private int totalNumOfGuest;
 
     private String bookingConfirmationCode;
+
+    private LocalDateTime bookingDate;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")

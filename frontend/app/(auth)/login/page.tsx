@@ -34,6 +34,8 @@ function LoginForm() {
                 console.log("Setting role:", response.role);
                 localStorage.setItem('token', response.token);
                 localStorage.setItem('role', response.role);
+                // Dispatch custom event to notify Navbar about auth change
+                window.dispatchEvent(new Event('auth-change'));
                 router.push(from);
             }
         } catch (error: any) {

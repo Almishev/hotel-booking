@@ -79,7 +79,7 @@ const EditBookingPage = () => {
                     <h3>{t('rooms.roomDetails')}</h3>
                     <div>
                         <p>{t('rooms.roomType')}: {bookingDetails.room.roomType}</p>
-                        <p>{t('rooms.price')}: ${bookingDetails.room.roomPrice}</p>
+                        <p>{t('rooms.price')}: €{bookingDetails.room.roomPrice}</p>
                         <p>{t('rooms.description')}: {bookingDetails.room.roomDescription}</p>
                         <img src={bookingDetails.room.roomPhotoUrl} alt="" sizes="" srcSet="" />
                     </div>

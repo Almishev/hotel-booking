@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import '@/lib/i18n';
 
 export default function RoomDetailsPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const router = useRouter();
   const params = useParams();
   const roomId = params.roomId as string;
@@ -56,10 +56,12 @@ export default function RoomDetailsPage() {
       const oneDay = 24 * 60 * 60 * 1000;
       const startDate = new Date(checkInDate);
       const endDate = new Date(checkOutDate);
-      const totalDays = Math.round(Math.abs((endDate.getTime() - startDate.getTime()) / oneDay)) + 1;
+      // Calculate number of nights (not days) - check-in to check-out
+      // Example: 24/12 to 26/12 = 2 nights (24-25 and 25-26)
+      const totalNights = Math.round(Math.abs((endDate.getTime() - startDate.getTime()) / oneDay));
       const totalGuests = numAdults + numChildren;
       const roomPricePerNight = roomDetails.roomPrice;
-      const totalPrice = roomPricePerNight * totalDays;
+      const totalPrice = roomPricePerNight * totalNights;
       setTotalPrice(totalPrice);
       setTotalGuests(totalGuests);
     }
@@ -81,13 +83,15 @@ export default function RoomDetailsPage() {
   const acceptBooking = async () => {
     if (!checkInDate || !checkOutDate) {
       setErrorMessage(t('rooms.selectCheckIn') + ' / ' + t('rooms.selectCheckOut'));
-      setTimeout(() => setErrorMessage(''), 5000);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(() => setErrorMessage(''), 10000);
       return;
     }
 
     if (isNaN(numAdults) || numAdults < 1 || isNaN(numChildren) || numChildren < 0) {
       setErrorMessage(t('rooms.booking') + ': ' + t('login.fillAllFields'));
-      setTimeout(() => setErrorMessage(''), 5000);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(() => setErrorMessage(''), 10000);
       return;
     }
 
@@ -104,12 +108,16 @@ export default function RoomDetailsPage() {
     let currentUserId = userId;
     if (!currentUserId) {
       try {
+        console.log("Fetching user profile to get userId...");
         const userProfile = await ApiService.getUserProfile();
+        console.log("User profile response:", userProfile);
         // Safely check for user id using optional chaining
         if (userProfile?.user?.id) {
           currentUserId = userProfile.user.id;
           setUserId(currentUserId);
+          console.log("UserId set to:", currentUserId);
         } else {
+          console.error("User profile does not contain user id:", userProfile);
           setErrorMessage(t('rooms.pleaseLoginToBook') || 'Please login to book a room');
           setTimeout(() => {
             router.push('/login');
@@ -117,15 +125,25 @@ export default function RoomDetailsPage() {
           return;
         }
       } catch (profileError: any) {
-        setErrorMessage(t('rooms.pleaseLoginToBook') || 'Please login to book a room');
-        setTimeout(() => {
-          router.push('/login');
-        }, 2000);
+        console.error("Error fetching user profile:", profileError);
+        console.error("Error response:", profileError.response);
+        // Check if it's an authentication error
+        if (profileError.response?.status === 401 || profileError.response?.status === 403) {
+          setErrorMessage(t('rooms.pleaseLoginToBook') || 'Please login to book a room');
+          setTimeout(() => {
+            router.push('/login');
+          }, 2000);
+        } else {
+          setErrorMessage(profileError.response?.data?.message || profileError.message || t('rooms.errorFetchingProfile'));
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          setTimeout(() => setErrorMessage(''), 10000);
+        }
         return;
       }
     }
 
     try {
+      console.log("Creating booking with:", { roomId, currentUserId, checkInDate, checkOutDate, numAdults, numChildren });
       const startDate = new Date(checkInDate);
       const endDate = new Date(checkOutDate);
       const formattedCheckInDate = new Date(startDate.getTime() - (startDate.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
@@ -135,21 +153,90 @@ export default function RoomDetailsPage() {
         checkInDate: formattedCheckInDate,
         checkOutDate: formattedCheckOutDate,
         numOfAdults: numAdults,
-        numOfChildren: numChildren
+        numOfChildren: numChildren,
+        language: i18n.language || 'en' // Add current language
       };
       
+      console.log("Sending booking request:", booking);
       const response = await ApiService.bookRoom(roomId, currentUserId, booking);
-      if (response.statusCode === 200) {
+      console.log("Booking response:", response);
+      
+      if (response && response.statusCode === 200) {
         setConfirmationCode(response.bookingConfirmationCode);
         setShowMessage(true);
         setTimeout(() => {
           setShowMessage(false);
           router.push('/rooms');
         }, 10000);
+      } else if (response && response.statusCode) {
+        // Backend returned an error response (not an exception)
+        const backendMessage = response.message || '';
+        // Map backend error messages to translations
+        if (backendMessage.toLowerCase().includes('room') && backendMessage.toLowerCase().includes('available')) {
+          setErrorMessage(t('rooms.roomNotAvailable'));
+        } else if (backendMessage.toLowerCase().includes('room') && backendMessage.toLowerCase().includes('not found')) {
+          setErrorMessage(t('rooms.roomNotFound'));
+        } else if (backendMessage.toLowerCase().includes('user') && backendMessage.toLowerCase().includes('not found')) {
+          setErrorMessage(t('rooms.userNotFound'));
+        } else if (backendMessage.toLowerCase().includes('check in date') || backendMessage.toLowerCase().includes('check out date')) {
+          setErrorMessage(t('rooms.invalidDates'));
+        } else {
+          // Use translation, fallback to generic error message
+          setErrorMessage(t('rooms.bookingFailed'));
+        }
+        // Scroll to top to show error message
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        setTimeout(() => setErrorMessage(''), 10000);
       }
     } catch (error: any) {
-      setErrorMessage(error.response?.data?.message || error.message);
-      setTimeout(() => setErrorMessage(''), 5000);
+      console.error("Error creating booking:", error);
+      console.error("Error response:", error.response);
+      
+      // Check if it's an authentication error
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        setErrorMessage(t('rooms.pleaseLoginToBook') || 'Please login to book a room');
+        setTimeout(() => {
+          router.push('/login');
+        }, 2000);
+      } else if (error.response?.status === 404) {
+        // Backend returned 404 with error message in response body
+        // Check if it's the room availability error
+        const backendMessage = error.response?.data?.message || '';
+        // Map backend error messages to translations
+        if (backendMessage.toLowerCase().includes('room') && backendMessage.toLowerCase().includes('available')) {
+          setErrorMessage(t('rooms.roomNotAvailable'));
+        } else if (backendMessage.toLowerCase().includes('room') && backendMessage.toLowerCase().includes('not found')) {
+          setErrorMessage(t('rooms.roomNotFound'));
+        } else if (backendMessage.toLowerCase().includes('user') && backendMessage.toLowerCase().includes('not found')) {
+          setErrorMessage(t('rooms.userNotFound'));
+        } else if (backendMessage.toLowerCase().includes('check in date') || backendMessage.toLowerCase().includes('check out date')) {
+          setErrorMessage(t('rooms.invalidDates'));
+        } else {
+          // Use translation for unknown errors
+          setErrorMessage(t('rooms.roomNotAvailable'));
+        }
+        // Scroll to top to show error message
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        setTimeout(() => setErrorMessage(''), 10000);
+      } else {
+        // Other errors - try to map backend message to translation
+        const backendMessage = error.response?.data?.message || error.message || '';
+        if (backendMessage.toLowerCase().includes('room') && backendMessage.toLowerCase().includes('available')) {
+          setErrorMessage(t('rooms.roomNotAvailable'));
+        } else if (backendMessage.toLowerCase().includes('room') && backendMessage.toLowerCase().includes('not found')) {
+          setErrorMessage(t('rooms.roomNotFound'));
+        } else if (backendMessage.toLowerCase().includes('user') && backendMessage.toLowerCase().includes('not found')) {
+          setErrorMessage(t('rooms.userNotFound'));
+        } else if (backendMessage.toLowerCase().includes('check in date') || backendMessage.toLowerCase().includes('check out date')) {
+          setErrorMessage(t('rooms.invalidDates'));
+        } else {
+          // Use translation for unknown errors
+          setErrorMessage(t('rooms.errorCreatingBooking'));
+        }
+        // Scroll to top to show error message
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        setTimeout(() => setErrorMessage(''), 10000);
+      }
     }
   };
 
@@ -189,7 +276,7 @@ export default function RoomDetailsPage() {
       <img src={roomPhotoUrl} alt={roomType} className="room-details-image" />
       <div className="room-details-info">
         <h3>{roomType}</h3>
-        <p>{t('rooms.price')}: ${roomPrice} {t('rooms.perNight')}</p>
+        <p>{t('rooms.price')}: €{roomPrice} {t('rooms.perNight')}</p>
         {roomDescription && roomDescription.trim() !== '' ? (
           <p><strong>{t('rooms.description')}:</strong> {roomDescription}</p>
         ) : (
@@ -288,7 +375,7 @@ export default function RoomDetailsPage() {
             {(checkInDate && checkOutDate) && (
               <div className="booking-summary">
                 <div className="total-price-guests">
-                  <span className="price-display">{t('rooms.totalPrice')}: ${totalPrice}</span>
+                  <span className="price-display">{t('rooms.totalPrice')}: €{totalPrice}</span>
                   <span className="guests-display">{t('rooms.totalGuests')}: {totalGuests}</span>
                 </div>
                 <button className="confirm-booking-button" onClick={acceptBooking}>

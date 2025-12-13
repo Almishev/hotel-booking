@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import ApiService from '@/lib/service/ApiService';
@@ -9,12 +9,58 @@ import '@/lib/i18n';
 
 export default function Navbar() {
     const { t, i18n } = useTranslation();
-    const isAuthenticated = ApiService.isAuthenticated();
-    const isAdmin = ApiService.isAdmin();
-    const isUser = ApiService.isUser();
     const router = useRouter();
     const pathname = usePathname();
     const [menuOpen, setMenuOpen] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [isUser, setIsUser] = useState(false);
+    const [mounted, setMounted] = useState(false);
+
+    // Function to update authentication state
+    const updateAuthState = () => {
+        setIsAuthenticated(ApiService.isAuthenticated());
+        setIsAdmin(ApiService.isAdmin());
+        setIsUser(ApiService.isUser());
+    };
+
+    // Only check authentication on client side after mount
+    useEffect(() => {
+        setMounted(true);
+        updateAuthState();
+    }, []);
+
+    // Update authentication state when pathname changes (e.g., after login/logout)
+    useEffect(() => {
+        if (mounted) {
+            updateAuthState();
+        }
+    }, [pathname, mounted]);
+
+    // Listen for storage changes (when token is set/removed in localStorage)
+    useEffect(() => {
+        if (!mounted) return;
+
+        const handleStorageChange = (e: StorageEvent) => {
+            if (e.key === 'token' || e.key === 'role') {
+                updateAuthState();
+            }
+        };
+
+        // Listen for storage events from other tabs/windows
+        window.addEventListener('storage', handleStorageChange);
+
+        // Also listen for custom events (for same-tab updates)
+        const handleCustomStorageChange = () => {
+            updateAuthState();
+        };
+        window.addEventListener('auth-change', handleCustomStorageChange);
+
+        return () => {
+            window.removeEventListener('storage', handleStorageChange);
+            window.removeEventListener('auth-change', handleCustomStorageChange);
+        };
+    }, [mounted]);
 
     const handleLogout = () => {
         const isLogout = window.confirm('Are you sure you want to logout this user?');
@@ -48,10 +94,10 @@ export default function Navbar() {
                 <li><Link href="/home" className={isActive('/home') ? "active" : ""} onClick={handleNavClick}>{t('navbar.home')}</Link></li>
                 <li><Link href="/rooms" className={isActive('/rooms') ? "active" : ""} onClick={handleNavClick}>{t('navbar.rooms')}</Link></li>
                 <li><Link href="/find-booking" className={isActive('/find-booking') ? "active" : ""} onClick={handleNavClick}>{t('navbar.findBooking')}</Link></li>
-                {isUser && <li><Link href="/profile" className={isActive('/profile') ? "active" : ""} onClick={handleNavClick}>{t('navbar.profile')}</Link></li>}
-                {isAdmin && <li><Link href="/admin" className={isActive('/admin') ? "active" : ""} onClick={handleNavClick}>{t('navbar.admin')}</Link></li>}
-                {!isAuthenticated && <li><Link href="/login" className={isActive('/login') ? "active" : ""} onClick={handleNavClick}>{t('navbar.login')}</Link></li>}
-                {isAuthenticated && <li onClick={() => { handleLogout(); handleNavClick(); }} style={{cursor:'pointer'}}>{t('navbar.logout')}</li>}
+                {mounted && isUser && <li><Link href="/profile" className={isActive('/profile') ? "active" : ""} onClick={handleNavClick}>{t('navbar.profile')}</Link></li>}
+                {mounted && isAdmin && <li><Link href="/admin" className={isActive('/admin') ? "active" : ""} onClick={handleNavClick}>{t('navbar.admin')}</Link></li>}
+                {mounted && !isAuthenticated && <li><Link href="/login" className={isActive('/login') ? "active" : ""} onClick={handleNavClick}>{t('navbar.login')}</Link></li>}
+                {mounted && isAuthenticated && <li onClick={() => { handleLogout(); handleNavClick(); }} style={{cursor:'pointer'}}>{t('navbar.logout')}</li>}
                 <li className="navbar-flags" style={{marginLeft: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
                     <span style={{background: i18n.language === 'bg' ? '#e0f2f1' : '#f5f5f5', padding: '2px 6px', borderRadius: 5, border: i18n.language === 'bg' ? '2px solid #00796b' : '1px solid #ccc', display: 'flex', alignItems: 'center', cursor: 'pointer'}} onClick={() => changeLanguage('bg')}>
                         <img src="/assets/flags/bg.svg" alt="BG" style={{width: 28, height: 20, display: 'block'}} />

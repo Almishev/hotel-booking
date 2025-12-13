@@ -23,7 +23,7 @@ export default function RoomResult({ roomSearchResults }: RoomResultProps) {
                             <img className='room-list-item-image' src={room.roomPhotoUrl} alt={room.roomType} />
                             <div className="room-details">
                                 <h3>{room.roomType}</h3>
-                                <p>{t('rooms.price')}: ${room.roomPrice} {t('rooms.perNight')}</p>
+                                <p>{t('rooms.price')}: €{room.roomPrice} {t('rooms.perNight')}</p>
                                 <p>{t('rooms.description')}: {room.roomDescription}</p>
                             </div>
 

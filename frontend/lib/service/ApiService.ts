@@ -147,10 +147,28 @@ export default class ApiService {
 
         console.log("USER ID IS: " + userId)
 
-        const response = await axios.post(`${this.BASE_URL}/bookings/book-room/${roomId}/${userId}`, booking, {
-            headers: this.getHeader()
-        })
-        return response.data
+        try {
+            // Extract language from booking object if present
+            const language = booking.language || 'en';
+            const bookingWithoutLanguage = { ...booking };
+            delete bookingWithoutLanguage.language;
+            
+            const response = await axios.post(
+                `${this.BASE_URL}/bookings/book-room/${roomId}/${userId}?language=${language}`, 
+                bookingWithoutLanguage, 
+                {
+                    headers: this.getHeader()
+                }
+            )
+            return response.data
+        } catch (error: any) {
+            // If backend returns error response with status code in body, return it
+            if (error.response?.data && error.response.data.statusCode) {
+                return error.response.data;
+            }
+            // Otherwise throw the error to be handled by caller
+            throw error;
+        }
     }
 
     /* This  gets alll bokings from the database */
@@ -182,6 +200,8 @@ export default class ApiService {
         localStorage.removeItem('token')
         localStorage.removeItem('role')
         localStorage.removeItem('jwt') // Clear any old JWT tokens
+        // Dispatch custom event to notify Navbar about auth change
+        window.dispatchEvent(new Event('auth-change'));
         console.log("Logged out - cleared all authentication data")
     }
 
