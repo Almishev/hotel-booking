@@ -9,12 +9,14 @@ export default class ApiService {
     static getHeader() {
         if (typeof window === 'undefined') return {};
         const token = localStorage.getItem("token");
-        console.log("ApiService - Token from localStorage:", token ? token.substring(0, 20) + "..." : "null");
-        const headers = {
-            Authorization: `Bearer ${token}`,
+        const headers: any = {
             "Content-Type": "application/json"
         };
-        console.log("ApiService - Request headers:", headers);
+        // Only add Authorization header if token exists and is valid
+        // Check for null, undefined, empty string, or string "null"
+        if (token && token !== 'null' && token !== 'undefined' && token.trim() !== '') {
+            headers.Authorization = `Bearer ${token}`;
+        }
         return headers;
     }
 
@@ -186,9 +188,11 @@ export default class ApiService {
     static isAuthenticated() {
         if (typeof window === 'undefined') return false;
         const token = localStorage.getItem('token')
-        console.log("ApiService - isAuthenticated check:", !!token)
+        // Check if token exists and is not "null" string or empty
+        const isValid = token && token !== 'null' && token.trim() !== '';
+        console.log("ApiService - isAuthenticated check:", isValid)
         console.log("ApiService - Token value:", token ? token.substring(0, 20) + "..." : "null")
-        return !!token
+        return !!isValid
     }
 
     static isAdmin() {

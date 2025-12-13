@@ -80,7 +80,8 @@ const resources = {
         totalPrice: 'Обща цена',
         totalGuests: 'Общ брой гости',
         confirmBooking: 'Потвърди резервация',
-        noDescription: 'Няма описание'
+        noDescription: 'Няма описание',
+        pleaseLoginToBook: 'Моля, влезте в профила си, за да резервирате стая.'
       },
       findBooking: {
         findBooking: 'Намери резервация',
@@ -268,7 +269,8 @@ const resources = {
         totalPrice: 'Συνολική τιμή',
         totalGuests: 'Σύνολο επισκεπτών',
         confirmBooking: 'Επιβεβαίωση κράτησης',
-        noDescription: 'Δεν υπάρχει περιγραφή'
+        noDescription: 'Δεν υπάρχει περιγραφή',
+        pleaseLoginToBook: 'Παρακαλώ συνδεθείτε για να κάνετε κράτηση.'
       },
       findBooking: {
         findBooking: 'Εύρεση κράτησης',

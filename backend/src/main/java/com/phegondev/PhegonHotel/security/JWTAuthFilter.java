@@ -26,28 +26,29 @@ public class JWTAuthFilter extends OncePerRequestFilter {
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
 
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        // Don't execute this filter for public endpoints
+        String requestURI = request.getRequestURI();
+        return requestURI.startsWith("/auth/") ||
+               requestURI.equals("/rooms/all") ||
+               requestURI.equals("/rooms/all-available-rooms") ||
+               requestURI.equals("/rooms/types") ||
+               requestURI.equals("/rooms/available-rooms-by-date-and-type") ||
+               requestURI.startsWith("/rooms/room-by-id/") ||
+               requestURI.startsWith("/bookings/get-by-confirmation-code/") ||
+               requestURI.startsWith("/users/get-by-id/") ||
+               requestURI.startsWith("/users/get-user-bookings/") ||
+               requestURI.equals("/users/get-logged-in-profile-info");
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
+        // For protected endpoints, require valid JWT token
         final String authHeader = request.getHeader("Authorization");
-        final String jwtToken;
-        final String userEmail;
-
-        // Skip JWT validation for public endpoints
-        String requestURI = request.getRequestURI();
-        if (requestURI.startsWith("/auth/") ||
-            requestURI.equals("/rooms/all") ||
-            requestURI.equals("/rooms/all-available-rooms") ||
-            requestURI.equals("/rooms/types") ||
-            requestURI.equals("/rooms/available-rooms-by-date-and-type") ||
-            requestURI.startsWith("/rooms/room-by-id/") ||
-            requestURI.startsWith("/bookings/get-by-confirmation-code/") ||
-            requestURI.startsWith("/users/get-by-id/") ||
-            requestURI.startsWith("/users/get-user-bookings/")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+        String jwtToken;
+        String userEmail;
 
         if (authHeader == null || authHeader.isBlank() || !authHeader.startsWith("Bearer ")) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

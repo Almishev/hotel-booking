@@ -44,6 +44,7 @@ public class SecurityConfig {
                         .requestMatchers("/bookings/get-by-confirmation-code/**").permitAll()
                         .requestMatchers("/users/get-by-id/**").permitAll()
                         .requestMatchers("/users/get-user-bookings/**").permitAll()
+                        .requestMatchers("/users/get-logged-in-profile-info").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())

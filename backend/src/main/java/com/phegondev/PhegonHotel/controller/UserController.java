@@ -40,9 +40,20 @@ public class UserController {
     }
 
     @GetMapping("/get-logged-in-profile-info")
-    @PreAuthorize("hasAuthority('USER') or hasAuthority('ADMIN')")
     public ResponseEntity<Response> getLoggedInUserProfile() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        
+        // If user is not authenticated, return empty response
+        if (authentication == null || authentication.getName() == null || 
+            authentication.getName().equals("anonymousUser")) {
+            Response response = new Response();
+            response.setStatusCode(200);
+            response.setMessage("No user logged in");
+            response.setUser(null);
+            return ResponseEntity.status(response.getStatusCode()).body(response);
+        }
+        
+        // If user is authenticated, return their profile
         Response response = userService.getMyInfo(authentication.getName());
         return ResponseEntity.status(response.getStatusCode()).body(response);
     }
