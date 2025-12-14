@@ -28,6 +28,14 @@ export default function Navbar() {
     useEffect(() => {
         setMounted(true);
         updateAuthState();
+        
+        // Load language from localStorage if available
+        if (typeof window !== 'undefined') {
+            const savedLanguage = localStorage.getItem('i18nextLng');
+            if (savedLanguage && ['en', 'bg', 'el'].includes(savedLanguage)) {
+                i18n.changeLanguage(savedLanguage);
+            }
+        }
     }, []);
 
     // Update authentication state when pathname changes (e.g., after login/logout)
@@ -74,6 +82,15 @@ export default function Navbar() {
 
     const changeLanguage = (lng: string) => {
         i18n.changeLanguage(lng);
+        
+        // Store language in localStorage for persistence
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('i18nextLng', lng);
+        }
+        
+        // Don't change URL - just update i18n language
+        // The language will be sent to backend when booking is made
+        // URL stays the same to avoid 404 errors
     };
 
     const isActive = (path: string) => pathname === path;

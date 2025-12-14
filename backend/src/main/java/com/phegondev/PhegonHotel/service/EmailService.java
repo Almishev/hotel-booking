@@ -22,17 +22,25 @@ public class EmailService {
     private MessageSource messageSource;
 
     public void sendBookingConfirmationEmail(Booking booking) {
+        sendBookingConfirmationEmail(booking, null);
+    }
+    
+    public void sendBookingConfirmationEmail(Booking booking, String languageOverride) {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             
             User user = booking.getUser();
             Room room = booking.getRoom();
             
-            // Get user's preferred language or default to English
-            String language = user.getPreferredLanguage();
+            // Get language: prioritize override (from booking request), then user's preferred language, then default to English
+            String language = languageOverride;
+            if (language == null || language.isEmpty()) {
+                language = user.getPreferredLanguage();
+            }
             if (language == null || language.isEmpty()) {
                 language = "en";
             }
+            
             // Create Locale from language code (e.g., "en", "bg", "el")
             // Use Locale.of() for Java 19+ which is the recommended way
             Locale locale;
@@ -49,16 +57,17 @@ public class EmailService {
                     break;
             }
             
+            // Debug logging
+            System.out.println("Email language: " + language + " (override: " + languageOverride + ", user preferred: " + user.getPreferredLanguage() + ")");
+            System.out.println("Locale: " + locale.getLanguage() + ", Locale object: " + locale);
+            System.out.println("MessageSource class: " + messageSource.getClass().getName());
+            
             message.setTo(user.getEmail());
             
-            // Get subject with fallback to English if translation not found
-            String subject;
-            try {
-                subject = messageSource.getMessage("email.subject", null, locale);
-            } catch (Exception e) {
-                // Fallback to English if translation not found
-                subject = messageSource.getMessage("email.subject", null, Locale.ENGLISH);
-            }
+            // Get subject with fallback message
+            String defaultSubject = getDefaultEnglishText("email.subject");
+            String subject = messageSource.getMessage("email.subject", null, defaultSubject, locale);
+            System.out.println("Email subject: " + subject + " (locale: " + locale + ")");
             message.setSubject(subject);
             
             String emailContent = buildBookingConfirmationEmail(booking, user, room, locale);
@@ -75,14 +84,16 @@ public class EmailService {
     private String buildBookingConfirmationEmail(Booking booking, User user, Room room, Locale locale) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         
-        // Helper method to get message with fallback to English
+        // Helper method to get message with fallback to default English text
         java.util.function.Function<String, String> getMessage = (key) -> {
-            try {
-                return messageSource.getMessage(key, null, locale);
-            } catch (Exception e) {
-                // Fallback to English if translation not found
-                return messageSource.getMessage(key, null, Locale.ENGLISH);
+            // Use default English text as fallback
+            String defaultText = getDefaultEnglishText(key);
+            String result = messageSource.getMessage(key, null, defaultText, locale);
+            // Debug first few messages to see if translations are working
+            if (key.equals("email.dear") || key.equals("email.thankYou")) {
+                System.out.println("Translation for " + key + " (locale: " + locale + "): " + result);
             }
+            return result;
         };
         
         StringBuilder emailContent = new StringBuilder();
@@ -146,5 +157,42 @@ public class EmailService {
         emailContent.append(getMessage.apply("email.team"));
         
         return emailContent.toString();
+    }
+    
+    // Helper method to provide default English text for each key
+    private String getDefaultEnglishText(String key) {
+        return switch (key) {
+            case "email.subject" -> "Booking Confirmation - Phegon Hotel";
+            case "email.dear" -> "Dear";
+            case "email.thankYou" -> "Thank you for choosing Phegon Hotel! Your booking has been confirmed.";
+            case "email.bookingDetails" -> "BOOKING DETAILS";
+            case "email.confirmationCode" -> "Confirmation Code";
+            case "email.checkInDate" -> "Check-in Date";
+            case "email.checkOutDate" -> "Check-out Date";
+            case "email.numberOfAdults" -> "Number of Adults";
+            case "email.numberOfChildren" -> "Number of Children";
+            case "email.totalGuests" -> "Total Guests";
+            case "email.roomDetails" -> "ROOM DETAILS";
+            case "email.roomType" -> "Room Type";
+            case "email.roomPricePerNight" -> "Room Price per Night";
+            case "email.roomDescription" -> "Room Description";
+            case "email.pricing" -> "PRICING";
+            case "email.pricePerNight" -> "Price per Night";
+            case "email.numberOfNights" -> "Number of Nights";
+            case "email.totalPrice" -> "Total Price";
+            case "email.importantInformation" -> "IMPORTANT INFORMATION";
+            case "email.arriveOnDate" -> "Please arrive at the hotel on your check-in date";
+            case "email.checkInTime" -> "Check-in time: 2:00 PM";
+            case "email.checkOutTime" -> "Check-out time: 11:00 AM";
+            case "email.bringValidID" -> "Please bring a valid ID for check-in";
+            case "email.keepConfirmationCode" -> "Keep this confirmation code for your records";
+            case "email.contactInformation" -> "CONTACT INFORMATION";
+            case "email.hotel" -> "Phegon Hotel";
+            case "email.thankYouAgain" -> "Thank you for choosing Phegon Hotel!";
+            case "email.lookForward" -> "We look forward to welcoming you.";
+            case "email.bestRegards" -> "Best regards";
+            case "email.team" -> "Phegon Hotel Team";
+            default -> key;
+        };
     }
 } 

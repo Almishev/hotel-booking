@@ -55,15 +55,21 @@ public class BookingService implements IBookingService {
             bookingRequest.setBookingConfirmationCode(bookingConfirmationCode);
             
             // Update user's preferred language if provided
+            String finalLanguage = language; // Store language before saving
             if (language != null && !language.isEmpty()) {
                 user.setPreferredLanguage(language);
                 userRepository.save(user);
+                // Refresh user object to ensure it has the updated language
+                user = userRepository.findById(userId).orElse(user);
+                // Update booking request with refreshed user
+                bookingRequest.setUser(user);
             }
             
             Booking savedBooking = bookingRepository.save(bookingRequest);
             
-            // Send confirmation email
-            emailService.sendBookingConfirmationEmail(savedBooking);
+            // Pass language directly to email service to ensure it uses the correct language
+            // Use the language from request, not from user (which might not be updated yet)
+            emailService.sendBookingConfirmationEmail(savedBooking, finalLanguage);
             
             response.setStatusCode(200);
             response.setMessage("successful");

@@ -164,6 +164,8 @@ export default function RoomDetailsPage() {
       if (response && response.statusCode === 200) {
         setConfirmationCode(response.bookingConfirmationCode);
         setShowMessage(true);
+        // Scroll to top to show success message
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         setTimeout(() => {
           setShowMessage(false);
           router.push('/rooms');
