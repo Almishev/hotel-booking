@@ -14,6 +14,7 @@ export default function ManageBookingsPage() {
     const [filteredBookings, setFilteredBookings] = useState<any[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [bookingsPerPage] = useState(10);
+    const [mounted, setMounted] = useState(false);
     const router = useRouter();
 
     const [stats, setStats] = useState({
@@ -59,13 +60,20 @@ export default function ManageBookingsPage() {
             stats.totalAdults += booking.numOfAdults || 0;
             stats.totalChildren += booking.numOfChildren || 0;
             
-            const checkIn = new Date(booking.checkInDate);
-            const checkOut = new Date(booking.checkOutDate);
-            const nights = Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24));
-            const roomPricePerNight = booking.room?.roomPrice || 0;
-            stats.totalRevenue += nights * roomPricePerNight;
+            // If booking is for a holiday package, use package price
+            if (booking.holidayPackage?.packagePrice) {
+                stats.totalRevenue += parseFloat(booking.holidayPackage.packagePrice.toString());
+            } else {
+                // Otherwise, calculate from room price and nights
+                const checkIn = new Date(booking.checkInDate);
+                const checkOut = new Date(booking.checkOutDate);
+                const nights = Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24));
+                const roomPricePerNight = booking.room?.roomPrice || 0;
+                stats.totalRevenue += nights * roomPricePerNight;
+            }
 
-            if (new Date(booking.checkInDate) > new Date()) {
+            // Only calculate active bookings on client side to avoid hydration mismatch
+            if (typeof window !== 'undefined' && new Date(booking.checkInDate) > new Date()) {
                 stats.activeBookings++;
             }
         });
@@ -117,6 +125,7 @@ export default function ManageBookingsPage() {
     };
 
     const getBookingStatus = (booking: any) => {
+        if (!mounted) return 'Loading...'; // Prevent hydration mismatch
         const today = new Date();
         const checkIn = new Date(booking.checkInDate);
         const checkOut = new Date(booking.checkOutDate);
@@ -142,6 +151,10 @@ export default function ManageBookingsPage() {
             totalGuests: filtered.reduce((sum, b) => sum + (b.totalNumOfGuest || 0), 0)
         };
     };
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     useEffect(() => {
         const fetchBookings = async () => {
@@ -214,7 +227,7 @@ export default function ManageBookingsPage() {
         }
 
         return filtered;
-    }, [bookings, filters]);
+    }, [bookings, filters, mounted]);
 
     // Use useMemo for sorting instead of useCallback to avoid infinite loops
     const sortedBookings = useMemo(() => {
@@ -277,7 +290,12 @@ export default function ManageBookingsPage() {
     };
 
     const calculateBookingTotalPrice = (booking: any) => {
-        // Check if we have all required data
+        // If booking is for a holiday package, use package price
+        if (booking.holidayPackage?.packagePrice) {
+            return parseFloat(booking.holidayPackage.packagePrice.toString());
+        }
+        
+        // Otherwise, calculate from room price and nights
         if (!booking.checkInDate || !booking.checkOutDate) {
             return 0;
         }
@@ -317,7 +335,7 @@ export default function ManageBookingsPage() {
                     </div>
                     <div className="stat-card">
                         <h3>{t('admin.totalRevenue')}</h3>
-                        <p className="stat-number">€{stats.totalRevenue.toLocaleString()}</p>
+                        <p className="stat-number">€{mounted ? stats.totalRevenue.toLocaleString() : '0'}</p>
                     </div>
                     <div className="stat-card">
                         <h3>{t('admin.activeBookings')}</h3>

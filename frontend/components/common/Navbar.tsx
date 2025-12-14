@@ -110,6 +110,7 @@ export default function Navbar() {
             <ul className={`navbar-ul${menuOpen ? ' open' : ''}`}>
                 <li><Link href="/home" className={isActive('/home') ? "active" : ""} onClick={handleNavClick}>{t('navbar.home')}</Link></li>
                 <li><Link href="/rooms" className={isActive('/rooms') ? "active" : ""} onClick={handleNavClick}>{t('navbar.rooms')}</Link></li>
+                <li><Link href="/packages" className={isActive('/packages') ? "active" : ""} onClick={handleNavClick}>{t('navbar.packages')}</Link></li>
                 <li><Link href="/find-booking" className={isActive('/find-booking') ? "active" : ""} onClick={handleNavClick}>{t('navbar.findBooking')}</Link></li>
                 {mounted && isUser && <li><Link href="/profile" className={isActive('/profile') ? "active" : ""} onClick={handleNavClick}>{t('navbar.profile')}</Link></li>}
                 {mounted && isAdmin && <li><Link href="/admin" className={isActive('/admin') ? "active" : ""} onClick={handleNavClick}>{t('navbar.admin')}</Link></li>}

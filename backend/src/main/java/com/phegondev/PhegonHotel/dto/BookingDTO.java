@@ -21,4 +21,5 @@ public class BookingDTO {
     private LocalDateTime bookingDate;
     private UserDTO user;
     private RoomDTO room;
+    private HolidayPackageDTO holidayPackage;
 }

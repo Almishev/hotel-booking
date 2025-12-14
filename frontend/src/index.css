@@ -120,6 +120,14 @@
     border-radius: 5px;
 }
 
+.form-group .password-input-container {
+    width: 90%;
+}
+
+.form-group .password-input-container input {
+    width: 100%;
+}
+
 button[type="submit"] {
     width: 95%;
     padding: 12px;

@@ -38,7 +38,10 @@ public class JWTAuthFilter extends OncePerRequestFilter {
                requestURI.startsWith("/rooms/room-by-id/") ||
                requestURI.startsWith("/bookings/get-by-confirmation-code/") ||
                requestURI.startsWith("/users/get-by-id/") ||
-               requestURI.startsWith("/users/get-user-bookings/");
+               requestURI.startsWith("/users/get-user-bookings/") ||
+               requestURI.equals("/holiday-packages/all") ||
+               requestURI.matches("/holiday-packages/\\d+") ||
+               requestURI.startsWith("/holiday-packages/available");
     }
 
     @Override

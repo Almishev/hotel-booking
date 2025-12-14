@@ -36,6 +36,9 @@ export default function AdminPage() {
                     <button className="admin-button" onClick={() => router.push('/admin/manage-bookings')}>
                         {t('admin.manageBookings')}
                     </button>
+                    <button className="admin-button" onClick={() => router.push('/admin/manage-packages')}>
+                        {t('admin.managePackages')}
+                    </button>
                 </div>
             </div>
         </AdminRoute>

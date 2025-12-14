@@ -11,6 +11,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     Optional<Booking> findByBookingConfirmationCode(String confirmationCode);
     
-    @Query("SELECT b FROM Booking b JOIN FETCH b.room JOIN FETCH b.user")
+    @Query("SELECT b FROM Booking b JOIN FETCH b.room JOIN FETCH b.user LEFT JOIN FETCH b.holidayPackage")
     List<Booking> findAllWithRoomAndUser();
 }

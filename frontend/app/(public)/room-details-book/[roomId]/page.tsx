@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import ApiService from '@/lib/service/ApiService';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -12,7 +12,9 @@ export default function RoomDetailsPage() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
   const roomId = params.roomId as string;
+  const packageId = searchParams.get('packageId');
   
   const [roomDetails, setRoomDetails] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -28,6 +30,8 @@ export default function RoomDetailsPage() {
   const [showMessage, setShowMessage] = useState(false);
   const [confirmationCode, setConfirmationCode] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [packageDetails, setPackageDetails] = useState<any>(null);
+  const [isPackageBooking, setIsPackageBooking] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -40,6 +44,32 @@ export default function RoomDetailsPage() {
         } else {
           setError(t('rooms.notFound') || 'Room not found');
         }
+        
+        // If packageId is provided, fetch package details
+        if (packageId) {
+          try {
+            const packageResponse = await ApiService.getHolidayPackageById(packageId);
+            if (packageResponse && packageResponse.holidayPackage) {
+              const pkg = packageResponse.holidayPackage;
+              setPackageDetails(pkg);
+              setIsPackageBooking(true);
+              
+              // Set dates from package
+              if (pkg.startDate && pkg.endDate) {
+                setCheckInDate(new Date(pkg.startDate));
+                setCheckOutDate(new Date(pkg.endDate));
+              }
+              
+              // Set price from package
+              if (pkg.packagePrice) {
+                setTotalPrice(parseFloat(pkg.packagePrice.toString()));
+              }
+            }
+          } catch (pkgError: any) {
+            console.error('Error fetching package details:', pkgError);
+            // Continue without package - user can still book normally
+          }
+        }
         // Don't fetch user profile here - userId is only needed when booking
       } catch (error: any) {
         console.error('Error fetching room details:', error);
@@ -49,9 +79,17 @@ export default function RoomDetailsPage() {
       }
     };
     fetchData();
-  }, [roomId]);
+  }, [roomId, packageId]);
 
   useEffect(() => {
+    // If it's a package booking, don't recalculate price - use package price
+    if (isPackageBooking && packageDetails) {
+      const totalGuests = numAdults + numChildren;
+      setTotalGuests(totalGuests);
+      // Price is already set from package
+      return;
+    }
+    
     if (checkInDate && checkOutDate && roomDetails) {
       const oneDay = 24 * 60 * 60 * 1000;
       const startDate = new Date(checkInDate);
@@ -65,7 +103,7 @@ export default function RoomDetailsPage() {
       setTotalPrice(totalPrice);
       setTotalGuests(totalGuests);
     }
-  }, [checkInDate, checkOutDate, numAdults, numChildren, roomDetails]);
+  }, [checkInDate, checkOutDate, numAdults, numChildren, roomDetails, isPackageBooking, packageDetails]);
 
   const handleBookNow = () => {
     // Check if user is authenticated before showing date picker
@@ -76,7 +114,8 @@ export default function RoomDetailsPage() {
       }, 2000);
       return;
     }
-    // If authenticated, show date picker
+    // If it's a package booking, dates are already set - just show the booking form
+    // If it's a normal booking, show date picker
     setShowDatePicker(true);
   };
 
@@ -149,13 +188,20 @@ export default function RoomDetailsPage() {
       const formattedCheckInDate = new Date(startDate.getTime() - (startDate.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
       const formattedCheckOutDate = new Date(endDate.getTime() - (endDate.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
       
-      const booking = {
+      const booking: any = {
         checkInDate: formattedCheckInDate,
         checkOutDate: formattedCheckOutDate,
         numOfAdults: numAdults,
         numOfChildren: numChildren,
         language: i18n.language || 'en' // Add current language
       };
+      
+      // If it's a package booking, include holidayPackage
+      if (isPackageBooking && packageDetails) {
+        booking.holidayPackage = {
+          id: packageDetails.id
+        };
+      }
       
       console.log("Sending booking request:", booking);
       const response = await ApiService.bookRoom(roomId, currentUserId, booking);
@@ -278,7 +324,26 @@ export default function RoomDetailsPage() {
       <img src={roomPhotoUrl} alt={roomType} className="room-details-image" />
       <div className="room-details-info">
         <h3>{roomType}</h3>
-        <p>{t('rooms.price')}: €{roomPrice} {t('rooms.perNight')}</p>
+        {isPackageBooking && packageDetails ? (
+          <>
+            <div style={{ backgroundColor: '#e3f2fd', padding: '1rem', borderRadius: '8px', marginBottom: '1rem', border: '2px solid #2196f3' }}>
+              <h4 style={{ color: '#1976d2', marginBottom: '0.5rem' }}>{t('packages.packageBooking')}: {packageDetails.name}</h4>
+              <p><strong>{t('packages.dates')}:</strong> {new Date(packageDetails.startDate).toLocaleDateString()} - {new Date(packageDetails.endDate).toLocaleDateString()}</p>
+              <p><strong>{t('packages.price')}:</strong> €{packageDetails.packagePrice}</p>
+              {packageDetails.description && (
+                <p><strong>{t('packages.description')}:</strong> {packageDetails.description}</p>
+              )}
+            </div>
+            <p style={{ textDecoration: 'line-through', color: '#999' }}>
+              {t('rooms.price')}: €{roomPrice} {t('rooms.perNight')}
+            </p>
+            <p style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#00796b' }}>
+              {t('packages.packagePrice')}: €{packageDetails.packagePrice}
+            </p>
+          </>
+        ) : (
+          <p>{t('rooms.price')}: €{roomPrice} {t('rooms.perNight')}</p>
+        )}
         {roomDescription && roomDescription.trim() !== '' ? (
           <p><strong>{t('rooms.description')}:</strong> {roomDescription}</p>
         ) : (
@@ -306,35 +371,43 @@ export default function RoomDetailsPage() {
         </div>
         {showDatePicker && (
           <div className="date-picker-container">
-            <div className="booking-form-section">
-              <h4>{t('rooms.selectDates')}</h4>
-              <div className="date-inputs">
-                <DatePicker
-                  className="detail-search-field datepicker-input"
-                  selected={checkInDate}
-                  onChange={(date) => setCheckInDate(date)}
-                  selectsStart
-                  startDate={checkInDate}
-                  endDate={checkOutDate}
-                  placeholderText={t('rooms.selectCheckIn')}
-                  dateFormat="dd/MM/yyyy"
-                  minDate={new Date()}
-                  wrapperClassName="datepicker-wrapper"
-                />
-                <DatePicker
-                  className="detail-search-field datepicker-input"
-                  selected={checkOutDate}
-                  onChange={(date) => setCheckOutDate(date)}
-                  selectsEnd
-                  startDate={checkInDate}
-                  endDate={checkOutDate}
-                  minDate={checkInDate || new Date()}
-                  placeholderText={t('rooms.selectCheckOut')}
-                  dateFormat="dd/MM/yyyy"
-                  wrapperClassName="datepicker-wrapper"
-                />
+            {isPackageBooking && packageDetails ? (
+              <div className="booking-form-section" style={{ backgroundColor: '#e3f2fd', padding: '1rem', borderRadius: '8px', marginBottom: '1rem' }}>
+                <h4 style={{ color: '#1976d2' }}>{t('packages.packageBooking')}: {packageDetails.name}</h4>
+                <p><strong>{t('packages.dates')}:</strong> {new Date(packageDetails.startDate).toLocaleDateString()} - {new Date(packageDetails.endDate).toLocaleDateString()}</p>
+                <p><strong>{t('packages.price')}:</strong> €{packageDetails.packagePrice}</p>
               </div>
-            </div>
+            ) : (
+              <div className="booking-form-section">
+                <h4>{t('rooms.selectDates')}</h4>
+                <div className="date-inputs">
+                  <DatePicker
+                    className="detail-search-field datepicker-input"
+                    selected={checkInDate}
+                    onChange={(date) => setCheckInDate(date)}
+                    selectsStart
+                    startDate={checkInDate}
+                    endDate={checkOutDate}
+                    placeholderText={t('rooms.selectCheckIn')}
+                    dateFormat="dd/MM/yyyy"
+                    minDate={new Date()}
+                    wrapperClassName="datepicker-wrapper"
+                  />
+                  <DatePicker
+                    className="detail-search-field datepicker-input"
+                    selected={checkOutDate}
+                    onChange={(date) => setCheckOutDate(date)}
+                    selectsEnd
+                    startDate={checkInDate}
+                    endDate={checkOutDate}
+                    minDate={checkInDate || new Date()}
+                    placeholderText={t('rooms.selectCheckOut')}
+                    dateFormat="dd/MM/yyyy"
+                    wrapperClassName="datepicker-wrapper"
+                  />
+                </div>
+              </div>
+            )}
             
             <div className="booking-form-section">
               <h4>{t('rooms.guests')}</h4>

@@ -45,6 +45,10 @@ public class Booking {
     @JoinColumn(name = "room_id")
     private Room room;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "holiday_package_id")
+    private HolidayPackage holidayPackage; // Nullable - ако е null, значи е нормална резервация
+
     public void calculateTotalNumberOfGuest() {
         this.totalNumOfGuest = this.numOfAdults + this.numOfChildren;
     }

@@ -6,7 +6,9 @@ import com.phegondev.PhegonHotel.entity.Booking;
 import com.phegondev.PhegonHotel.entity.Room;
 import com.phegondev.PhegonHotel.entity.User;
 import com.phegondev.PhegonHotel.exception.OurException;
+import com.phegondev.PhegonHotel.entity.HolidayPackage;
 import com.phegondev.PhegonHotel.repo.BookingRepository;
+import com.phegondev.PhegonHotel.repo.HolidayPackageRepository;
 import com.phegondev.PhegonHotel.repo.RoomRepository;
 import com.phegondev.PhegonHotel.repo.UserRepository;
 import com.phegondev.PhegonHotel.service.interfac.IBookingService;
@@ -15,6 +17,7 @@ import com.phegondev.PhegonHotel.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -28,6 +31,8 @@ public class BookingService implements IBookingService {
     private UserRepository userRepository;
     @Autowired
     private EmailService emailService;
+    @Autowired
+    private HolidayPackageRepository holidayPackageRepository;
 
 
     @Override
@@ -44,8 +49,43 @@ public class BookingService implements IBookingService {
 
             List<Booking> existingBookings = room.getBookings();
 
+            // Ако резервацията НЕ е за пакет, провери дали има неразрушим активен пакет, който припокрива датите
+            if (bookingRequest.getHolidayPackage() == null) {
+                List<HolidayPackage> nonDestructiblePackages = holidayPackageRepository
+                        .findNonDestructiblePackagesForRoomAndDates(roomId, bookingRequest.getCheckInDate(), bookingRequest.getCheckOutDate());
+                
+                // Ако има неразрушим пакет, който припокрива датите, блокираме резервацията
+                if (!nonDestructiblePackages.isEmpty()) {
+                    HolidayPackage blockingPackage = nonDestructiblePackages.get(0);
+                    throw new OurException("These dates are part of a holiday package: \"" + blockingPackage.getName() + 
+                                       "\". Please book the package instead or choose different dates.");
+                }
+            }
+
             if (!roomIsAvailable(bookingRequest, existingBookings)) {
                 throw new OurException("Room not Available for selected date range");
+            }
+
+            // Ако е резервация за пакет, задай holidayPackage
+            if (bookingRequest.getHolidayPackage() != null) {
+                HolidayPackage packageEntity = holidayPackageRepository.findById(bookingRequest.getHolidayPackage().getId())
+                        .orElseThrow(() -> new OurException("Holiday Package Not Found"));
+                
+                // Провери дали пакетът все още е наличен (няма други резервации, които блокират датите на пакета)
+                // Това е важно само ако пакетът е разрушим (allowPartialBookings = true)
+                if (packageEntity.getAllowPartialBookings()) {
+                    List<Booking> conflictingBookings = existingBookings.stream()
+                            .filter(booking -> booking.getHolidayPackage() == null) // Само нормални резервации
+                            .filter(booking -> datesOverlap(booking.getCheckInDate(), booking.getCheckOutDate(), 
+                                    packageEntity.getStartDate(), packageEntity.getEndDate()))
+                            .toList();
+                    
+                    if (!conflictingBookings.isEmpty()) {
+                        throw new OurException("Holiday package is no longer available. Some dates are already booked.");
+                    }
+                }
+                
+                bookingRequest.setHolidayPackage(packageEntity);
             }
 
             bookingRequest.setRoom(room);
@@ -183,5 +223,10 @@ public class BookingService implements IBookingService {
                                 || (bookingRequest.getCheckInDate().equals(existingBooking.getCheckOutDate())
                                 && bookingRequest.getCheckOutDate().equals(bookingRequest.getCheckInDate()))
                 );
+    }
+
+    // Helper метод за проверка на припокриване на дати
+    private boolean datesOverlap(LocalDate start1, LocalDate end1, LocalDate start2, LocalDate end2) {
+        return start1.isBefore(end2) && end1.isAfter(start2);
     }
 }

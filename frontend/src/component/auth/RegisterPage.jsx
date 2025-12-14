@@ -16,6 +16,7 @@ function RegisterPage() {
 
     const [errorMessage, setErrorMessage] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -83,7 +84,22 @@ function RegisterPage() {
                 </div>
                 <div className="form-group">
                     <label>{t('register.password')}:</label>
-                    <input type="password" name="password" value={formData.password} onChange={handleInputChange} required />
+                    <div className="password-input-container">
+                        <input
+                            type={showPassword ? "text" : "password"}
+                            name="password"
+                            value={formData.password}
+                            onChange={handleInputChange}
+                            required
+                        />
+                        <button
+                            type="button"
+                            className="password-toggle-btn"
+                            onClick={() => setShowPassword(!showPassword)}
+                        >
+                            {showPassword ? "●" : "○"}
+                        </button>
+                    </div>
                 </div>
                 <button type="submit">{t('register.submit')}</button>
             </form>

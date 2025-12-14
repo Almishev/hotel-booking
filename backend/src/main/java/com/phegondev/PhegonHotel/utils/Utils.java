@@ -1,9 +1,11 @@
 package com.phegondev.PhegonHotel.utils;
 
 import com.phegondev.PhegonHotel.dto.BookingDTO;
+import com.phegondev.PhegonHotel.dto.HolidayPackageDTO;
 import com.phegondev.PhegonHotel.dto.RoomDTO;
 import com.phegondev.PhegonHotel.dto.UserDTO;
 import com.phegondev.PhegonHotel.entity.Booking;
+import com.phegondev.PhegonHotel.entity.HolidayPackage;
 import com.phegondev.PhegonHotel.entity.Room;
 import com.phegondev.PhegonHotel.entity.User;
 
@@ -103,6 +105,20 @@ public class Utils {
             roomDTO.setRoomPhotoUrl(booking.getRoom().getRoomPhotoUrl());
             roomDTO.setRoomDescription(booking.getRoom().getRoomDescription());
             bookingDTO.setRoom(roomDTO);
+        }
+        if (booking.getHolidayPackage() != null) {
+            HolidayPackage holidayPackage = booking.getHolidayPackage();
+            HolidayPackageDTO packageDTO = new HolidayPackageDTO();
+            packageDTO.setId(holidayPackage.getId());
+            packageDTO.setName(holidayPackage.getName());
+            packageDTO.setStartDate(holidayPackage.getStartDate());
+            packageDTO.setEndDate(holidayPackage.getEndDate());
+            packageDTO.setPackagePrice(holidayPackage.getPackagePrice());
+            packageDTO.setDescription(holidayPackage.getDescription());
+            packageDTO.setIsActive(holidayPackage.getIsActive());
+            packageDTO.setAllowPartialBookings(holidayPackage.getAllowPartialBookings());
+            // Don't include room in packageDTO to avoid circular reference
+            bookingDTO.setHolidayPackage(packageDTO);
         }
         return bookingDTO;
     }

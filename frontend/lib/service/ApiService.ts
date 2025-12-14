@@ -228,5 +228,106 @@ export default class ApiService {
         console.log("ApiService - isUser check:", role === 'USER')
         return role === 'USER'
     }
+
+    /**HOLIDAY PACKAGES */
+    /* This adds a new holiday package */
+    static async addHolidayPackage(packageData: {
+        roomId: number;
+        name: string;
+        startDate: string;
+        endDate: string;
+        packagePrice: number;
+        description?: string;
+        allowPartialBookings?: boolean;
+    }) {
+        const params = new URLSearchParams();
+        params.append('roomId', packageData.roomId.toString());
+        params.append('name', packageData.name);
+        params.append('startDate', packageData.startDate);
+        params.append('endDate', packageData.endDate);
+        params.append('packagePrice', packageData.packagePrice.toString());
+        if (packageData.description) {
+            params.append('description', packageData.description);
+        }
+        if (packageData.allowPartialBookings !== undefined) {
+            params.append('allowPartialBookings', packageData.allowPartialBookings.toString());
+        }
+        
+        const result = await axios.post(`${this.BASE_URL}/holiday-packages/add?${params.toString()}`, {}, {
+            headers: this.getHeader()
+        });
+        return result.data;
+    }
+
+    /* This gets all holiday packages */
+    static async getAllHolidayPackages() {
+        const result = await axios.get(`${this.BASE_URL}/holiday-packages/all`);
+        return result.data;
+    }
+
+    /* This gets a holiday package by id */
+    static async getHolidayPackageById(packageId: string) {
+        const result = await axios.get(`${this.BASE_URL}/holiday-packages/${packageId}`);
+        return result.data;
+    }
+
+    /* This updates a holiday package */
+    static async updateHolidayPackage(packageId: string, packageData: {
+        roomId?: number;
+        name?: string;
+        startDate?: string;
+        endDate?: string;
+        packagePrice?: number;
+        description?: string;
+        isActive?: boolean;
+        allowPartialBookings?: boolean;
+    }) {
+        const params = new URLSearchParams();
+        if (packageData.roomId !== undefined) {
+            params.append('roomId', packageData.roomId.toString());
+        }
+        if (packageData.name) {
+            params.append('name', packageData.name);
+        }
+        if (packageData.startDate) {
+            params.append('startDate', packageData.startDate);
+        }
+        if (packageData.endDate) {
+            params.append('endDate', packageData.endDate);
+        }
+        if (packageData.packagePrice !== undefined) {
+            params.append('packagePrice', packageData.packagePrice.toString());
+        }
+        if (packageData.description !== undefined) {
+            params.append('description', packageData.description);
+        }
+        if (packageData.isActive !== undefined) {
+            params.append('isActive', packageData.isActive.toString());
+        }
+        if (packageData.allowPartialBookings !== undefined) {
+            params.append('allowPartialBookings', packageData.allowPartialBookings.toString());
+        }
+        
+        const result = await axios.put(`${this.BASE_URL}/holiday-packages/update/${packageId}?${params.toString()}`, {}, {
+            headers: this.getHeader()
+        });
+        return result.data;
+    }
+
+    /* This deletes a holiday package */
+    static async deleteHolidayPackage(packageId: string) {
+        const result = await axios.delete(`${this.BASE_URL}/holiday-packages/delete/${packageId}`, {
+            headers: this.getHeader()
+        });
+        return result.data;
+    }
+
+    /* This gets active packages for room and dates */
+    static async getActivePackagesForRoomAndDates(roomId: string, checkInDate: string, checkOutDate: string) {
+        const result = await axios.get(
+            `${this.BASE_URL}/holiday-packages/available?roomId=${roomId}&checkInDate=${checkInDate}&checkOutDate=${checkOutDate}`
+        );
+        return result.data;
+    }
 }
 
