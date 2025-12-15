@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "cross-env PORT=3000 next start",
+    "start": "next start",
     "start:prod": "next start",
     "lint": "eslint"
   },
