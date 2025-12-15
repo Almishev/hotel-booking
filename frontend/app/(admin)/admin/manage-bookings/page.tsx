@@ -259,9 +259,16 @@ export default function ManageBookingsPage() {
                 bValue = b.user?.name || '';
             }
 
+            // За всички полета, които са дати, сравняваме по timestamp (число),
+            // иначе получаваме Date обекти и сортирането връща винаги 0.
             if (sortConfig.key.includes('Date')) {
-                aValue = new Date(aValue);
-                bValue = new Date(bValue);
+                const aTime = aValue ? new Date(aValue).getTime() : NaN;
+                const bTime = bValue ? new Date(bValue).getTime() : NaN;
+
+                if (!isNaN(aTime) && !isNaN(bTime)) {
+                    return sortConfig.direction === 'asc' ? aTime - bTime : bTime - aTime;
+                }
+                return 0;
             }
 
             if (typeof aValue === 'number' && typeof bValue === 'number') {

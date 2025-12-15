@@ -161,6 +161,12 @@ export default function AdminPage() {
         }
     };
 
+    const handlePrintCalendar = () => {
+        if (typeof window !== 'undefined') {
+            window.print();
+        }
+    };
+
     return (
         <StaffRoute>
             <div className="admin-page">
@@ -193,6 +199,7 @@ export default function AdminPage() {
                 {/* Модален прозорец с календар за заетост по стаи за избран период */}
                 {showCalendarModal && (
                     <div
+                        className="calendar-modal-overlay"
                         style={{
                             position: 'fixed',
                             top: 0,
@@ -207,6 +214,7 @@ export default function AdminPage() {
                         }}
                     >
                         <div
+                            className="calendar-modal-content"
                             style={{
                                 backgroundColor: '#fff',
                                 borderRadius: '8px',
@@ -240,7 +248,7 @@ export default function AdminPage() {
                                 </button>
                             </div>
 
-                            <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                            <div className="calendar-date-inputs" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
                                 <div>
                                     <label style={{ display: 'block', marginBottom: '0.25rem' }}>От дата</label>
                                     <input
@@ -264,7 +272,7 @@ export default function AdminPage() {
                                 )}
                             </div>
 
-                            <div style={{ overflowX: 'auto' }}>
+                            <div className="calendar-table-wrapper" style={{ overflowX: 'auto' }}>
                                 <table style={{ borderCollapse: 'collapse', width: '100%', minWidth: '600px' }}>
                                     <thead>
                                         <tr>
@@ -312,7 +320,22 @@ export default function AdminPage() {
                             </div>
 
                             {/* Допълнителен бутон за затваряне долу, за по-лесен достъп */}
-                            <div style={{ marginTop: '1rem', textAlign: 'right' }}>
+                            <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <button
+                                    type="button"
+                                    onClick={handlePrintCalendar}
+                                    style={{
+                                        padding: '0.5rem 1rem',
+                                        borderRadius: '4px',
+                                        border: 'none',
+                                        backgroundColor: '#00796b',
+                                        color: '#fff',
+                                        cursor: 'pointer',
+                                        fontWeight: 'bold'
+                                    }}
+                                >
+                                    Принтирай календара
+                                </button>
                                 <button
                                     type="button"
                                     onClick={() => setShowCalendarModal(false)}

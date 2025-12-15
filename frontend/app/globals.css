@@ -1542,3 +1542,130 @@ p {
         flex: 1 1 100%;
     }
 }
+
+/* Print styles for calendar modal */
+@media print {
+    /* Hide everything by default - more aggressive approach */
+    html, body {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    body * {
+        visibility: hidden;
+    }
+    
+    /* Show calendar modal overlay and all its content */
+    .calendar-modal-overlay,
+    .calendar-modal-overlay * {
+        visibility: visible !important;
+    }
+    
+    /* Position calendar modal overlay */
+    .calendar-modal-overlay {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        background-color: white !important;
+        display: flex !important;
+        align-items: flex-start !important;
+        justify-content: center !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        z-index: 999999 !important;
+        overflow: visible !important;
+    }
+    
+    /* Show modal content container */
+    .calendar-modal-content {
+        box-shadow: none !important;
+        max-width: 100% !important;
+        max-height: none !important;
+        padding: 1rem !important;
+        margin: 0 !important;
+        background-color: white !important;
+        border-radius: 0 !important;
+        width: 100% !important;
+        overflow: visible !important;
+        display: block !important;
+        visibility: visible !important;
+    }
+    
+    /* Show calendar header */
+    .calendar-modal-content h2 {
+        display: block !important;
+        margin-bottom: 1rem !important;
+        font-size: 1.5rem !important;
+        visibility: visible !important;
+    }
+    
+    /* Hide all buttons when printing */
+    .calendar-modal-content button {
+        display: none !important;
+        visibility: hidden !important;
+    }
+    
+    /* Hide date inputs container when printing */
+    .calendar-modal-content .calendar-date-inputs {
+        display: none !important;
+        visibility: hidden !important;
+    }
+    
+    /* Hide error messages */
+    .calendar-modal-content span[style*="color: #c62828"] {
+        display: none !important;
+        visibility: hidden !important;
+    }
+    
+    /* Show calendar table wrapper */
+    .calendar-modal-content .calendar-table-wrapper {
+        display: block !important;
+        overflow: visible !important;
+        width: 100% !important;
+        visibility: visible !important;
+    }
+    
+    /* Show calendar table */
+    .calendar-modal-content .calendar-table-wrapper table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        page-break-inside: auto;
+        display: table !important;
+        visibility: visible !important;
+        margin: 0 !important;
+    }
+    
+    .calendar-modal-content .calendar-table-wrapper table thead {
+        display: table-header-group !important;
+        visibility: visible !important;
+    }
+    
+    .calendar-modal-content .calendar-table-wrapper table tbody {
+        display: table-row-group !important;
+        visibility: visible !important;
+    }
+    
+    .calendar-modal-content .calendar-table-wrapper table tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
+        display: table-row !important;
+        visibility: visible !important;
+    }
+    
+    .calendar-modal-content .calendar-table-wrapper table td,
+    .calendar-modal-content .calendar-table-wrapper table th {
+        display: table-cell !important;
+        border: 1px solid #ddd !important;
+        padding: 0.5rem !important;
+        visibility: visible !important;
+    }
+    
+    .calendar-modal-content .calendar-table-wrapper table th {
+        background-color: #f5f5f5 !important;
+        font-weight: bold !important;
+    }
+}
