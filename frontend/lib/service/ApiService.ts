@@ -173,6 +173,18 @@ export default class ApiService {
         }
     }
 
+    /* This creates a booking from the admin panel (walk-in guest) */
+    static async adminCreateBooking(roomId: string, payload: any) {
+        const result = await axios.post(
+            `${this.BASE_URL}/bookings/admin-booking/${roomId}`,
+            payload,
+            {
+                headers: this.getHeader()
+            }
+        );
+        return result.data;
+    }
+
     /* This  gets alll bokings from the database */
     static async getAllBookings() {
         const result = await axios.get(`${this.BASE_URL}/bookings/all`, {
@@ -222,6 +234,13 @@ export default class ApiService {
         const role = localStorage.getItem('role')
         console.log("ApiService - isAdmin check:", role === 'ADMIN')
         return role === 'ADMIN'
+    }
+
+    static isEditor() {
+        if (typeof window === 'undefined') return false;
+        const role = localStorage.getItem('role');
+        console.log("ApiService - isEditor check:", role === 'EDITOR');
+        return role === 'EDITOR';
     }
 
     static isUser() {

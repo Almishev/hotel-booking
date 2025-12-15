@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import ApiService from '@/lib/service/ApiService';
-import { AdminRoute } from '@/lib/service/guard';
+import { StaffRoute } from '@/lib/service/guard';
 import { useTranslation } from 'react-i18next';
 import '@/lib/i18n';
 
@@ -53,11 +53,15 @@ export default function EditBookingPage() {
     }
 
     if (!booking) {
-        return <div>{t('findBooking.loading')}</div>;
+        return (
+            <StaffRoute>
+                <div>{t('findBooking.loading')}</div>
+            </StaffRoute>
+        );
     }
 
     return (
-        <AdminRoute>
+        <StaffRoute>
             <div className="find-booking-page">
                 <h2>{t('admin.editBooking')}</h2>
                 {error && <p className='error-message'>{error}</p>}
@@ -101,7 +105,7 @@ export default function EditBookingPage() {
                     </div>
                 )}
             </div>
-        </AdminRoute>
+        </StaffRoute>
     );
 }
 

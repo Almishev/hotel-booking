@@ -4,6 +4,7 @@ C:\Users\Admin\Desktop\hms\backend\src\main\java\com\phegondev\PhegonHotel\contr
 C:\Users\Admin\Desktop\hms\backend\src\main\java\com\phegondev\PhegonHotel\controller\HolidayPackageController.java
 C:\Users\Admin\Desktop\hms\backend\src\main\java\com\phegondev\PhegonHotel\controller\RoomController.java
 C:\Users\Admin\Desktop\hms\backend\src\main\java\com\phegondev\PhegonHotel\controller\UserController.java
+C:\Users\Admin\Desktop\hms\backend\src\main\java\com\phegondev\PhegonHotel\dto\AdminBookingRequest.java
 C:\Users\Admin\Desktop\hms\backend\src\main\java\com\phegondev\PhegonHotel\dto\BookingDTO.java
 C:\Users\Admin\Desktop\hms\backend\src\main\java\com\phegondev\PhegonHotel\dto\HolidayPackageDTO.java
 C:\Users\Admin\Desktop\hms\backend\src\main\java\com\phegondev\PhegonHotel\dto\LoginRequest.java

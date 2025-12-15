@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import ApiService from '@/lib/service/ApiService';
-import { AdminRoute } from '@/lib/service/guard';
+import { StaffRoute } from '@/lib/service/guard';
 import Pagination from '@/components/common/Pagination';
 import { useTranslation } from 'react-i18next';
 import '@/lib/i18n';
@@ -44,6 +44,8 @@ export default function ManageBookingsPage() {
         from: '',
         to: ''
     });
+
+    const [roomTypes, setRoomTypes] = useState<string[]>([]);
 
     const calculateStats = useCallback((bookingsData: any[]) => {
         const stats = {
@@ -167,19 +169,26 @@ export default function ManageBookingsPage() {
     }, []);
 
     useEffect(() => {
-        const fetchBookings = async () => {
+        const fetchData = async () => {
             try {
-                const response = await ApiService.getAllBookings();
-                const allBookings = response.bookingList || [];
+                const [bookingsResponse, roomTypesResponse] = await Promise.all([
+                    ApiService.getAllBookings(),
+                    ApiService.getRoomTypes()
+                ]);
+
+                const allBookings = bookingsResponse.bookingList || [];
                 setBookings(allBookings);
                 setFilteredBookings(allBookings);
                 calculateStats(allBookings);
+
+                const types = roomTypesResponse || [];
+                setRoomTypes(types);
             } catch (error: any) {
-                console.error('Error fetching bookings:', error.message);
+                console.error('Error fetching bookings or room types:', error.message);
             }
         };
 
-        fetchBookings();
+        fetchData();
     }, [calculateStats]);
 
     // Use useMemo for filtering to avoid infinite loops
@@ -332,7 +341,7 @@ export default function ManageBookingsPage() {
     const analytics = getAnalytics();
 
     return (
-        <AdminRoute>
+        <StaffRoute>
             <div className='admin-dashboard'>
                 <h2>{t('admin.dashboardTitle')}</h2>
                 
@@ -417,9 +426,11 @@ export default function ManageBookingsPage() {
                                 onChange={(e) => setFilters(prev => ({ ...prev, roomType: e.target.value }))}
                             >
                                 <option value="all">{t('admin.allRoomTypes')}</option>
-                                <option value="Delux">Delux</option>
-                                <option value="Standard">Standard</option>
-                                <option value="Suite">Suite</option>
+                                {roomTypes.map((type) => (
+                                    <option key={type} value={type}>
+                                        {type}
+                                    </option>
+                                ))}
                             </select>
                         </div>
                         <div className="filter-group">
@@ -505,12 +516,21 @@ export default function ManageBookingsPage() {
                                         </span>
                                     </td>
                                     <td>
-                                        <button
-                                            className="manage-btn"
-                                            onClick={() => router.push(`/admin/edit-booking/${booking.bookingConfirmationCode}`)}
-                                        >
-                                            {t('admin.manage')}
-                                        </button>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                                            <button
+                                                className="manage-btn"
+                                                onClick={() => router.push(`/admin/edit-booking/${booking.bookingConfirmationCode}`)}
+                                            >
+                                                {t('admin.manage')}
+                                            </button>
+                                            <button
+                                                className="manage-btn"
+                                                style={{ backgroundColor: '#00796b' }}
+                                                onClick={() => router.push(`/admin/checkin-form/${booking.bookingConfirmationCode}`)}
+                                            >
+                                                {t('admin.printCheckInForm') || 'Формуляр за настаняване'}
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))}
@@ -525,6 +545,6 @@ export default function ManageBookingsPage() {
                     paginate={paginate}
                 />
             </div>
-        </AdminRoute>
+        </StaffRoute>
     );
 }

@@ -14,6 +14,7 @@ export default function Navbar() {
     const [menuOpen, setMenuOpen] = useState(false);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [isAdmin, setIsAdmin] = useState(false);
+    const [isEditor, setIsEditor] = useState(false);
     const [isUser, setIsUser] = useState(false);
     const [mounted, setMounted] = useState(false);
 
@@ -21,6 +22,7 @@ export default function Navbar() {
     const updateAuthState = () => {
         setIsAuthenticated(ApiService.isAuthenticated());
         setIsAdmin(ApiService.isAdmin());
+        setIsEditor(ApiService.isEditor());
         setIsUser(ApiService.isUser());
     };
 
@@ -113,7 +115,17 @@ export default function Navbar() {
                 <li><Link href="/packages" className={isActive('/packages') ? "active" : ""} onClick={handleNavClick}>{t('navbar.packages')}</Link></li>
                 <li><Link href="/find-booking" className={isActive('/find-booking') ? "active" : ""} onClick={handleNavClick}>{t('navbar.findBooking')}</Link></li>
                 {mounted && isUser && <li><Link href="/profile" className={isActive('/profile') ? "active" : ""} onClick={handleNavClick}>{t('navbar.profile')}</Link></li>}
-                {mounted && isAdmin && <li><Link href="/admin" className={isActive('/admin') ? "active" : ""} onClick={handleNavClick}>{t('navbar.admin')}</Link></li>}
+                {mounted && (isAdmin || isEditor) && (
+                    <li>
+                        <Link
+                            href="/admin"
+                            className={isActive('/admin') ? "active" : ""}
+                            onClick={handleNavClick}
+                        >
+                            {t('navbar.admin')}
+                        </Link>
+                    </li>
+                )}
                 {mounted && !isAuthenticated && <li><Link href="/login" className={isActive('/login') ? "active" : ""} onClick={handleNavClick}>{t('navbar.login')}</Link></li>}
                 {mounted && isAuthenticated && <li onClick={() => { handleLogout(); handleNavClick(); }} style={{cursor:'pointer'}}>{t('navbar.logout')}</li>}
                 <li className="navbar-flags" style={{marginLeft: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem'}}>

@@ -1,5 +1,6 @@
 package com.phegondev.PhegonHotel.service.impl;
 
+import com.phegondev.PhegonHotel.dto.AdminBookingRequest;
 import com.phegondev.PhegonHotel.dto.BookingDTO;
 import com.phegondev.PhegonHotel.dto.Response;
 import com.phegondev.PhegonHotel.entity.Booking;
@@ -15,6 +16,7 @@ import com.phegondev.PhegonHotel.service.interfac.IBookingService;
 import com.phegondev.PhegonHotel.service.EmailService;
 import com.phegondev.PhegonHotel.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -33,6 +35,9 @@ public class BookingService implements IBookingService {
     private EmailService emailService;
     @Autowired
     private HolidayPackageRepository holidayPackageRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
 
     @Override
@@ -140,6 +145,70 @@ public class BookingService implements IBookingService {
             response.setStatusCode(500);
             response.setMessage("Error Saving a booking: " + e.getMessage());
 
+        }
+        return response;
+    }
+
+    @Override
+    public Response createAdminBooking(Long roomId, AdminBookingRequest request) {
+        Response response = new Response();
+        try {
+            // Determine language (optional)
+            String language = request.getLanguage();
+
+            // Find or create user
+            User user;
+            if (request.getUserId() != null) {
+                user = userRepository.findById(request.getUserId())
+                        .orElseThrow(() -> new OurException("User Not Found"));
+            } else {
+                if (request.getGuestEmail() == null || request.getGuestEmail().isBlank()) {
+                    throw new OurException("Guest email is required for admin booking");
+                }
+                if (userRepository.existsByEmail(request.getGuestEmail())) {
+                    // If user already exists with this email, reuse it
+                    user = userRepository.findByEmail(request.getGuestEmail())
+                            .orElseThrow(() -> new OurException("User Not Found"));
+                } else {
+                    user = new User();
+                    user.setEmail(request.getGuestEmail());
+                    user.setName(request.getGuestName() != null ? request.getGuestName() : "Guest");
+                    user.setPhoneNumber(request.getGuestPhoneNumber() != null ? request.getGuestPhoneNumber() : "N/A");
+                    user.setRole("USER");
+                    String randomPassword = Utils.generateRandomConfirmationCode(8);
+                    user.setPassword(passwordEncoder.encode(randomPassword));
+                    if (language != null && !language.isBlank()) {
+                        user.setPreferredLanguage(language);
+                    }
+                    user = userRepository.save(user);
+                }
+            }
+
+            // Build Booking entity from request
+            Booking booking = new Booking();
+            booking.setCheckInDate(request.getCheckInDate());
+            booking.setCheckOutDate(request.getCheckOutDate());
+            booking.setNumOfAdults(request.getNumOfAdults());
+            booking.setNumOfChildren(request.getNumOfChildren());
+            // totalNumOfGuest will be calculated by setters
+            booking.calculateTotalNumberOfGuest();
+
+            // Attach holiday package if provided
+            if (request.getHolidayPackageId() != null) {
+                HolidayPackage pkg = holidayPackageRepository.findById(request.getHolidayPackageId())
+                        .orElseThrow(() -> new OurException("Holiday Package Not Found"));
+                booking.setHolidayPackage(pkg);
+            }
+
+            // Reuse existing saveBooking logic (availability checks, emails, etc.)
+            return saveBooking(roomId, user.getId(), booking, language);
+
+        } catch (OurException e) {
+            response.setStatusCode(400);
+            response.setMessage(e.getMessage());
+        } catch (Exception e) {
+            response.setStatusCode(500);
+            response.setMessage("Error Creating admin booking: " + e.getMessage());
         }
         return response;
     }

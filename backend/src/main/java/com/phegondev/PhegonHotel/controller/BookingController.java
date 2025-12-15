@@ -1,6 +1,7 @@
 package com.phegondev.PhegonHotel.controller;
 
 
+import com.phegondev.PhegonHotel.dto.AdminBookingRequest;
 import com.phegondev.PhegonHotel.dto.Response;
 import com.phegondev.PhegonHotel.entity.Booking;
 import com.phegondev.PhegonHotel.service.interfac.IBookingService;
@@ -31,9 +32,17 @@ public class BookingController {
     }
 
     @GetMapping("/all")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('EDITOR')")
     public ResponseEntity<Response> getAllBookings() {
         Response response = bookingService.getAllBookings();
+        return ResponseEntity.status(response.getStatusCode()).body(response);
+    }
+
+    @PostMapping("/admin-booking/{roomId}")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('EDITOR')")
+    public ResponseEntity<Response> createAdminBooking(@PathVariable Long roomId,
+                                                       @RequestBody AdminBookingRequest request) {
+        Response response = bookingService.createAdminBooking(roomId, request);
         return ResponseEntity.status(response.getStatusCode()).body(response);
     }
 
@@ -44,7 +53,7 @@ public class BookingController {
     }
 
     @DeleteMapping("/cancel/{bookingId}")
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER') or hasAuthority('EDITOR')")
     public ResponseEntity<Response> cancelBooking(@PathVariable Long bookingId) {
         Response response = bookingService.cancelBooking(bookingId);
         return ResponseEntity.status(response.getStatusCode()).body(response);
