@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import ApiService from '@/lib/service/ApiService';
 import { StaffRoute } from '@/lib/service/guard';
@@ -12,12 +12,26 @@ interface RoomOption {
   roomType: string;
 }
 
+interface BookingSummary {
+  id: number;
+  room?: {
+    id: number;
+    roomType: string;
+  };
+  checkInDate: string;
+  checkOutDate: string;
+}
+
 export default function AddBookingPage() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
 
   const [rooms, setRooms] = useState<RoomOption[]>([]);
   const [availableRooms, setAvailableRooms] = useState<RoomOption[]>([]);
+  const [bookings, setBookings] = useState<BookingSummary[]>([]);
+  const [calendarStartDate, setCalendarStartDate] = useState<string>(''); // начало на периода за календара
+  const [calendarEndDate, setCalendarEndDate] = useState<string>('');     // край на периода за календара
+  const [showCalendarModal, setShowCalendarModal] = useState<boolean>(false);
   const [packages, setPackages] = useState<any[]>([]);
   const [roomPackages, setRoomPackages] = useState<any[]>([]); // пакети, валидни за избраните дати
   const [selectedPackageId, setSelectedPackageId] = useState<string>('');
@@ -41,14 +55,28 @@ export default function AddBookingPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [roomsResponse, packagesResponse] = await Promise.all([
+        const [roomsResponse, packagesResponse, bookingsResponse] = await Promise.all([
           ApiService.getAllRooms(),
-          ApiService.getAllHolidayPackages()
+          ApiService.getAllHolidayPackages(),
+          ApiService.getAllBookings()
         ]);
 
         const list = roomsResponse.roomList || [];
-        setRooms(list.map((r: any) => ({ id: r.id, roomType: r.roomType })));
-        setAvailableRooms(list.map((r: any) => ({ id: r.id, roomType: r.roomType })));
+        const mappedRooms = list.map((r: any) => ({ id: r.id, roomType: r.roomType }));
+        setRooms(mappedRooms);
+        setAvailableRooms(mappedRooms);
+
+        const bookingList = bookingsResponse.bookingList || [];
+        setBookings(bookingList);
+
+        // инициален период за календара: днес + следващите 7 дни
+        const today = new Date();
+        const todayISO = today.toISOString().slice(0, 10);
+        const after7 = new Date(today);
+        after7.setDate(today.getDate() + 6);
+        const after7ISO = after7.toISOString().slice(0, 10);
+        setCalendarStartDate(todayISO);
+        setCalendarEndDate(after7ISO);
 
         const pkgList = (packagesResponse.holidayPackageList || []).filter(
           (p: any) => p.isActive
@@ -64,6 +92,44 @@ export default function AddBookingPage() {
 
     fetchData();
   }, []);
+
+  // генерираме масив с дни за календара
+  const calendarDays = useMemo(() => {
+    const result: Date[] = [];
+    if (!calendarStartDate || !calendarEndDate) return result;
+
+    const start = new Date(calendarStartDate);
+    const end = new Date(calendarEndDate);
+    start.setHours(0, 0, 0, 0);
+    end.setHours(0, 0, 0, 0);
+    if (end < start) return result;
+
+    const current = new Date(start);
+    while (current <= end) {
+      result.push(new Date(current));
+      current.setDate(current.getDate() + 1);
+    }
+    return result;
+  }, [calendarStartDate, calendarEndDate]);
+
+  const formatDayLabel = (date: Date) => {
+    return date.toLocaleDateString('bg-BG', {
+      day: '2-digit',
+      month: '2-digit'
+    });
+  };
+
+  const isRoomOccupiedOnDate = (roomId: number, date: Date) => {
+    return bookings.some((b) => {
+      if (!b.room || b.room.id !== roomId) return false;
+      const checkIn = new Date(b.checkInDate);
+      const checkOut = new Date(b.checkOutDate);
+      checkIn.setHours(0, 0, 0, 0);
+      checkOut.setHours(0, 0, 0, 0);
+      // checkIn ≤ date < checkOut
+      return date >= checkIn && date < checkOut;
+    });
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -402,6 +468,17 @@ export default function AddBookingPage() {
         {success && <p className="success-message">{success}</p>}
 
         <div className="edit-room-form">
+          {/* Бутон за календара за заетост */}
+          <div className="form-group" style={{ marginBottom: '1rem' }}>
+            <button
+              type="button"
+              className="home-search-button"
+              onClick={() => setShowCalendarModal(true)}
+            >
+              Календар за заетост по стаи
+            </button>
+          </div>
+
           <div className="form-group">
             <label>{t('admin.checkInDate')}</label>
             <input type="date" name="checkInDate" value={form.checkInDate} onChange={handleChange} required />
@@ -518,6 +595,146 @@ export default function AddBookingPage() {
             {t('admin.add') || 'Създай резервация'}
           </button>
         </div>
+
+        {/* Модален прозорец с календар за заетост по стаи */}
+        {showCalendarModal && (
+          <div
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              backgroundColor: 'rgba(0,0,0,0.5)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 1000
+            }}
+          >
+            <div
+              style={{
+                backgroundColor: '#fff',
+                borderRadius: '8px',
+                maxWidth: '95%',
+                maxHeight: '90%',
+                width: '1200px',
+                padding: '1.5rem',
+                overflow: 'auto',
+                boxShadow: '0 2px 10px rgba(0,0,0,0.3)'
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                <h2 style={{ margin: 0 }}>Календар за заетост по стаи (по избран период)</h2>
+                <button
+                  type="button"
+                  onClick={() => setShowCalendarModal(false)}
+                  style={{
+                    border: '1px solid #ccc',
+                    borderRadius: '50%',
+                    width: '32px',
+                    height: '32px',
+                    background: '#f5f5f5',
+                    fontSize: '1.2rem',
+                    cursor: 'pointer',
+                    lineHeight: '30px',
+                    textAlign: 'center'
+                  }}
+                  aria-label="Затвори календара"
+                >
+                  ×
+                </button>
+              </div>
+
+              <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.25rem' }}>От дата</label>
+                  <input
+                    type="date"
+                    value={calendarStartDate}
+                    onChange={(e) => setCalendarStartDate(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.25rem' }}>До дата</label>
+                  <input
+                    type="date"
+                    value={calendarEndDate}
+                    onChange={(e) => setCalendarEndDate(e.target.value)}
+                  />
+                </div>
+                {(!calendarStartDate || !calendarEndDate || calendarDays.length === 0) && (
+                  <span style={{ color: '#c62828', fontSize: '0.9rem' }}>
+                    Моля, изберете валиден период (От дата ≤ До дата)
+                  </span>
+                )}
+              </div>
+
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ borderCollapse: 'collapse', width: '100%', minWidth: '600px' }}>
+                  <thead>
+                    <tr>
+                      <th style={{ border: '1px solid #ddd', padding: '0.5rem', backgroundColor: '#f5f5f5' }}>
+                        Стая
+                      </th>
+                      {calendarDays.map((day) => (
+                        <th
+                          key={day.toISOString()}
+                          style={{ border: '1px solid #ddd', padding: '0.5rem', backgroundColor: '#f5f5f5', textAlign: 'center' }}
+                        >
+                          {formatDayLabel(day)}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rooms.map((room) => (
+                      <tr key={room.id}>
+                        <td style={{ border: '1px solid #ddd', padding: '0.5rem', whiteSpace: 'nowrap' }}>
+                          #{room.id} - {room.roomType}
+                        </td>
+                        {calendarDays.map((day) => {
+                          const occupied = isRoomOccupiedOnDate(room.id, day);
+                          return (
+                            <td
+                              key={room.id + '-' + day.toISOString()}
+                              style={{
+                                border: '1px solid #eee',
+                                padding: '0.3rem',
+                                textAlign: 'center',
+                                backgroundColor: occupied ? '#ffcdd2' : '#c8e6c9',
+                                color: '#333',
+                                fontSize: '0.8rem'
+                              }}
+                            >
+                              {occupied ? 'Заето' : 'Свободно'}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div style={{ marginTop: '1rem', textAlign: 'right' }}>
+                <button
+                  type="button"
+                  onClick={() => setShowCalendarModal(false)}
+                  style={{
+                    padding: '0.5rem 1rem',
+                    borderRadius: '4px',
+                    border: '1px solid #ccc',
+                    backgroundColor: '#f5f5f5',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Затвори
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </StaffRoute>
   );

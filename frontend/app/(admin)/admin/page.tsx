@@ -1,31 +1,165 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import ApiService from '@/lib/service/ApiService';
 import { StaffRoute } from '@/lib/service/guard';
 import { useTranslation } from 'react-i18next';
 import '@/lib/i18n';
 
+interface RoomSummary {
+    id: number;
+    roomType: string;
+}
+
+interface BookingSummary {
+    id: number;
+    room?: {
+        id: number;
+        roomType: string;
+    };
+    checkInDate: string;
+    checkOutDate: string;
+}
+
 export default function AdminPage() {
     const { t } = useTranslation();
     const [adminName, setAdminName] = useState('');
     const [isAdmin, setIsAdmin] = useState(false);
+    const [rooms, setRooms] = useState<RoomSummary[]>([]);
+    const [bookings, setBookings] = useState<BookingSummary[]>([]);
+    const [startDate, setStartDate] = useState<string>(''); // начало на периода за календара
+    const [endDate, setEndDate] = useState<string>('');     // край на периода за календара
+    const [reportDate, setReportDate] = useState<string>(''); // дата за справките
+    const [showCalendarModal, setShowCalendarModal] = useState<boolean>(false); // показване на модал с календара
     const router = useRouter();
 
     useEffect(() => {
-                const fetchAdminName = async () => {
+        const fetchData = async () => {
             try {
-                const response = await ApiService.getUserProfile();
-                setAdminName(response.user.name);
+                const [profile, roomsResponse, bookingsResponse] = await Promise.all([
+                    ApiService.getUserProfile(),
+                    ApiService.getAllRooms(),
+                    ApiService.getAllBookings()
+                ]);
+
+                setAdminName(profile.user.name);
                 setIsAdmin(ApiService.isAdmin());
+
+                const roomList = roomsResponse.roomList || [];
+                setRooms(roomList.map((r: any) => ({
+                    id: r.id,
+                    roomType: r.roomType
+                })));
+
+                const bookingList = bookingsResponse.bookingList || [];
+                setBookings(bookingList);
+
+                // инициално задаваме период: днес + следващите 14 дни
+                const today = new Date();
+                const todayISO = today.toISOString().slice(0, 10);
+                const after14 = new Date(today);
+                after14.setDate(today.getDate() + 13);
+                const after14ISO = after14.toISOString().slice(0, 10);
+                setStartDate(todayISO);
+                setEndDate(after14ISO);
+                setReportDate(todayISO);
             } catch (error: any) {
-                console.error('Error fetching admin details:', error.message);
+                console.error('Error fetching admin dashboard data:', error.message);
             }
         };
 
-        fetchAdminName();
+        fetchData();
     }, []);
+
+    // генерираме масив с дни в избрания диапазон
+    const days = useMemo(() => {
+        const result: Date[] = [];
+        if (!startDate || !endDate) return result;
+
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        start.setHours(0, 0, 0, 0);
+        end.setHours(0, 0, 0, 0);
+        if (end < start) return result;
+
+        const current = new Date(start);
+        while (current <= end) {
+            result.push(new Date(current));
+            current.setDate(current.getDate() + 1);
+        }
+        return result;
+    }, [startDate, endDate]);
+
+    const formatDayLabel = (date: Date) => {
+        return date.toLocaleDateString('bg-BG', {
+            day: '2-digit',
+            month: '2-digit'
+        });
+    };
+
+    const isRoomOccupiedOnDate = (roomId: number, date: Date) => {
+        return bookings.some((b) => {
+            if (!b.room || b.room.id !== roomId) return false;
+            const checkIn = new Date(b.checkInDate);
+            const checkOut = new Date(b.checkOutDate);
+            checkIn.setHours(0, 0, 0, 0);
+            checkOut.setHours(0, 0, 0, 0);
+            // приемаме, че checkIn е включително, checkOut е изключително
+            return date >= checkIn && date < checkOut;
+        });
+    };
+
+    // помощни функции за справките
+    const parseISODate = (value: string) => {
+        if (!value) return null;
+        const d = new Date(value);
+        if (isNaN(d.getTime())) return null;
+        d.setHours(0, 0, 0, 0);
+        return d;
+    };
+
+    const getReportDataForDate = (isoDate: string) => {
+        const target = parseISODate(isoDate);
+        if (!target) {
+            return {
+                stayingBookings: [] as BookingSummary[],
+                arrivingBookings: [] as BookingSummary[],
+                departingBookings: [] as BookingSummary[]
+            };
+        }
+
+        const stayingBookings = bookings.filter((b) => {
+            if (!b.room) return false;
+            const checkIn = parseISODate(b.checkInDate);
+            const checkOut = parseISODate(b.checkOutDate);
+            if (!checkIn || !checkOut) return false;
+            // checkIn ≤ target < checkOut
+            return target >= checkIn && target < checkOut;
+        });
+
+        const arrivingBookings = bookings.filter((b) => {
+            const checkIn = parseISODate(b.checkInDate);
+            if (!checkIn) return false;
+            return checkIn.getTime() === target.getTime();
+        });
+
+        const departingBookings = bookings.filter((b) => {
+            const checkOut = parseISODate(b.checkOutDate);
+            if (!checkOut) return false;
+            return checkOut.getTime() === target.getTime();
+        });
+
+        return { stayingBookings, arrivingBookings, departingBookings };
+    };
+
+    const report = getReportDataForDate(reportDate);
+
+    const handlePrintReport = () => {
+        if (typeof window !== 'undefined') {
+            window.print();
+        }
+    };
 
     return (
         <StaffRoute>
@@ -48,6 +182,236 @@ export default function AdminPage() {
                             {t('admin.managePackages')}
                         </button>
                     )}
+                    <button
+                        className="admin-button"
+                        onClick={() => setShowCalendarModal(true)}
+                    >
+                        Календар за заетост
+                    </button>
+                </div>
+
+                {/* Модален прозорец с календар за заетост по стаи за избран период */}
+                {showCalendarModal && (
+                    <div
+                        style={{
+                            position: 'fixed',
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            height: '100%',
+                            backgroundColor: 'rgba(0,0,0,0.5)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            zIndex: 1000
+                        }}
+                    >
+                        <div
+                            style={{
+                                backgroundColor: '#fff',
+                                borderRadius: '8px',
+                                maxWidth: '95%',
+                                maxHeight: '90%',
+                                width: '1200px',
+                                padding: '1.5rem',
+                                overflow: 'auto',
+                                boxShadow: '0 2px 10px rgba(0,0,0,0.3)'
+                            }}
+                        >
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                                <h2 style={{ margin: 0 }}>Календар за заетост по стаи (по избран период)</h2>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowCalendarModal(false)}
+                                    style={{
+                                        border: '1px solid #ccc',
+                                        borderRadius: '50%',
+                                        width: '32px',
+                                        height: '32px',
+                                        background: 'blue',
+                                        fontSize: '1.2rem',
+                                        cursor: 'pointer',
+                                        lineHeight: '30px',
+                                        textAlign: 'center'
+                                    }}
+                                    aria-label="Затвори календара"
+                                >
+                                    ×
+                                </button>
+                            </div>
+
+                            <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                                <div>
+                                    <label style={{ display: 'block', marginBottom: '0.25rem' }}>От дата</label>
+                                    <input
+                                        type="date"
+                                        value={startDate}
+                                        onChange={(e) => setStartDate(e.target.value)}
+                                    />
+                                </div>
+                                <div>
+                                    <label style={{ display: 'block', marginBottom: '0.25rem' }}>До дата</label>
+                                    <input
+                                        type="date"
+                                        value={endDate}
+                                        onChange={(e) => setEndDate(e.target.value)}
+                                    />
+                                </div>
+                                {(!startDate || !endDate || days.length === 0) && (
+                                    <span style={{ color: '#c62828', fontSize: '0.9rem' }}>
+                                        Моля, изберете валиден период (От дата ≤ До дата)
+                                    </span>
+                                )}
+                            </div>
+
+                            <div style={{ overflowX: 'auto' }}>
+                                <table style={{ borderCollapse: 'collapse', width: '100%', minWidth: '600px' }}>
+                                    <thead>
+                                        <tr>
+                                            <th style={{ border: '1px solid #ddd', padding: '0.5rem', backgroundColor: '#f5f5f5' }}>
+                                                Стая
+                                            </th>
+                                            {days.map((day) => (
+                                                <th
+                                                    key={day.toISOString()}
+                                                    style={{ border: '1px solid #ddd', padding: '0.5rem', backgroundColor: '#f5f5f5', textAlign: 'center' }}
+                                                >
+                                                    {formatDayLabel(day)}
+                                                </th>
+                                            ))}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {rooms.map((room) => (
+                                            <tr key={room.id}>
+                                                <td style={{ border: '1px solid #ddd', padding: '0.5rem', whiteSpace: 'nowrap' }}>
+                                                    #{room.id} - {room.roomType}
+                                                </td>
+                                                {days.map((day) => {
+                                                    const occupied = isRoomOccupiedOnDate(room.id, day);
+                                                    return (
+                                                        <td
+                                                            key={room.id + '-' + day.toISOString()}
+                                                            style={{
+                                                                border: '1px solid #eee',
+                                                                padding: '0.3rem',
+                                                                textAlign: 'center',
+                                                                backgroundColor: occupied ? '#ffcdd2' : '#c8e6c9',
+                                                                color: '#333',
+                                                                fontSize: '0.8rem'
+                                                            }}
+                                                        >
+                                                            {occupied ? 'Заето' : 'Свободно'}
+                                                        </td>
+                                                    );
+                                                })}
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            {/* Допълнителен бутон за затваряне долу, за по-лесен достъп */}
+                            <div style={{ marginTop: '1rem', textAlign: 'right' }}>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowCalendarModal(false)}
+                                    style={{
+                                        padding: '0.5rem 1rem',
+                                        borderRadius: '4px',
+                                        border: '1px solid #ccc',
+                                        backgroundColor: 'blue',
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    Затвори
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Справки по дата */}
+                <div style={{ marginTop: '2rem', marginBottom: '2rem' }}>
+                    <h2 style={{ marginBottom: '1rem' }}>Справки за избрана дата</h2>
+                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap', marginBottom: '1rem' }}>
+                        <div>
+                            <label style={{ display: 'block', marginBottom: '0.25rem' }}>Дата за справка</label>
+                            <input
+                                type="date"
+                                value={reportDate}
+                                onChange={(e) => setReportDate(e.target.value)}
+                            />
+                        </div>
+                        <button
+                            type="button"
+                            onClick={handlePrintReport}
+                            style={{
+                                padding: '0.5rem 1rem',
+                                borderRadius: '4px',
+                                border: 'none',
+                                backgroundColor: '#00796b',
+                                color: '#fff',
+                                cursor: 'pointer'
+                            }}
+                        >
+                            Принтирай справката
+                        </button>
+                    </div>
+
+                    {/* Справка: колко човека и от кои стаи нощуват в хотела */}
+                    <div style={{ marginBottom: '1.5rem', border: '1px solid #ddd', borderRadius: '8px', padding: '1rem', backgroundColor: '#fafafa' }}>
+                        <h3 style={{ marginBottom: '0.5rem' }}>Нощуващи гости за датата</h3>
+                        <p style={{ marginBottom: '0.5rem' }}>
+                            Общо резервации: <strong>{report.stayingBookings.length}</strong>
+                        </p>
+                        <p style={{ marginBottom: '0.5rem' }}>
+                            Общо стаи: <strong>{new Set(report.stayingBookings.map(b => b.room?.id)).size}</strong>
+                        </p>
+                        <p style={{ marginBottom: '0.5rem' }}>
+                            (Броят гости може да се вземе от резервациите при нужда – тук основният акцент е по стаи.)
+                        </p>
+                        <ul style={{ paddingLeft: '1.2rem', margin: 0 }}>
+                            {report.stayingBookings.map((b) => (
+                                <li key={b.id}>
+                                    Стая #{b.room?.id} ({b.room?.roomType}) – престой {b.checkInDate} до {b.checkOutDate}
+                                </li>
+                            ))}
+                            {report.stayingBookings.length === 0 && <li>Няма нощуващи гости за избраната дата.</li>}
+                        </ul>
+                    </div>
+
+                    {/* Справка: колко стаи се освобождават */}
+                    <div style={{ marginBottom: '1.5rem', border: '1px solid #ddd', borderRadius: '8px', padding: '1rem', backgroundColor: '#fafafa' }}>
+                        <h3 style={{ marginBottom: '0.5rem' }}>Стаи, които се освобождават на датата</h3>
+                        <p style={{ marginBottom: '0.5rem' }}>
+                            Общо стаи за освобождаване: <strong>{new Set(report.departingBookings.map(b => b.room?.id)).size}</strong>
+                        </p>
+                        <ul style={{ paddingLeft: '1.2rem', margin: 0 }}>
+                            {report.departingBookings.map((b) => (
+                                <li key={b.id}>
+                                    Стая #{b.room?.id} ({b.room?.roomType}) – напускане на {b.checkOutDate}
+                                </li>
+                            ))}
+                            {report.departingBookings.length === 0 && <li>Няма стаи за освобождаване на избраната дата.</li>}
+                        </ul>
+                    </div>
+
+                    {/* Справка: колко стаи пристигат */}
+                    <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '1rem', backgroundColor: '#fafafa' }}>
+                        <h3 style={{ marginBottom: '0.5rem' }}>Стаи с настаняване на датата</h3>
+                        <p style={{ marginBottom: '0.5rem' }}>
+                            Общо стаи за настаняване: <strong>{new Set(report.arrivingBookings.map(b => b.room?.id)).size}</strong>
+                        </p>
+                        <ul style={{ paddingLeft: '1.2rem', margin: 0 }}>
+                            {report.arrivingBookings.map((b) => (
+                                <li key={b.id}>
+                                    Стая #{b.room?.id} ({b.room?.roomType}) – настаняване на {b.checkInDate}
+                                </li>
+                            ))}
+                            {report.arrivingBookings.length === 0 && <li>Няма стаи за настаняване на избраната дата.</li>}
+                        </ul>
+                    </div>
                 </div>
             </div>
         </StaffRoute>
