@@ -48,7 +48,7 @@ export default function EditPackagePage() {
                     if (pkg.roomTypePrices) {
                         const prices: Record<string, string> = {};
                         Object.entries(pkg.roomTypePrices).forEach(([key, value]) => {
-                            prices[key] = value.toString();
+                            prices[key] = String(value ?? '');
                         });
                         setRoomTypePrices(prices);
                         // Зареждане на типовете стаи от цените

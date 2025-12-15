@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import ApiService from '@/lib/service/ApiService';
 import Pagination from '@/components/common/Pagination';
@@ -9,7 +9,7 @@ import RoomSearch from '@/components/common/RoomSearch';
 import { useTranslation } from 'react-i18next';
 import '@/lib/i18n';
 
-export default function AllRoomsPage() {
+function AllRoomsContent() {
   const { t } = useTranslation();
   const searchParams = useSearchParams();
   const packageId = searchParams.get('packageId');
@@ -107,6 +107,14 @@ export default function AllRoomsPage() {
         paginate={paginate}
       />
     </div>
+  );
+}
+
+export default function AllRoomsPage() {
+  return (
+    <Suspense fallback={<div className='all-rooms'><p>Loading...</p></div>}>
+      <AllRoomsContent />
+    </Suspense>
   );
 }
 
