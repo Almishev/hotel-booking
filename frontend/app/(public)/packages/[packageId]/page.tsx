@@ -93,7 +93,10 @@ export default function PackageDetailsPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
       
-      <main style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto', marginBottom: '50px' }}>
+      <main
+        className="package-detail-page"
+        style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto', marginBottom: '50px' }}
+      >
         <Link 
           href="/packages" 
           style={{ 
@@ -110,6 +113,7 @@ export default function PackageDetailsPage() {
         <article
           itemScope
           itemType="https://schema.org/Offer"
+          className="package-detail-card"
           style={{
             border: '1px solid #ddd',
             borderRadius: '8px',
@@ -124,6 +128,7 @@ export default function PackageDetailsPage() {
               src={packageDetails.packagePhotoUrl} 
               alt={packageDetails.name}
               itemProp="image"
+              className="package-detail-image"
               style={{
                 position: 'absolute',
                 top: '2rem',
@@ -138,7 +143,10 @@ export default function PackageDetailsPage() {
             />
           )}
           
-          <div style={{ paddingRight: packageDetails.packagePhotoUrl ? '240px' : '0' }}>
+          <div
+            className="package-detail-content"
+            style={{ paddingRight: packageDetails.packagePhotoUrl ? '240px' : '0' }}
+          >
             <h1 itemProp="name" style={{ marginBottom: '1rem', color: '#00796b', fontSize: '2rem' }}>
               {packageDetails.name}
             </h1>

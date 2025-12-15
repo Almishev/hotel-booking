@@ -188,15 +188,18 @@ button[type="submit"]:hover {
 .search-container {
     display: flex;
     flex-wrap: wrap;
-    justify-content: left;
+    justify-content: center;
     align-items: center;
     margin-bottom: 10px;
     padding: 20px;
-    margin-left: 45px;
+    margin-left: 0;
 }
 
 .search-field {
-    flex: 0 0 calc(25% - 10px);
+    /* вместо фиксирани 25% ширина даваме гъвкава ширина,
+       за да могат кутиите да се подреждат и центрират по-добре */
+    flex: 1 1 260px;              /* минимална ширина ~260px, расте до свободното */
+    max-width: 350px;             /* да не стават прекалено широки на големи екрани */
     margin: 10px;
     padding: 15px;
     border: 1px solid #ddd;
@@ -246,7 +249,6 @@ button[type="submit"]:hover {
 
 .room-list-item {
     width: calc(95% - 20px);
-    height: 20vh;
     margin: 5px auto;
     border: 1px solid #ccc;
     border-radius: 5px;
@@ -283,6 +285,48 @@ button[type="submit"]:hover {
     padding: 15px;
     cursor: pointer;
     font-weight: 600;
+}
+
+/* Мобилно подравняване на картите със стаи:
+   снимка отгоре, под нея детайли, под тях бутонът */
+@media (max-width: 768px) {
+    .room-list-item {
+        flex-direction: column;
+        align-items: center;
+        height: auto;
+        padding: 1rem;
+    }
+
+    .room-list-item-image {
+        width: 100%;
+        height: auto;
+        max-height: 220px;
+        border-radius: 8px;
+        object-fit: cover;
+        margin-bottom: 1rem;
+    }
+
+    .room-details {
+        width: 100%;
+        margin-left: 0;
+        padding: 0 0 1rem 0;
+        text-align: center;
+    }
+
+    .book-now-div {
+        align-self: stretch;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .book-now-button {
+        width: 100%;
+        max-width: 320px;
+        text-align: center;
+    }
 }
 
 .book-now-button:hover {
@@ -375,6 +419,105 @@ button[type="submit"]:hover {
     border: 1px solid #ccc;
     border-radius: 5px;
     font-size: 16px;
+}
+
+/* Центриране на формата "Провери за наличност" на страницата Всички стаи */
+.all-rooms .search-container {
+    justify-content: center;
+    margin-left: 0;
+}
+
+.all-rooms .search-field {
+    flex: 0 0 100%;
+    max-width: 420px;
+}
+
+/* PACKAGES LIST & DETAIL – MOBILE LAYOUT */
+
+/* Списък с пакети */
+.packages-page {
+    max-width: 1200px;
+    margin: 0 auto 50px auto;
+}
+
+.packages-grid {
+    margin-top: 1.5rem;
+}
+
+.package-card {
+    /* оставяме desktop стила от inline, тук добавяме само мобилни override-и */
+}
+
+.package-card-image {
+    /* desktop позицията остава, коригираме само на мобилно */
+}
+
+@media (max-width: 768px) {
+    .packages-page {
+        padding: 1rem !important;
+    }
+
+    .packages-grid {
+        display: flex !important;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .package-card {
+        position: relative;
+        padding: 1.2rem !important;
+    }
+
+    .package-card-image {
+        position: static !important;
+        width: 100% !important;
+        height: auto !important;
+        max-height: 220px;
+        margin-bottom: 1rem;
+    }
+
+    .package-card-content {
+        padding-right: 0 !important;
+    }
+
+    .package-card-prices {
+        margin-top: 1rem !important;
+    }
+}
+
+/* Детайл на пакет */
+.package-detail-page {
+    max-width: 1200px;
+    margin: 0 auto 50px auto;
+}
+
+@media (max-width: 768px) {
+    .package-detail-page {
+        padding: 1rem !important;
+    }
+
+    .package-detail-card {
+        padding: 1.2rem !important;
+    }
+
+    .package-detail-image {
+        position: static !important;
+        width: 100% !important;
+        height: auto !important;
+        max-height: 260px;
+        margin-bottom: 1rem;
+        border-radius: 8px;
+        object-fit: cover;
+    }
+
+    .package-detail-content {
+        padding-right: 0 !important;
+    }
+
+    .package-detail-card h1 {
+        font-size: 1.6rem !important;
+        text-align: center;
+    }
 }
 
 .add-room-button {
@@ -681,7 +824,7 @@ p {
 
 /* Admin Styles */
 .admin-page {
-    max-width: 800px;
+    max-width: 1200px;
     margin: 50px auto;
     padding: 20px;
     border-radius: 10px;
@@ -1004,6 +1147,30 @@ p {
     font-weight: 600;
     margin-top: 20px;
     color: #666;
+}
+
+/* Мобилно подравняване на бутоните в страницата room-details-book */
+@media (max-width: 768px) {
+    .room-details-booking .book-now-div {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.4rem;
+        margin-top: 0.5rem;
+    }
+
+    .room-details-booking .book-now-button,
+    .room-details-booking .go-back-button {
+        width: 90%;
+        max-width: 300px;
+        box-sizing: border-box;
+        text-align: center;
+        padding: 0.45rem 0.7rem;
+        font-size: 0.9rem;
+        border-radius: 4px;
+        font-weight: 600;
+    }
 }
 
 .booking-info {

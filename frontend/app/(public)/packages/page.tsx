@@ -96,7 +96,10 @@ export default function PackagesPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
       
-      <main style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto', marginBottom: '50px' }}>
+      <main
+        className="packages-page"
+        style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto', marginBottom: '50px' }}
+      >
         <header style={{ marginBottom: '2rem', textAlign: 'center' }}>
           <h1 style={{ marginBottom: '0.5rem' }}>
             {t('packages.title')}
@@ -111,12 +114,16 @@ export default function PackagesPage() {
             <p>{t('packages.noPackages')}</p>
           </section>
         ) : (
-          <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '2rem' }}>
+          <section
+            className="packages-grid"
+            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '2rem' }}
+          >
             {packages.map((pkg: any) => (
               <article
                 key={pkg.id}
                 itemScope
                 itemType="https://schema.org/Offer"
+                className="package-card"
                 style={{
                   border: '1px solid #ddd',
                   borderRadius: '8px',
@@ -133,6 +140,7 @@ export default function PackagesPage() {
                     src={pkg.packagePhotoUrl} 
                     alt={pkg.name}
                     itemProp="image"
+                    className="package-card-image"
                     style={{
                       position: 'absolute',
                       top: '1rem',
@@ -146,7 +154,10 @@ export default function PackagesPage() {
                     }}
                   />
                 )}
-                <div style={{ paddingRight: pkg.packagePhotoUrl ? '140px' : '0' }}>
+                <div
+                  className="package-card-content"
+                  style={{ paddingRight: pkg.packagePhotoUrl ? '140px' : '0' }}
+                >
                   <h2 itemProp="name" style={{ marginBottom: '0.5rem', color: '#00796b' }}>
                     <Link 
                       href={`/packages/${pkg.id}`}
@@ -230,7 +241,10 @@ export default function PackagesPage() {
                   )}
                 </div>
                 
-                <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid #eee' }}>
+                <div
+                  className="package-card-prices"
+                  style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid #eee' }}
+                >
                   <p style={{ fontWeight: 'bold', marginBottom: '0.5rem', color: '#00796b' }}>
                     {t('packages.pricesByRoomType')}:
                   </p>
