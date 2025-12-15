@@ -27,6 +27,7 @@ public class HolidayPackage {
     @Column(nullable = false)
     private LocalDate endDate;
 
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     private String packagePhotoUrl; // URL на снимката на пакета в Cloudinary

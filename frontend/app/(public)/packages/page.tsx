@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import ApiService from '@/lib/service/ApiService';
 import { useTranslation } from 'react-i18next';
 import '@/lib/i18n';
@@ -147,7 +148,34 @@ export default function PackagesPage() {
                 )}
                 <div style={{ paddingRight: pkg.packagePhotoUrl ? '140px' : '0' }}>
                   <h2 itemProp="name" style={{ marginBottom: '0.5rem', color: '#00796b' }}>
-                    {pkg.name}
+                    <Link 
+                      href={`/packages/${pkg.id}`}
+                      title={t('packages.viewMore')}
+                      style={{ 
+                        color: '#00796b', 
+                        textDecoration: 'none',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        fontWeight: 'bold',
+                        fontSize: '1.3rem'
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.color = '#005a4f';
+                        e.currentTarget.style.textDecoration = 'underline';
+                        e.currentTarget.style.transform = 'translateX(3px)';
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.color = '#00796b';
+                        e.currentTarget.style.textDecoration = 'none';
+                        e.currentTarget.style.transform = 'translateX(0)';
+                      }}
+                    >
+                      {pkg.name}
+                      <span style={{ fontSize: '1rem', transition: 'transform 0.3s ease' }}>→</span>
+                    </Link>
                   </h2>
                   
                   <p style={{ marginBottom: '0.5rem', color: '#666' }}>
@@ -158,7 +186,33 @@ export default function PackagesPage() {
                   
                   {pkg.description && (
                     <p itemProp="description" style={{ marginBottom: '1rem', color: '#555', flexGrow: 1 }}>
-                      {pkg.description}
+                      {pkg.description.length > 120 ? (
+                        <>
+                          {pkg.description.substring(0, 120)}...{' '}
+                          <Link 
+                            href={`/packages/${pkg.id}`}
+                            style={{
+                              color: '#00796b',
+                              textDecoration: 'none',
+                              fontSize: '0.9rem',
+                              fontWeight: 'normal',
+                              cursor: 'pointer'
+                            }}
+                            onMouseOver={(e) => {
+                              e.currentTarget.style.textDecoration = 'underline';
+                              e.currentTarget.style.color = '#005a4f';
+                            }}
+                            onMouseOut={(e) => {
+                              e.currentTarget.style.textDecoration = 'none';
+                              e.currentTarget.style.color = '#00796b';
+                            }}
+                          >
+                            {t('packages.viewMoreShort')}
+                          </Link>
+                        </>
+                      ) : (
+                        pkg.description
+                      )}
                     </p>
                   )}
                 </div>

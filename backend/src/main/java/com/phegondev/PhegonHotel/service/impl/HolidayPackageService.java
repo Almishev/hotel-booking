@@ -61,6 +61,22 @@ public class HolidayPackageService implements IHolidayPackageService {
                 jdbcTemplate.execute("ALTER TABLE holiday_packages ALTER COLUMN room_id DROP NOT NULL");
                 System.out.println("Successfully updated room_id column to allow NULL values");
             }
+            
+            // Migrate description column from VARCHAR(255) to TEXT if needed
+            String descriptionCheckSql = "SELECT data_type, character_maximum_length FROM information_schema.columns " +
+                                        "WHERE table_name = 'holiday_packages' AND column_name = 'description'";
+            List<Map<String, Object>> descResults = jdbcTemplate.queryForList(descriptionCheckSql);
+            if (!descResults.isEmpty()) {
+                Map<String, Object> descRow = descResults.get(0);
+                String dataType = (String) descRow.get("data_type");
+                Object maxLength = descRow.get("character_maximum_length");
+                
+                // If it's varchar with a length limit (like 255), change it to TEXT
+                if ("character varying".equals(dataType) && maxLength != null) {
+                    jdbcTemplate.execute("ALTER TABLE holiday_packages ALTER COLUMN description TYPE TEXT");
+                    System.out.println("Successfully migrated description column from VARCHAR to TEXT");
+                }
+            }
         } catch (Exception e) {
             // Ignore if column doesn't exist or constraint is already dropped
             System.out.println("Package columns migration: " + e.getMessage());

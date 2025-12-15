@@ -244,7 +244,10 @@ const resources = {
         packageBooking: 'Пакетно предложение',
         packagePrice: 'Цена на пакет',
         pricesByRoomType: 'Цени по типове стаи',
-        noPricesAvailable: 'Няма налични цени'
+        noPricesAvailable: 'Няма налични цени',
+        backToPackages: 'Назад към пакетите',
+        viewMore: 'Виж повече',
+        viewMoreShort: 'виж още..'
       },
       footer: {
         copyright: 'Phegon Hotel | Всички права запазени'
@@ -491,7 +494,9 @@ const resources = {
         packageBooking: 'Πακέτο',
         packagePrice: 'Τιμή πακέτου',
         pricesByRoomType: 'Τιμές ανά τύπο δωματίου',
-        noPricesAvailable: 'Δεν υπάρχουν διαθέσιμες τιμές'
+        noPricesAvailable: 'Δεν υπάρχουν διαθέσιμες τιμές',
+        backToPackages: 'Πίσω στα πακέτα',
+        viewMore: 'Δείτε περισσότερα'
       },
       footer: {
         copyright: 'Phegon Hotel | Όλα τα δικαιώματα διατηρούνται'
@@ -740,7 +745,10 @@ const resources = {
         packageBooking: 'Package Booking',
         packagePrice: 'Package Price',
         pricesByRoomType: 'Prices by Room Type',
-        noPricesAvailable: 'No prices available'
+        noPricesAvailable: 'No prices available',
+        backToPackages: 'Back to Packages',
+        viewMore: 'View More',
+        viewMoreShort: 'view more..'
       },
       footer: {
         copyright: 'Phegon Hotel | All Right Reserved'

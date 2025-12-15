@@ -95,7 +95,9 @@ export default function AllRoomsPage() {
         </select>
       </div>
       
-      <RoomSearch handleSearchResult={handleSearchResult} />
+      {!(packageId && urlRoomType) && (
+        <RoomSearch handleSearchResult={handleSearchResult} />
+      )}
       <RoomResult roomSearchResults={currentRooms} packageId={packageId || undefined} />
 
       <Pagination
