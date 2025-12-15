@@ -68,7 +68,8 @@ public class RoomController {
     public ResponseEntity<Response> getAvailableRoomsByDateAndType(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkInDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkOutDate,
-            @RequestParam(required = false) String roomType
+            @RequestParam(required = false) String roomType,
+            @RequestParam(required = false) Long packageId
     ) {
         if (checkInDate == null || roomType == null || roomType.isBlank() || checkOutDate == null) {
             Response response = new Response();
@@ -76,7 +77,7 @@ public class RoomController {
             response.setMessage("Please provide values for all fields(checkInDate, roomType,checkOutDate)");
             return ResponseEntity.status(response.getStatusCode()).body(response);
         }
-        Response response = roomService.getAvailableRoomsByDataAndType(checkInDate, checkOutDate, roomType);
+        Response response = roomService.getAvailableRoomsByDataAndType(checkInDate, checkOutDate, roomType, packageId);
         return ResponseEntity.status(response.getStatusCode()).body(response);
     }
 
