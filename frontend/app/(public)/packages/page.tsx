@@ -45,9 +45,9 @@ export default function PackagesPage() {
     });
   };
 
-  const handleBookPackage = (pkg: any) => {
-    // Navigate to room details page with package info
-    router.push(`/room-details-book/${pkg.room.id}?packageId=${pkg.id}`);
+  const handleBookPackage = (pkg: any, roomType: string) => {
+    // Пренасочване към страницата за стаи с филтър за този тип стая и packageId
+    router.push(`/rooms?packageId=${pkg.id}&roomType=${encodeURIComponent(roomType)}`);
   };
 
   if (loading) {
@@ -83,7 +83,7 @@ export default function PackagesPage() {
       "validFrom": pkg.startDate,
       "validThrough": pkg.endDate,
       "url": typeof window !== 'undefined' ? `${window.location.origin}/room-details-book/${pkg.room?.id}?packageId=${pkg.id}` : "",
-      "image": pkg.room?.roomPhotoUrl || "",
+      "image": pkg.packagePhotoUrl || pkg.room?.roomPhotoUrl || "",
     }))
   };
 
@@ -110,7 +110,7 @@ export default function PackagesPage() {
             <p>{t('packages.noPackages')}</p>
           </section>
         ) : (
-          <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '2rem' }}>
+          <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '2rem' }}>
             {packages.map((pkg: any) => (
               <article
                 key={pkg.id}
@@ -123,71 +123,82 @@ export default function PackagesPage() {
                   boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
                   display: 'flex',
                   flexDirection: 'column',
-                  backgroundColor: '#fff'
+                  backgroundColor: '#fff',
+                  position: 'relative'
                 }}
               >
-                {pkg.room?.roomPhotoUrl && (
-                  <img
-                    src={pkg.room.roomPhotoUrl}
-                    alt={`${pkg.name} - ${pkg.room?.roomType} at Phegon Hotel`}
+                {pkg.packagePhotoUrl && (
+                  <img 
+                    src={pkg.packagePhotoUrl} 
+                    alt={pkg.name}
                     itemProp="image"
                     style={{
-                      width: '100%',
-                      height: '200px',
+                      position: 'absolute',
+                      top: '1rem',
+                      right: '1rem',
+                      width: '120px',
+                      height: '120px',
                       objectFit: 'cover',
-                      borderRadius: '4px',
-                      marginBottom: '1rem'
+                      borderRadius: '8px',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                      zIndex: 1
                     }}
                   />
                 )}
-                
-                <h2 itemProp="name" style={{ marginBottom: '0.5rem', color: '#00796b' }}>
-                  {pkg.name}
-                </h2>
-                
-                <p style={{ marginBottom: '0.5rem', color: '#666' }}>
-                  <strong>{t('packages.room')}:</strong> <span itemProp="category">{pkg.room?.roomType}</span>
-                </p>
-                
-                <p style={{ marginBottom: '0.5rem', color: '#666' }}>
-                  <strong>{t('packages.dates')}:</strong> 
-                  <time itemProp="validFrom" dateTime={pkg.startDate}>{formatDate(pkg.startDate)}</time> - 
-                  <time itemProp="validThrough" dateTime={pkg.endDate}> {formatDate(pkg.endDate)}</time>
-                </p>
-                
-                {pkg.description && (
-                  <p itemProp="description" style={{ marginBottom: '1rem', color: '#555', flexGrow: 1 }}>
-                    {pkg.description}
-                  </p>
-                )}
-                
-                <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid #eee' }}>
-                  <p style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#00796b', marginBottom: '1rem' }}>
-                    {t('packages.price')}: 
-                    <span itemProp="price" content={pkg.packagePrice}>€{pkg.packagePrice}</span>
-                    <meta itemProp="priceCurrency" content="EUR" />
+                <div style={{ paddingRight: pkg.packagePhotoUrl ? '140px' : '0' }}>
+                  <h2 itemProp="name" style={{ marginBottom: '0.5rem', color: '#00796b' }}>
+                    {pkg.name}
+                  </h2>
+                  
+                  <p style={{ marginBottom: '0.5rem', color: '#666' }}>
+                    <strong>{t('packages.dates')}:</strong> 
+                    <time itemProp="validFrom" dateTime={pkg.startDate}>{formatDate(pkg.startDate)}</time> - 
+                    <time itemProp="validThrough" dateTime={pkg.endDate}> {formatDate(pkg.endDate)}</time>
                   </p>
                   
-                  <button
-                    onClick={() => handleBookPackage(pkg)}
-                    aria-label={`${t('packages.bookNow')} - ${pkg.name}`}
-                    style={{
-                      width: '100%',
-                      padding: '0.75rem',
-                      backgroundColor: '#00796b',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '4px',
-                      cursor: 'pointer',
-                      fontSize: '1rem',
-                      fontWeight: 'bold',
-                      transition: 'background-color 0.3s'
-                    }}
-                    onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#005a4f'}
-                    onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#00796b'}
-                  >
-                    {t('packages.bookNow')}
-                  </button>
+                  {pkg.description && (
+                    <p itemProp="description" style={{ marginBottom: '1rem', color: '#555', flexGrow: 1 }}>
+                      {pkg.description}
+                    </p>
+                  )}
+                </div>
+                
+                <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid #eee' }}>
+                  <p style={{ fontWeight: 'bold', marginBottom: '0.5rem', color: '#00796b' }}>
+                    {t('packages.pricesByRoomType')}:
+                  </p>
+                  {pkg.roomTypePrices ? (
+                    Object.entries(pkg.roomTypePrices).map(([roomType, price]: [string, any]) => (
+                      <div key={roomType} style={{ marginBottom: '0.75rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ color: '#666' }}><strong>{roomType}:</strong></span>
+                        <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#00796b' }}>
+                          €{price}
+                        </span>
+                        <button
+                          onClick={() => handleBookPackage(pkg, roomType)}
+                          aria-label={`${t('packages.bookNow')} - ${pkg.name} - ${roomType}`}
+                          style={{
+                            padding: '0.5rem 1rem',
+                            backgroundColor: '#00796b',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            fontSize: '0.9rem',
+                            fontWeight: 'bold',
+                            transition: 'background-color 0.3s',
+                            marginLeft: '1rem'
+                          }}
+                          onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#005a4f'}
+                          onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#00796b'}
+                        >
+                          {t('packages.bookNow')}
+                        </button>
+                      </div>
+                    ))
+                  ) : (
+                    <p style={{ color: '#999' }}>{t('packages.noPricesAvailable') || 'No prices available'}</p>
+                  )}
                 </div>
               </article>
             ))}

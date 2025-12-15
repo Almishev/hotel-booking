@@ -14,11 +14,13 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
 
 
     // Изключваме стаи с резервации ИЛИ с неразрушими активни пакети, които припокриват датите
+    // Пакетът е за целия хотел, но проверяваме дали има пакет за този тип стая
     @Query("SELECT r FROM Room r WHERE r.roomType LIKE %:roomType% " +
            "AND r.id NOT IN (SELECT bk.room.id FROM Booking bk WHERE " +
            "(bk.checkInDate < :checkOutDate) AND (bk.checkOutDate > :checkInDate)) " +
-           "AND r.id NOT IN (SELECT hp.room.id FROM HolidayPackage hp WHERE hp.isActive = true " +
-           "AND hp.allowPartialBookings = false " +
+           "AND NOT EXISTS (SELECT hp FROM HolidayPackage hp " +
+           "JOIN hp.roomTypePrices rtp ON rtp.roomType = r.roomType " +
+           "WHERE hp.isActive = true AND hp.allowPartialBookings = false " +
            "AND (hp.startDate < :checkOutDate AND hp.endDate > :checkInDate))")
     List<Room> findAvailableRoomsByDatesAndTypes(LocalDate checkInDate, LocalDate checkOutDate, String roomType);
 

@@ -12,12 +12,14 @@ C:\Users\Admin\Desktop\hms\backend\src\main\java\com\phegondev\PhegonHotel\dto\R
 C:\Users\Admin\Desktop\hms\backend\src\main\java\com\phegondev\PhegonHotel\dto\UserDTO.java
 C:\Users\Admin\Desktop\hms\backend\src\main\java\com\phegondev\PhegonHotel\entity\Booking.java
 C:\Users\Admin\Desktop\hms\backend\src\main\java\com\phegondev\PhegonHotel\entity\HolidayPackage.java
+C:\Users\Admin\Desktop\hms\backend\src\main\java\com\phegondev\PhegonHotel\entity\HolidayPackageRoomTypePrice.java
 C:\Users\Admin\Desktop\hms\backend\src\main\java\com\phegondev\PhegonHotel\entity\Room.java
 C:\Users\Admin\Desktop\hms\backend\src\main\java\com\phegondev\PhegonHotel\entity\User.java
 C:\Users\Admin\Desktop\hms\backend\src\main\java\com\phegondev\PhegonHotel\exception\OurException.java
 C:\Users\Admin\Desktop\hms\backend\src\main\java\com\phegondev\PhegonHotel\PhegonHotelApplication.java
 C:\Users\Admin\Desktop\hms\backend\src\main\java\com\phegondev\PhegonHotel\repo\BookingRepository.java
 C:\Users\Admin\Desktop\hms\backend\src\main\java\com\phegondev\PhegonHotel\repo\HolidayPackageRepository.java
+C:\Users\Admin\Desktop\hms\backend\src\main\java\com\phegondev\PhegonHotel\repo\HolidayPackageRoomTypePriceRepository.java
 C:\Users\Admin\Desktop\hms\backend\src\main\java\com\phegondev\PhegonHotel\repo\RoomRepository.java
 C:\Users\Admin\Desktop\hms\backend\src\main\java\com\phegondev\PhegonHotel\repo\UserRepository.java
 C:\Users\Admin\Desktop\hms\backend\src\main\java\com\phegondev\PhegonHotel\security\CorsConfig.java

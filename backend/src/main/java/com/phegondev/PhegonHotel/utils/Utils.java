@@ -6,11 +6,15 @@ import com.phegondev.PhegonHotel.dto.RoomDTO;
 import com.phegondev.PhegonHotel.dto.UserDTO;
 import com.phegondev.PhegonHotel.entity.Booking;
 import com.phegondev.PhegonHotel.entity.HolidayPackage;
+import com.phegondev.PhegonHotel.entity.HolidayPackageRoomTypePrice;
 import com.phegondev.PhegonHotel.entity.Room;
 import com.phegondev.PhegonHotel.entity.User;
 
+import java.math.BigDecimal;
 import java.security.SecureRandom;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Utils {
@@ -113,11 +117,19 @@ public class Utils {
             packageDTO.setName(holidayPackage.getName());
             packageDTO.setStartDate(holidayPackage.getStartDate());
             packageDTO.setEndDate(holidayPackage.getEndDate());
-            packageDTO.setPackagePrice(holidayPackage.getPackagePrice());
             packageDTO.setDescription(holidayPackage.getDescription());
             packageDTO.setIsActive(holidayPackage.getIsActive());
             packageDTO.setAllowPartialBookings(holidayPackage.getAllowPartialBookings());
-            // Don't include room in packageDTO to avoid circular reference
+            
+            // Мапване на цените по типове стаи
+            Map<String, BigDecimal> roomTypePricesMap = new HashMap<>();
+            if (holidayPackage.getRoomTypePrices() != null) {
+                for (HolidayPackageRoomTypePrice rtp : holidayPackage.getRoomTypePrices()) {
+                    roomTypePricesMap.put(rtp.getRoomType(), rtp.getPackagePrice());
+                }
+            }
+            packageDTO.setRoomTypePrices(roomTypePricesMap);
+            
             bookingDTO.setHolidayPackage(packageDTO);
         }
         return bookingDTO;

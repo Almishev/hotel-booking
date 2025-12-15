@@ -60,9 +60,19 @@ export default function ManageBookingsPage() {
             stats.totalAdults += booking.numOfAdults || 0;
             stats.totalChildren += booking.numOfChildren || 0;
             
-            // If booking is for a holiday package, use package price
-            if (booking.holidayPackage?.packagePrice) {
-                stats.totalRevenue += parseFloat(booking.holidayPackage.packagePrice.toString());
+            // If booking is for a holiday package, use package price for the room type
+            if (booking.holidayPackage?.roomTypePrices && booking.room?.roomType) {
+                const priceForRoomType = booking.holidayPackage.roomTypePrices[booking.room.roomType];
+                if (priceForRoomType) {
+                    stats.totalRevenue += parseFloat(priceForRoomType.toString());
+                } else {
+                    // Ако няма цена за този тип стая, изчисли от roomPrice
+                    const checkIn = new Date(booking.checkInDate);
+                    const checkOut = new Date(booking.checkOutDate);
+                    const nights = Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24));
+                    const roomPricePerNight = booking.room?.roomPrice || 0;
+                    stats.totalRevenue += nights * roomPricePerNight;
+                }
             } else {
                 // Otherwise, calculate from room price and nights
                 const checkIn = new Date(booking.checkInDate);
@@ -290,9 +300,12 @@ export default function ManageBookingsPage() {
     };
 
     const calculateBookingTotalPrice = (booking: any) => {
-        // If booking is for a holiday package, use package price
-        if (booking.holidayPackage?.packagePrice) {
-            return parseFloat(booking.holidayPackage.packagePrice.toString());
+        // If booking is for a holiday package, use package price for the room type
+        if (booking.holidayPackage?.roomTypePrices && booking.room?.roomType) {
+            const priceForRoomType = booking.holidayPackage.roomTypePrices[booking.room.roomType];
+            if (priceForRoomType) {
+                return parseFloat(priceForRoomType.toString());
+            }
         }
         
         // Otherwise, calculate from room price and nights

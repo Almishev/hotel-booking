@@ -86,10 +86,9 @@ export default function ManagePackagesPage() {
                             <thead>
                                 <tr>
                                     <th>{t('admin.packageName')}</th>
-                                    <th>{t('admin.room')}</th>
                                     <th>{t('admin.startDate')}</th>
                                     <th>{t('admin.endDate')}</th>
-                                    <th>{t('admin.packagePrice')}</th>
+                                    <th>{t('admin.packagePrices')}</th>
                                     <th>{t('admin.isActive')}</th>
                                     <th>{t('admin.allowPartialBookings')}</th>
                                     <th>{t('admin.actions')}</th>
@@ -99,10 +98,21 @@ export default function ManagePackagesPage() {
                                 {packages.map((pkg: any) => (
                                     <tr key={pkg.id}>
                                         <td>{pkg.name}</td>
-                                        <td>{pkg.room?.roomType} (ID: {pkg.room?.id})</td>
                                         <td>{formatDate(pkg.startDate)}</td>
                                         <td>{formatDate(pkg.endDate)}</td>
-                                        <td>€{pkg.packagePrice}</td>
+                                        <td>
+                                            {pkg.roomTypePrices ? (
+                                                <div>
+                                                    {Object.entries(pkg.roomTypePrices).map(([roomType, price]: [string, any]) => (
+                                                        <div key={roomType} style={{ marginBottom: '0.25rem' }}>
+                                                            <strong>{roomType}:</strong> €{price}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                'N/A'
+                                            )}
+                                        </td>
                                         <td>{pkg.isActive ? t('admin.yes') : t('admin.no')}</td>
                                         <td>{pkg.allowPartialBookings ? t('admin.yes') : t('admin.no')}</td>
                                         <td>

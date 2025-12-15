@@ -14,16 +14,18 @@ export default function EditPackagePage() {
     const packageId = params.packageId as string;
     
     const [packageDetails, setPackageDetails] = useState({
-        roomId: '',
         name: '',
         startDate: '',
         endDate: '',
-        packagePrice: '',
         description: '',
         isActive: true,
         allowPartialBookings: false,
     });
-    const [rooms, setRooms] = useState<any[]>([]);
+    const [roomTypes, setRoomTypes] = useState<string[]>([]);
+    const [roomTypePrices, setRoomTypePrices] = useState<Record<string, string>>({});
+    const [file, setFile] = useState<File | null>(null);
+    const [preview, setPreview] = useState<string | null>(null);
+    const [currentPhotoUrl, setCurrentPhotoUrl] = useState<string | null>(null);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
@@ -34,34 +36,56 @@ export default function EditPackagePage() {
                 if (response.statusCode === 200 && response.holidayPackage) {
                     const pkg = response.holidayPackage;
                     setPackageDetails({
-                        roomId: pkg.room?.id?.toString() || '',
                         name: pkg.name || '',
                         startDate: pkg.startDate || '',
                         endDate: pkg.endDate || '',
-                        packagePrice: pkg.packagePrice?.toString() || '',
                         description: pkg.description || '',
                         isActive: pkg.isActive !== undefined ? pkg.isActive : true,
                         allowPartialBookings: pkg.allowPartialBookings !== undefined ? pkg.allowPartialBookings : false,
                     });
+                    
+                    // Зареждане на цените по типове стаи
+                    if (pkg.roomTypePrices) {
+                        const prices: Record<string, string> = {};
+                        Object.entries(pkg.roomTypePrices).forEach(([key, value]) => {
+                            prices[key] = value.toString();
+                        });
+                        setRoomTypePrices(prices);
+                        // Зареждане на типовете стаи от цените
+                        setRoomTypes(Object.keys(pkg.roomTypePrices));
+                    }
+                    
+                    // Зареждане на текущата снимка
+                    if (pkg.packagePhotoUrl) {
+                        setCurrentPhotoUrl(pkg.packagePhotoUrl);
+                    }
                 }
             } catch (error: any) {
                 setError(error.response?.data?.message || error.message);
             }
         };
 
-        const fetchRooms = async () => {
+        const fetchRoomTypes = async () => {
             try {
-                const response = await ApiService.getAllRooms();
-                if (response.statusCode === 200) {
-                    setRooms(response.roomList || []);
+                const types = await ApiService.getRoomTypes();
+                if (types && types.length > 0) {
+                    setRoomTypes(types);
+                    // Ако няма заредени цени, инициализирай празни
+                    if (Object.keys(roomTypePrices).length === 0) {
+                        const initialPrices: Record<string, string> = {};
+                        types.forEach((type: string) => {
+                            initialPrices[type] = '';
+                        });
+                        setRoomTypePrices(initialPrices);
+                    }
                 }
             } catch (error: any) {
-                console.error('Error fetching rooms:', error.message);
+                console.error('Error fetching room types:', error.message);
             }
         };
 
         fetchPackage();
-        fetchRooms();
+        fetchRoomTypes();
     }, [packageId]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -72,6 +96,13 @@ export default function EditPackagePage() {
         }));
     };
 
+    const handleRoomTypePriceChange = (roomType: string, price: string) => {
+        setRoomTypePrices(prev => ({
+            ...prev,
+            [roomType]: price,
+        }));
+    };
+
     const handleRadioChange = (value: boolean) => {
         setPackageDetails(prevState => ({
             ...prevState,
@@ -79,10 +110,28 @@ export default function EditPackagePage() {
         }));
     };
 
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const selectedFile = e.target.files?.[0];
+        if (selectedFile) {
+            setFile(selectedFile);
+            setPreview(URL.createObjectURL(selectedFile));
+        } else {
+            setFile(null);
+            setPreview(null);
+        }
+    };
+
     const updatePackage = async () => {
-        if (!packageDetails.name || !packageDetails.startDate || 
-            !packageDetails.endDate || !packageDetails.packagePrice) {
+        if (!packageDetails.name || !packageDetails.startDate || !packageDetails.endDate) {
             setError(t('admin.errorFill'));
+            setTimeout(() => setError(''), 5000);
+            return;
+        }
+
+        // Проверка дали всички типове стаи имат цена
+        const missingPrices = roomTypes.filter(type => !roomTypePrices[type] || roomTypePrices[type].trim() === '');
+        if (missingPrices.length > 0) {
+            setError(t('admin.enterPriceForAllRoomTypes') || 'Please enter price for all room types');
             setTimeout(() => setError(''), 5000);
             return;
         }
@@ -98,22 +147,36 @@ export default function EditPackagePage() {
         }
 
         try {
-            const response = await ApiService.updateHolidayPackage(packageId, {
-                roomId: packageDetails.roomId ? parseInt(packageDetails.roomId) : undefined,
-                name: packageDetails.name,
-                startDate: packageDetails.startDate,
-                endDate: packageDetails.endDate,
-                packagePrice: parseFloat(packageDetails.packagePrice),
-                description: packageDetails.description || undefined,
-                isActive: packageDetails.isActive,
-                allowPartialBookings: packageDetails.allowPartialBookings,
+            const formData = new FormData();
+            formData.append('name', packageDetails.name);
+            formData.append('startDate', packageDetails.startDate);
+            formData.append('endDate', packageDetails.endDate);
+            if (packageDetails.description !== undefined) {
+                formData.append('description', packageDetails.description);
+            }
+            formData.append('isActive', packageDetails.isActive.toString());
+            formData.append('allowPartialBookings', packageDetails.allowPartialBookings.toString());
+            
+            // Добавяне на цените за всеки тип стая
+            roomTypes.forEach(roomType => {
+                formData.append(`roomTypePrice_${roomType}`, roomTypePrices[roomType]);
             });
+            
+            // Добавяне на нова снимка, ако е избрана
+            if (file) {
+                formData.append('photo', file);
+            }
+
+            const response = await ApiService.updateHolidayPackage(packageId, formData);
 
             if (response.statusCode === 200) {
                 setSuccess(t('admin.successUpdatePackage'));
                 setTimeout(() => {
                     router.push('/admin/manage-packages');
                 }, 2000);
+            } else {
+                setError(response.message || 'Error updating package');
+                setTimeout(() => setError(''), 5000);
             }
         } catch (error: any) {
             setError(error.response?.data?.message || error.message);
@@ -128,22 +191,6 @@ export default function EditPackagePage() {
                 {error && <p className="error-message">{error}</p>}
                 {success && <p className="success-message">{success}</p>}
                 <div className="edit-room-form">
-                    <div className="form-group">
-                        <label>{t('admin.selectRoom')}</label>
-                        <select
-                            name="roomId"
-                            value={packageDetails.roomId}
-                            onChange={handleChange}
-                        >
-                            <option value="">{t('admin.selectRoom')}</option>
-                            {rooms.map(room => (
-                                <option key={room.id} value={room.id}>
-                                    {room.roomType} - €{room.roomPrice}/night (ID: {room.id})
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-
                     <div className="form-group">
                         <label>{t('admin.packageName')}</label>
                         <input
@@ -178,25 +225,39 @@ export default function EditPackagePage() {
                     </div>
 
                     <div className="form-group">
-                        <label>{t('admin.packagePrice')}</label>
-                        <input
-                            type="number"
-                            name="packagePrice"
-                            value={packageDetails.packagePrice}
-                            onChange={handleChange}
-                            step="0.01"
-                            min="0"
-                            required
-                        />
-                    </div>
-
-                    <div className="form-group">
                         <label>{t('admin.description')}</label>
                         <textarea
                             name="description"
                             value={packageDetails.description}
                             onChange={handleChange}
                         ></textarea>
+                    </div>
+
+                    <div className="form-group">
+                        <label>{t('admin.packagePhoto') || 'Package Photo'}</label>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleFileChange}
+                        />
+                        {preview ? (
+                            <div style={{ marginTop: '10px' }}>
+                                <img 
+                                    src={preview} 
+                                    alt="Preview" 
+                                    style={{ maxWidth: '300px', maxHeight: '300px', objectFit: 'cover', borderRadius: '8px' }}
+                                />
+                            </div>
+                        ) : currentPhotoUrl ? (
+                            <div style={{ marginTop: '10px' }}>
+                                <p style={{ marginBottom: '5px', fontSize: '0.9rem', color: '#666' }}>Current photo:</p>
+                                <img 
+                                    src={currentPhotoUrl} 
+                                    alt="Current package" 
+                                    style={{ maxWidth: '300px', maxHeight: '300px', objectFit: 'cover', borderRadius: '8px' }}
+                                />
+                            </div>
+                        ) : null}
                     </div>
 
                     <div className="form-group">
@@ -209,6 +270,30 @@ export default function EditPackagePage() {
                             />
                             {t('admin.isActive')}
                         </label>
+                    </div>
+
+                    <div className="form-group">
+                        <label>{t('admin.packagePricesByRoomType')}</label>
+                        {roomTypes.length === 0 ? (
+                            <p>{t('admin.loadingRoomTypes') || 'Loading room types...'}</p>
+                        ) : (
+                            roomTypes.map((roomType) => (
+                                <div key={roomType} style={{ marginBottom: '1rem' }}>
+                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>
+                                        {t('admin.packagePrice')} - {roomType}:
+                                    </label>
+                                    <input
+                                        type="number"
+                                        value={roomTypePrices[roomType] || ''}
+                                        onChange={(e) => handleRoomTypePriceChange(roomType, e.target.value)}
+                                        step="0.01"
+                                        min="0"
+                                        required
+                                        style={{ width: '100%', padding: '0.5rem' }}
+                                    />
+                                </div>
+                            ))
+                        )}
                     </div>
 
                     <div className="form-group">

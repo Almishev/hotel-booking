@@ -7,9 +7,10 @@ import '@/lib/i18n';
 
 interface RoomResultProps {
   roomSearchResults: any[];
+  packageId?: string;
 }
 
-export default function RoomResult({ roomSearchResults }: RoomResultProps) {
+export default function RoomResult({ roomSearchResults, packageId }: RoomResultProps) {
     const { t } = useTranslation();
     const router = useRouter();
     const isAdmin = ApiService.isAdmin();
@@ -38,7 +39,12 @@ export default function RoomResult({ roomSearchResults }: RoomResultProps) {
                                 ) : (
                                     <button
                                         className="book-now-button"
-                                        onClick={() => router.push(`/room-details-book/${room.id}`)}
+                                        onClick={() => {
+                                            const url = packageId 
+                                                ? `/room-details-book/${room.id}?packageId=${packageId}`
+                                                : `/room-details-book/${room.id}`;
+                                            router.push(url);
+                                        }}
                                     >
                                         {t('rooms.viewBookNow')}
                                     </button>

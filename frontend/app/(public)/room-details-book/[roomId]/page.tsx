@@ -59,11 +59,6 @@ export default function RoomDetailsPage() {
                 setCheckInDate(new Date(pkg.startDate));
                 setCheckOutDate(new Date(pkg.endDate));
               }
-              
-              // Set price from package
-              if (pkg.packagePrice) {
-                setTotalPrice(parseFloat(pkg.packagePrice.toString()));
-              }
             }
           } catch (pkgError: any) {
             console.error('Error fetching package details:', pkgError);
@@ -82,11 +77,18 @@ export default function RoomDetailsPage() {
   }, [roomId, packageId]);
 
   useEffect(() => {
-    // If it's a package booking, don't recalculate price - use package price
-    if (isPackageBooking && packageDetails) {
+    // If it's a package booking, use package price for the room type
+    if (isPackageBooking && packageDetails && roomDetails) {
       const totalGuests = numAdults + numChildren;
       setTotalGuests(totalGuests);
-      // Price is already set from package
+      
+      // Set price from package - използвай цената за конкретния тип стая
+      if (packageDetails.roomTypePrices && roomDetails.roomType) {
+        const priceForRoomType = packageDetails.roomTypePrices[roomDetails.roomType];
+        if (priceForRoomType) {
+          setTotalPrice(parseFloat(priceForRoomType.toString()));
+        }
+      }
       return;
     }
     
@@ -324,12 +326,14 @@ export default function RoomDetailsPage() {
       <img src={roomPhotoUrl} alt={roomType} className="room-details-image" />
       <div className="room-details-info">
         <h3>{roomType}</h3>
-        {isPackageBooking && packageDetails ? (
+            {isPackageBooking && packageDetails ? (
           <>
             <div style={{ backgroundColor: '#e3f2fd', padding: '1rem', borderRadius: '8px', marginBottom: '1rem', border: '2px solid #2196f3' }}>
               <h4 style={{ color: '#1976d2', marginBottom: '0.5rem' }}>{t('packages.packageBooking')}: {packageDetails.name}</h4>
               <p><strong>{t('packages.dates')}:</strong> {new Date(packageDetails.startDate).toLocaleDateString()} - {new Date(packageDetails.endDate).toLocaleDateString()}</p>
-              <p><strong>{t('packages.price')}:</strong> €{packageDetails.packagePrice}</p>
+              {packageDetails.roomTypePrices && roomDetails?.roomType && packageDetails.roomTypePrices[roomDetails.roomType] ? (
+                <p><strong>{t('packages.price')}:</strong> €{packageDetails.roomTypePrices[roomDetails.roomType]}</p>
+              ) : null}
               {packageDetails.description && (
                 <p><strong>{t('packages.description')}:</strong> {packageDetails.description}</p>
               )}
@@ -337,9 +341,11 @@ export default function RoomDetailsPage() {
             <p style={{ textDecoration: 'line-through', color: '#999' }}>
               {t('rooms.price')}: €{roomPrice} {t('rooms.perNight')}
             </p>
-            <p style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#00796b' }}>
-              {t('packages.packagePrice')}: €{packageDetails.packagePrice}
-            </p>
+            {packageDetails.roomTypePrices && roomDetails?.roomType && packageDetails.roomTypePrices[roomDetails.roomType] ? (
+              <p style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#00796b' }}>
+                {t('packages.packagePrice')}: €{packageDetails.roomTypePrices[roomDetails.roomType]}
+              </p>
+            ) : null}
           </>
         ) : (
           <p>{t('rooms.price')}: €{roomPrice} {t('rooms.perNight')}</p>
@@ -375,7 +381,9 @@ export default function RoomDetailsPage() {
               <div className="booking-form-section" style={{ backgroundColor: '#e3f2fd', padding: '1rem', borderRadius: '8px', marginBottom: '1rem' }}>
                 <h4 style={{ color: '#1976d2' }}>{t('packages.packageBooking')}: {packageDetails.name}</h4>
                 <p><strong>{t('packages.dates')}:</strong> {new Date(packageDetails.startDate).toLocaleDateString()} - {new Date(packageDetails.endDate).toLocaleDateString()}</p>
-                <p><strong>{t('packages.price')}:</strong> €{packageDetails.packagePrice}</p>
+                {packageDetails.roomTypePrices && roomDetails?.roomType && packageDetails.roomTypePrices[roomDetails.roomType] ? (
+                  <p><strong>{t('packages.price')}:</strong> €{packageDetails.roomTypePrices[roomDetails.roomType]}</p>
+                ) : null}
               </div>
             ) : (
               <div className="booking-form-section">

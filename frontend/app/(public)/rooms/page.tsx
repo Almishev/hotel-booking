@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import ApiService from '@/lib/service/ApiService';
 import Pagination from '@/components/common/Pagination';
 import RoomResult from '@/components/common/RoomResult';
@@ -10,6 +11,9 @@ import '@/lib/i18n';
 
 export default function AllRoomsPage() {
   const { t } = useTranslation();
+  const searchParams = useSearchParams();
+  const packageId = searchParams.get('packageId');
+  const urlRoomType = searchParams.get('roomType');
   const [rooms, setRooms] = useState<any[]>([]);
   const [filteredRooms, setFilteredRooms] = useState<any[]>([]);
   const [roomTypes, setRoomTypes] = useState<string[]>([]);
@@ -46,6 +50,14 @@ export default function AllRoomsPage() {
     fetchRooms();
     fetchRoomTypes();
   }, []);
+
+  // Ако има packageId и roomType в URL, филтрирай стаите
+  useEffect(() => {
+    if (urlRoomType && rooms.length > 0) {
+      setSelectedRoomType(urlRoomType);
+      filterRooms(urlRoomType);
+    }
+  }, [urlRoomType, rooms]);
 
   const handleRoomTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedRoomType(e.target.value);
@@ -84,7 +96,7 @@ export default function AllRoomsPage() {
       </div>
       
       <RoomSearch handleSearchResult={handleSearchResult} />
-      <RoomResult roomSearchResults={currentRooms} />
+      <RoomResult roomSearchResults={currentRooms} packageId={packageId || undefined} />
 
       <Pagination
         roomsPerPage={roomsPerPage}

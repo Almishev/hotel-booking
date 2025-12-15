@@ -11,11 +11,20 @@ public interface HolidayPackageRepository extends JpaRepository<HolidayPackage, 
 
     List<HolidayPackage> findByIsActiveTrue();
 
-    @Query("SELECT hp FROM HolidayPackage hp WHERE hp.isActive = true AND hp.room.id = :roomId " +
-           "AND (hp.startDate < :checkOutDate AND hp.endDate > :checkInDate)")
-    List<HolidayPackage> findActivePackagesForRoomAndDates(Long roomId, LocalDate checkInDate, LocalDate checkOutDate);
+    // Пакетът е за целия хотел, не за конкретна стая - филтрираме само по дати
+    @Query("SELECT DISTINCT hp FROM HolidayPackage hp LEFT JOIN FETCH hp.roomTypePrices " +
+           "WHERE hp.isActive = true AND (hp.startDate < :checkOutDate AND hp.endDate > :checkInDate)")
+    List<HolidayPackage> findActivePackagesForDates(LocalDate checkInDate, LocalDate checkOutDate);
 
-    @Query("SELECT hp FROM HolidayPackage hp WHERE hp.isActive = true AND hp.allowPartialBookings = false " +
-           "AND hp.room.id = :roomId AND (hp.startDate < :checkOutDate AND hp.endDate > :checkInDate)")
-    List<HolidayPackage> findNonDestructiblePackagesForRoomAndDates(Long roomId, LocalDate checkInDate, LocalDate checkOutDate);
+    // Намиране на неразрушими пакети за дати (без филтриране по стая, защото пакетът е за целия хотел)
+    @Query("SELECT DISTINCT hp FROM HolidayPackage hp LEFT JOIN FETCH hp.roomTypePrices " +
+           "WHERE hp.isActive = true AND hp.allowPartialBookings = false " +
+           "AND (hp.startDate < :checkOutDate AND hp.endDate > :checkInDate)")
+    List<HolidayPackage> findNonDestructiblePackagesForDates(LocalDate checkInDate, LocalDate checkOutDate);
+    
+    // Намиране на активни пакети за конкретен тип стая и дати
+    @Query("SELECT DISTINCT hp FROM HolidayPackage hp LEFT JOIN FETCH hp.roomTypePrices rtp " +
+           "WHERE hp.isActive = true AND rtp.roomType = :roomType " +
+           "AND (hp.startDate < :checkOutDate AND hp.endDate > :checkInDate)")
+    List<HolidayPackage> findActivePackagesForRoomTypeAndDates(String roomType, LocalDate checkInDate, LocalDate checkOutDate);
 }

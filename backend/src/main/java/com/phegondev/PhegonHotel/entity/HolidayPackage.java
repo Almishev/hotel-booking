@@ -27,10 +27,9 @@ public class HolidayPackage {
     @Column(nullable = false)
     private LocalDate endDate;
 
-    @Column(nullable = false)
-    private BigDecimal packagePrice; // Обща цена за целия пакет
-
     private String description;
+
+    private String packagePhotoUrl; // URL на снимката на пакета в Cloudinary
 
     @Column(nullable = false)
     private Boolean isActive = true;
@@ -38,9 +37,23 @@ public class HolidayPackage {
     @Column(nullable = false)
     private Boolean allowPartialBookings = false; // Ако е false, пакетът блокира всички припокриващи резервации
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "room_id", nullable = false)
-    private Room room;
+    // Пакетът се отнася за целия хотел, не за конкретна стая
+    // Цените за различните типове стаи се съхраняват в HolidayPackageRoomTypePrice
+    
+    // Временно поле за да може Hibernate да обнови схемата - да се премахне след миграция
+    @Column(name = "package_price", nullable = true, insertable = false, updatable = false)
+    @JsonIgnore
+    @Deprecated
+    private BigDecimal packagePrice; // DEPRECATED - не се използва, само за миграция на схемата
+
+    // Временно поле за да може Hibernate да обнови схемата - да се премахне след миграция
+    @Column(name = "room_id", nullable = true, insertable = false, updatable = false)
+    @JsonIgnore
+    @Deprecated
+    private Long roomId; // DEPRECATED - не се използва, само за миграция на схемата
+
+    @OneToMany(mappedBy = "holidayPackage", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<HolidayPackageRoomTypePrice> roomTypePrices = new ArrayList<>();
 
     @OneToMany(mappedBy = "holidayPackage", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonIgnore

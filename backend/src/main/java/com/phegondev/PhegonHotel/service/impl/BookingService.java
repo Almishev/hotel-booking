@@ -50,13 +50,21 @@ public class BookingService implements IBookingService {
             List<Booking> existingBookings = room.getBookings();
 
             // Ако резервацията НЕ е за пакет, провери дали има неразрушим активен пакет, който припокрива датите
+            // Пакетът е за целия хотел, но проверяваме дали има пакет за този тип стая
             if (bookingRequest.getHolidayPackage() == null) {
+                String roomType = room.getRoomType();
                 List<HolidayPackage> nonDestructiblePackages = holidayPackageRepository
-                        .findNonDestructiblePackagesForRoomAndDates(roomId, bookingRequest.getCheckInDate(), bookingRequest.getCheckOutDate());
+                        .findNonDestructiblePackagesForDates(bookingRequest.getCheckInDate(), bookingRequest.getCheckOutDate());
+                
+                // Филтрираме само пакетите, които имат цена за този тип стая
+                List<HolidayPackage> relevantPackages = nonDestructiblePackages.stream()
+                        .filter(pkg -> pkg.getRoomTypePrices().stream()
+                                .anyMatch(rtp -> rtp.getRoomType().equals(roomType)))
+                        .toList();
                 
                 // Ако има неразрушим пакет, който припокрива датите, блокираме резервацията
-                if (!nonDestructiblePackages.isEmpty()) {
-                    HolidayPackage blockingPackage = nonDestructiblePackages.get(0);
+                if (!relevantPackages.isEmpty()) {
+                    HolidayPackage blockingPackage = relevantPackages.get(0);
                     throw new OurException("These dates are part of a holiday package: \"" + blockingPackage.getName() + 
                                        "\". Please book the package instead or choose different dates.");
                 }
@@ -70,6 +78,15 @@ public class BookingService implements IBookingService {
             if (bookingRequest.getHolidayPackage() != null) {
                 HolidayPackage packageEntity = holidayPackageRepository.findById(bookingRequest.getHolidayPackage().getId())
                         .orElseThrow(() -> new OurException("Holiday Package Not Found"));
+                
+                // Провери дали пакетът има цена за този тип стая
+                String roomType = room.getRoomType();
+                boolean hasPriceForRoomType = packageEntity.getRoomTypePrices().stream()
+                        .anyMatch(rtp -> rtp.getRoomType().equals(roomType));
+                
+                if (!hasPriceForRoomType) {
+                    throw new OurException("This holiday package is not available for room type: " + roomType);
+                }
                 
                 // Провери дали пакетът все още е наличен (няма други резервации, които блокират датите на пакета)
                 // Това е важно само ако пакетът е разрушим (allowPartialBookings = true)

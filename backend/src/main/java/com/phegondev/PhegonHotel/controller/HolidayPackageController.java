@@ -7,9 +7,12 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/holiday-packages")
@@ -21,15 +24,30 @@ public class HolidayPackageController {
     @PostMapping("/add")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Response> addHolidayPackage(
-            @RequestParam Long roomId,
             @RequestParam String name,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-            @RequestParam BigDecimal packagePrice,
             @RequestParam(required = false) String description,
-            @RequestParam(required = false, defaultValue = "false") Boolean allowPartialBookings
+            @RequestParam(required = false, defaultValue = "false") Boolean allowPartialBookings,
+            @RequestParam(value = "photo", required = false) MultipartFile photo,
+            @RequestParam Map<String, String> allParams // За да получим всички roomTypePrice параметри
     ) {
-        Response response = holidayPackageService.addHolidayPackage(roomId, name, startDate, endDate, packagePrice, description, allowPartialBookings);
+        // Извличане на цените по типове стаи от параметрите
+        // Очакваме формат: roomTypePrice_Delux=100, roomTypePrice_Standard=80, etc.
+        Map<String, BigDecimal> roomTypePrices = new HashMap<>();
+        for (Map.Entry<String, String> entry : allParams.entrySet()) {
+            if (entry.getKey().startsWith("roomTypePrice_")) {
+                String roomType = entry.getKey().substring("roomTypePrice_".length());
+                try {
+                    BigDecimal price = new BigDecimal(entry.getValue());
+                    roomTypePrices.put(roomType, price);
+                } catch (NumberFormatException e) {
+                    // Пропускаме невалидни цени
+                }
+            }
+        }
+
+        Response response = holidayPackageService.addHolidayPackage(name, startDate, endDate, roomTypePrices, description, allowPartialBookings, photo);
         return ResponseEntity.status(response.getStatusCode()).body(response);
     }
 
@@ -49,16 +67,40 @@ public class HolidayPackageController {
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Response> updateHolidayPackage(
             @PathVariable Long packageId,
-            @RequestParam(required = false) Long roomId,
             @RequestParam(required = false) String name,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-            @RequestParam(required = false) BigDecimal packagePrice,
             @RequestParam(required = false) String description,
             @RequestParam(required = false) Boolean isActive,
-            @RequestParam(required = false) Boolean allowPartialBookings
+            @RequestParam(required = false) Boolean allowPartialBookings,
+            @RequestParam(value = "photo", required = false) MultipartFile photo,
+            @RequestParam Map<String, String> allParams // За да получим всички roomTypePrice параметри
     ) {
-        Response response = holidayPackageService.updateHolidayPackage(packageId, roomId, name, startDate, endDate, packagePrice, description, isActive, allowPartialBookings);
+        // Извличане на цените по типове стаи от параметрите
+        Map<String, BigDecimal> roomTypePrices = null;
+        boolean hasRoomTypePrices = false;
+        for (Map.Entry<String, String> entry : allParams.entrySet()) {
+            if (entry.getKey().startsWith("roomTypePrice_")) {
+                if (roomTypePrices == null) {
+                    roomTypePrices = new HashMap<>();
+                }
+                hasRoomTypePrices = true;
+                String roomType = entry.getKey().substring("roomTypePrice_".length());
+                try {
+                    BigDecimal price = new BigDecimal(entry.getValue());
+                    roomTypePrices.put(roomType, price);
+                } catch (NumberFormatException e) {
+                    // Пропускаме невалидни цени
+                }
+            }
+        }
+
+        // Ако няма roomTypePrices параметри, не обновяваме цените
+        if (!hasRoomTypePrices) {
+            roomTypePrices = null;
+        }
+
+        Response response = holidayPackageService.updateHolidayPackage(packageId, name, startDate, endDate, roomTypePrices, description, isActive, allowPartialBookings, photo);
         return ResponseEntity.status(response.getStatusCode()).body(response);
     }
 
@@ -70,12 +112,21 @@ public class HolidayPackageController {
     }
 
     @GetMapping("/available")
-    public ResponseEntity<Response> getActivePackagesForRoomAndDates(
-            @RequestParam Long roomId,
+    public ResponseEntity<Response> getActivePackagesForRoomTypeAndDates(
+            @RequestParam String roomType,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkInDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkOutDate
     ) {
-        Response response = holidayPackageService.getActivePackagesForRoomAndDates(roomId, checkInDate, checkOutDate);
+        Response response = holidayPackageService.getActivePackagesForRoomTypeAndDates(roomType, checkInDate, checkOutDate);
+        return ResponseEntity.status(response.getStatusCode()).body(response);
+    }
+
+    @GetMapping("/price")
+    public ResponseEntity<Response> getPackagePriceForRoomType(
+            @RequestParam Long packageId,
+            @RequestParam String roomType
+    ) {
+        Response response = holidayPackageService.getPackagePriceForRoomType(packageId, roomType);
         return ResponseEntity.status(response.getStatusCode()).body(response);
     }
 }

@@ -223,7 +223,12 @@ const resources = {
         yes: 'Да',
         no: 'Не',
         room: 'Стая',
-        edit: 'Редактирай'
+        edit: 'Редактирай',
+        packagePricesByRoomType: 'Цени на пакет по типове стаи',
+        packagePrices: 'Цени на пакет',
+        enterPriceForAllRoomTypes: 'Моля, въведете цена за всички типове стаи',
+        loadingRoomTypes: 'Зареждане на типове стаи...',
+        packagePhoto: 'Снимка на пакет'
       },
       packages: {
         title: 'Пакетни предложения',
@@ -236,7 +241,9 @@ const resources = {
         bookNow: 'Резервирай сега',
         description: 'Описание',
         packageBooking: 'Пакетно предложение',
-        packagePrice: 'Цена на пакет'
+        packagePrice: 'Цена на пакет',
+        pricesByRoomType: 'Цени по типове стаи',
+        noPricesAvailable: 'Няма налични цени'
       },
       footer: {
         copyright: 'Phegon Hotel | Всички права запазени'
@@ -463,7 +470,12 @@ const resources = {
         yes: 'Ναι',
         no: 'Όχι',
         room: 'Δωμάτιο',
-        edit: 'Επεξεργασία'
+        edit: 'Επεξεργασία',
+        packagePricesByRoomType: 'Τιμές πακέτου ανά τύπο δωματίου',
+        packagePrices: 'Τιμές πακέτου',
+        enterPriceForAllRoomTypes: 'Παρακαλώ εισάγετε τιμή για όλους τους τύπους δωματίων',
+        loadingRoomTypes: 'Φόρτωση τύπων δωματίων...',
+        packagePhoto: 'Φωτογραφία πακέτου'
       },
       packages: {
         title: 'Πακέτα',
@@ -476,7 +488,9 @@ const resources = {
         bookNow: 'Κράτηση τώρα',
         description: 'Περιγραφή',
         packageBooking: 'Πακέτο',
-        packagePrice: 'Τιμή πακέτου'
+        packagePrice: 'Τιμή πακέτου',
+        pricesByRoomType: 'Τιμές ανά τύπο δωματίου',
+        noPricesAvailable: 'Δεν υπάρχουν διαθέσιμες τιμές'
       },
       footer: {
         copyright: 'Phegon Hotel | Όλα τα δικαιώματα διατηρούνται'
@@ -704,7 +718,12 @@ const resources = {
         yes: 'Yes',
         no: 'No',
         room: 'Room',
-        edit: 'Edit'
+        edit: 'Edit',
+        packagePricesByRoomType: 'Package Prices by Room Type',
+        packagePrices: 'Package Prices',
+        enterPriceForAllRoomTypes: 'Please enter price for all room types',
+        loadingRoomTypes: 'Loading room types...',
+        packagePhoto: 'Package Photo'
       },
       packages: {
         title: 'Holiday Packages',
@@ -717,7 +736,9 @@ const resources = {
         bookNow: 'Book Now',
         description: 'Description',
         packageBooking: 'Package Booking',
-        packagePrice: 'Package Price'
+        packagePrice: 'Package Price',
+        pricesByRoomType: 'Prices by Room Type',
+        noPricesAvailable: 'No prices available'
       },
       footer: {
         copyright: 'Phegon Hotel | All Right Reserved'
