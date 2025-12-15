@@ -179,9 +179,22 @@ export default function PackagesPage() {
                   </h2>
                   
                   <p style={{ marginBottom: '0.5rem', color: '#666' }}>
-                    <strong>{t('packages.dates')}:</strong> 
-                    <time itemProp="validFrom" dateTime={pkg.startDate}>{formatDate(pkg.startDate)}</time> - 
-                    <time itemProp="validThrough" dateTime={pkg.endDate}> {formatDate(pkg.endDate)}</time>
+                    <strong>{t('packages.dates')}:</strong>{' '}
+                    <time
+                      itemProp="validFrom"
+                      dateTime={pkg.startDate}
+                      style={{ color: '#ff8c00', fontWeight: 'bold' }}
+                    >
+                      {formatDate(pkg.startDate)}
+                    </time>{' '}
+                    -{' '}
+                    <time
+                      itemProp="validThrough"
+                      dateTime={pkg.endDate}
+                      style={{ color: '#ff8c00', fontWeight: 'bold' }}
+                    >
+                      {formatDate(pkg.endDate)}
+                    </time>
                   </p>
                   
                   {pkg.description && (

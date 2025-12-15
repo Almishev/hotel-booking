@@ -725,7 +725,8 @@ export default function AddBookingPage() {
                     padding: '0.5rem 1rem',
                     borderRadius: '4px',
                     border: '1px solid #ccc',
-                    backgroundColor: '#f5f5f5',
+                    backgroundColor: 'blue',
+                    color: '#fff',
                     cursor: 'pointer'
                   }}
                 >

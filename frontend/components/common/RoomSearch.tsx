@@ -16,9 +16,10 @@ export default function RoomSearch({ handleSearchResult }: RoomSearchProps) {
   const { t } = useTranslation();
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
-  const [roomType, setRoomType] = useState('');
+  const [roomType, setRoomType] = useState('ALL'); // по подразбиране всички типове
   const [roomTypes, setRoomTypes] = useState<string[]>([]);
   const [error, setError] = useState('');
+  const [isPackageError, setIsPackageError] = useState(false);
 
   useEffect(() => {
     const fetchRoomTypes = async () => {
@@ -32,15 +33,17 @@ export default function RoomSearch({ handleSearchResult }: RoomSearchProps) {
     fetchRoomTypes();
   }, []);
 
-  const showError = (message: string, timeout = 5000) => {
+  const showError = (message: string, timeout = 5000, isPackage = false) => {
     setError(message);
+    setIsPackageError(isPackage);
     setTimeout(() => {
       setError('');
+      setIsPackageError(false);
     }, timeout);
   };
 
   const handleInternalSearch = async () => {
-    if (!startDate || !endDate || !roomType) {
+    if (!startDate || !endDate) {
       showError(t('login.fillAllFields'));
       return false;
     }
@@ -56,20 +59,62 @@ export default function RoomSearch({ handleSearchResult }: RoomSearchProps) {
     try {
       const formattedStartDate = startDate ? startDate.toISOString().split('T')[0] : null;
       const formattedEndDate = endDate ? endDate.toISOString().split('T')[0] : null;
-      const response = await ApiService.getAvailableRoomsByDateAndType(
-        formattedStartDate!, 
-        formattedEndDate!, 
-        roomType
-      );
+      
+      let aggregatedRooms: any[] = [];
 
-      if (response.statusCode === 200) {
-        if (response.roomList.length === 0) {
-          showError(t('rooms.noRooms'));
-          return;
+      if (roomType === 'ALL') {
+        // Търсим по всички типове стаи и обединяваме резултатите
+        const responses = await Promise.all(
+          roomTypes.map((type) =>
+            ApiService.getAvailableRoomsByDateAndType(
+              formattedStartDate!,
+              formattedEndDate!,
+              type
+            )
+          )
+        );
+
+        responses.forEach((response) => {
+          if (response.statusCode === 200 && Array.isArray(response.roomList)) {
+            aggregatedRooms = aggregatedRooms.concat(response.roomList);
+          }
+        });
+
+        // премахваме дубликатите по room.id
+        const seen = new Set<number>();
+        aggregatedRooms = aggregatedRooms.filter((room: any) => {
+          if (!room || typeof room.id !== 'number') return false;
+          if (seen.has(room.id)) return false;
+          seen.add(room.id);
+          return true;
+        });
+      } else {
+        const response = await ApiService.getAvailableRoomsByDateAndType(
+          formattedStartDate!, 
+          formattedEndDate!, 
+          roomType
+        );
+
+        if (response.statusCode === 200 && Array.isArray(response.roomList)) {
+          aggregatedRooms = response.roomList;
         }
-        handleSearchResult(response.roomList);
-        setError('');
       }
+
+      if (!aggregatedRooms || aggregatedRooms.length === 0) {
+        // Ако няма свободни стаи за нормална резервация, е възможно
+        // датите да попадат в пакет с неразрушими настройки.
+        // Показваме по-ясно съобщение и подсказваме за пакетите.
+        showError(
+          t('rooms.datesPartOfPackage') ||
+            'Няма свободни стаи за тези дати. Възможно е да има пакетни предложения за този период.',
+          15000,
+          true
+        );
+        return;
+      }
+
+      handleSearchResult(aggregatedRooms);
+      setError('');
     } catch (error: any) {
       showError(t('rooms.loading') + ': ' + (error.response?.data?.message || error.message));
     }
@@ -77,7 +122,12 @@ export default function RoomSearch({ handleSearchResult }: RoomSearchProps) {
 
   return (
     <section>
-      <h3 className="search-section-title">{t('home.checkAvailability')}</h3>
+      <h3
+        className="search-section-title"
+        style={{ textAlign: 'center', marginBottom: '1.5rem', marginTop: '2rem' }}
+      >
+        {t('home.checkAvailability')}
+      </h3>
       <div className="search-container">
         <div className="search-field">
           <label>{t('rooms.selectCheckIn')}</label>
@@ -103,8 +153,8 @@ export default function RoomSearch({ handleSearchResult }: RoomSearchProps) {
         <div className="search-field">
           <label>{t('rooms.selectRoomType')}</label>
           <select value={roomType} onChange={(e) => setRoomType(e.target.value)}>
-            <option disabled value="">
-              {t('rooms.selectRoomType')}
+            <option value="ALL">
+              {t('rooms.all')}
             </option>
             {roomTypes.map((type) => (
               <option key={type} value={type}>
@@ -117,7 +167,28 @@ export default function RoomSearch({ handleSearchResult }: RoomSearchProps) {
           {t('rooms.searchRooms')}
         </button>
       </div>
-      {error && <p className="error-message">{error}</p>}
+      {error && (
+        <div style={{ marginTop: '1rem', textAlign: 'center' }}>
+          <p
+            className={isPackageError ? '' : 'error-message'}
+            style={
+              isPackageError
+                ? { fontWeight: 'bold', color: '#555', marginBottom: '0.5rem' }
+                : undefined
+            }
+          >
+            {error}
+          </p>
+          {isPackageError && (
+            <a
+              href="/packages"
+              style={{ color: '#00796b', textDecoration: 'underline', fontWeight: 'bold' }}
+            >
+              Виж пакетните предложения
+            </a>
+          )}
+        </div>
+      )}
     </section>
   );
 }
