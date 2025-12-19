@@ -3,7 +3,8 @@ import path from "path";
 
 const nextConfig: NextConfig = {
   /* config options here */
-  outputFileTracingRoot: path.join(__dirname, '../../'),
+  // Enable standalone output for Docker
+  output: 'standalone',
   // Ensure proper routing in production
   trailingSlash: false,
   // Enable proper static file serving

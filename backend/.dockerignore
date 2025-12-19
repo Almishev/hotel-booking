@@ -1,18 +1,10 @@
-# Ignore unnecessary files in Docker build
-target/
-.git/
+target
+.git
 .gitignore
-.idea/
-.vscode/
-*.iml
 *.log
-*.class
 .DS_Store
-Thumbs.db
-
-# Keep these for Docker build
-# mvnw
-# .mvn/
-# pom.xml
-# src/
-
+.idea
+*.iml
+HELP.md
+mvnw
+mvnw.cmd

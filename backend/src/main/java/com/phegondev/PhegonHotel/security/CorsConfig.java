@@ -1,24 +1,29 @@
 package com.phegondev.PhegonHotel.security;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Configuration
 public class CorsConfig {
 
+    @Value("${cors.allowed.origins:http://localhost:3000,http://127.0.0.1:3000,http://localhost}")
+    private String allowedOrigins;
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of(
-                "https://hotel-booking-frontend-cbk1.onrender.com",
-                "http://localhost:3000",
-                "http://127.0.0.1:3000"
-        ));
+        
+        // Parse allowed origins from environment variable or use defaults
+        List<String> origins = Arrays.asList(allowedOrigins.split(","));
+        config.setAllowedOrigins(origins);
+        
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept", "X-Requested-With", "Origin"));
         config.setExposedHeaders(List.of("Authorization"));

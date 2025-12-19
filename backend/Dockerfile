@@ -1,29 +1,32 @@
-FROM eclipse-temurin:21-jdk
+FROM maven:3.9-eclipse-temurin-21 AS builder
 
 WORKDIR /app
 
-# Copy Maven wrapper files
-COPY mvnw .
-COPY .mvn .mvn
+# Copy pom.xml first for better caching
 COPY pom.xml .
 
-# Make mvnw executable
-RUN chmod +x ./mvnw
-
 # Download dependencies (cached layer if pom.xml doesn't change)
-RUN ./mvnw dependency:go-offline -B || true
+RUN mvn dependency:go-offline -B || true
 
 # Copy source code
 COPY src ./src
 
 # Build the application
-RUN ./mvnw clean package -DskipTests -B
+RUN mvn clean package -DskipTests -B
 
-# Copy the JAR file (exclude *original.jar files)
-RUN JAR_FILE=$(find target -name "*.jar" -not -name "*original*" | head -1) && cp "$JAR_FILE" app.jar
+# Runtime stage
+FROM eclipse-temurin:21-jre-alpine
 
-# Expose port (Render sets PORT env var, default to 10000)
-EXPOSE 10000
+# Install wget for healthcheck
+RUN apk add --no-cache wget
 
-# Run the application (Render will override PORT via environment variable)
+WORKDIR /app
+
+# Copy JAR file from builder
+COPY --from=builder /app/target/*.jar app.jar
+
+# Expose port
+EXPOSE 8081
+
+# Run the application
 ENTRYPOINT ["java", "-jar", "app.jar"] 
