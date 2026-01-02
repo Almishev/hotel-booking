@@ -1,0 +1,28 @@
+# Production overrides for docker-compose.yml
+# Usage: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+
+version: '3.8'
+
+services:
+  postgres:
+    # PostgreSQL is NOT exposed directly in production - only accessible within Docker network
+    # No ports section - uses only expose
+
+  backend:
+    # Backend is NOT exposed directly - only through nginx
+    # No ports section - uses only expose
+    environment:
+      SPRING_PROFILES_ACTIVE: production
+
+  frontend:
+    # Frontend is NOT exposed directly - only through nginx
+    # No ports section - uses only expose
+    environment:
+      NODE_ENV: production
+
+  nginx:
+    # Standard production ports
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+

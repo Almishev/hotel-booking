@@ -1,0 +1,38 @@
+# Development overrides for docker-compose.yml
+# Usage: docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+
+version: '3.8'
+
+services:
+  postgres:
+    # Expose PostgreSQL port for development access
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+
+  backend:
+    # Expose backend directly for development
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_PROFILES_ACTIVE: development
+    # Optional: Mount source for hot reload (if configured)
+    # volumes:
+    #   - ./backend/src:/app/src:ro
+
+  frontend:
+    # Expose frontend directly for development
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+    # Optional: Mount source for hot reload (if configured)
+    # volumes:
+    #   - ./frontend:/app:ro
+    #   - /app/node_modules
+
+  nginx:
+    # Use different port for development to avoid conflicts
+    ports:
+      - "${NGINX_PORT:-8080}:80"
+      - "${NGINX_SSL_PORT:-8443}:443"
+
