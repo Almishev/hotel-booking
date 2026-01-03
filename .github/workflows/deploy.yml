@@ -19,6 +19,7 @@ jobs:
           port: ${{ secrets.HETZNER_PORT || 22 }}
           script: |
             cd /root/hotel-booking
+            git pull origin main
             chmod +x deploy.sh
             ./deploy.sh
 

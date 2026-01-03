@@ -10,9 +10,8 @@ echo "🚀 Starting deployment..."
 # Navigate to project directory
 cd /root/hotel-booking
 
-# Pull latest changes
-echo "📥 Pulling latest changes from GitHub..."
-git pull origin main
+# Note: git pull is done in workflow before executing this script
+# This ensures deploy.sh exists before we try to run it
 
 # Stop old containers
 echo "🛑 Stopping old containers..."
