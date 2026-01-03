@@ -1,206 +1,304 @@
-# Phegon Hotel - Хотелско резервиране и управление
+# Phegon Hotel - Hotel Booking & Management System
 
-## 📋 Описание на приложението
+A comprehensive full-stack web application for hotel room booking and management operations. The system provides an intuitive interface for guests to book rooms and a complete administrative panel for hotel management.
 
-**Phegon Hotel** е пълнофункционална уеб платформа за резервиране на хотелски стаи и управление на хотелски операции. Приложението предлага интуитивен интерфейс за гостите да резервират стаи и пълна административна панел за управление на хотела.
+## 🚀 Features
 
-## 🏗️ Архитектура
+### 👥 For Guests (Public Features)
 
-### Frontend (React.js)
-- **React 18** с функционални компоненти и Hooks
-- **React Router** за навигация между страниците
-- **React i18next** за многоезична поддръжка (български, английски, гръцки)
-- **Axios** за HTTP заявки към backend API
-- **React DatePicker** за избор на дати
-- **Responsive Design** с CSS Grid и Flexbox
+#### 🏠 Home Page
+- Beautiful landing page with hero section
+- Search for available rooms by dates and type
+- View hotel amenities (AC, mini-bar, parking, WiFi)
+- Direct navigation to all rooms
 
-### Backend (Spring Boot)
-- **Spring Boot 3** с Java 17
-- **Spring Security** с JWT автентикация
-- **Spring Data JPA** за работа с база данни
-- **PostgreSQL** като основна база данни
-- **Cloudinary** за съхранение на изображения
-- **Email Service** за изпращане на потвърждения
+#### 🛏️ Room Browsing
+- List of all available rooms
+- Filter by room type
+- Detailed information for each room (price, description, images)
+- Availability check by dates
 
-## 🚀 Функционалности
+#### 📅 Room Booking
+- Select check-in and check-out dates
+- Specify number of adults and children
+- Automatic total price calculation
+- Booking confirmation with unique code
+- Email and SMS notifications with details
 
-### 👥 За гостите (Public функционалности)
+#### 📦 Holiday Packages
+- Browse and book holiday packages
+- Package details with included services
+- Combined room and package bookings
 
-#### 🏠 Начална страница
-- Красива landing page с hero секция
-- Търсене на налични стаи по дати и тип
-- Преглед на услугите на хотела (климатик, мини бар, паркинг, WiFi)
-- Директна навигация към всички стаи
+#### 🔍 Booking Search
+- Search for booking by confirmation code
+- View booking details
+- Room information and guest data
 
-#### 🛏️ Преглед на стаи
-- Списък с всички налични стаи
-- Филтриране по тип стая
-- Детайлна информация за всяка стая (цена, описание, снимки)
-- Проверка на наличност по дати
+### 👤 For Registered Users
 
-#### 📅 Резервиране на стаи
-- Избор на дати за настаняване и освобождаване
-- Указване на брой възрастни и деца
-- Автоматично изчисляване на общата цена
-- Потвърждение на резервация с уникален код
-- Изпращане на SMS и имейл с детайли
+#### 👤 User Profile
+- View personal information
+- List of all user bookings
+- Edit profile information
+- Delete account
 
-#### 🔍 Търсене на резервации
-- Търсене на резервация по код за потвърждение
-- Преглед на детайли за резервацията
-- Информация за стаята и данни за клиента
+#### 🔐 Authentication
+- Registration with email, name, phone, and password
+- Login with email and password
+- JWT token for secure authentication
+- Protected routes for personal information
 
-### 👤 За регистрирани потребители
+### 👨‍💼 For Administrators
 
-#### 👤 Профил на потребителя
-- Преглед на личната информация
-- Списък с всички резервации на потребителя
-- Редактиране на профилна информация
-- Изтриване на акаунт
+#### 📊 Admin Dashboard
+- Statistics for total bookings
+- Total revenue from bookings
+- Active bookings at the moment
+- Analytics by periods
 
-#### 🔐 Автентикация
-- Регистрация с имейл, име, телефон и парола
-- Вход с имейл и парола
-- JWT токен за сигурна автентикация
-- Защитени маршрути за лична информация
+#### 🏨 Room Management
+- **Add new rooms** with type, price, description, and image
+- **Edit existing rooms** (all fields)
+- **Delete rooms** with confirmation
+- **View all rooms** with pagination
 
-### 👨‍💼 За администратори
+#### 📋 Booking Management
+- **View all bookings** with advanced filters:
+  - Search by confirmation code
+  - Filter by dates (from/to)
+  - Filter by room type
+  - Filter by number of guests
+  - Filter by status (active, current, completed)
+- **Sorting** by various fields
+- **Edit bookings** (dates, number of guests)
+- **Cancel bookings**
+- **Export data** to CSV format
+- **Analytics** by periods with detailed statistics
 
-#### 📊 Админски дашборд
-- Статистика за общ брой резервации
-- Общ приход от резервации
-- Активни резервации в момента
-- Аналитика по периоди
+#### 📦 Holiday Package Management
+- **Add new packages** with details and pricing
+- **Edit existing packages**
+- **Delete packages**
+- **View all packages** with management options
 
-#### 🏨 Управление на стаи
-- **Добавяне на нови стаи** с тип, цена, описание и снимка
-- **Редактиране на съществуващи стаи** (всички полета)
-- **Изтриване на стаи** с потвърждение
-- **Преглед на всички стаи** с пагинация
+#### 📈 Analytics & Reports
+- Booking statistics by periods
+- Guest analysis (adults/children)
+- Total number of guests by periods
+- Data export for external processing
 
-#### 📋 Управление на резервации
-- **Преглед на всички резервации** с разширени филтри:
-  - Търсене по код за потвърждение
-  - Филтриране по дати (от/до)
-  - Филтриране по тип стая
-  - Филтриране по брой гости
-  - Филтриране по статус (активни, текущи, завършени)
-- **Сортиране** по различни полета
-- **Редактиране на резервации** (дати, брой гости)
-- **Отмяна на резервации**
-- **Експорт на данни** в CSV формат
-- **Аналитика** по периоди с детайлна статистика
+## 🌐 Multi-language Support
 
-#### 📈 Аналитика и отчети
-- Статистика за резервации по периоди
-- Анализ на гости (възрастни/деца)
-- Общ брой гости по периоди
-- Експорт на данни за външна обработка
+The application supports three languages:
+- **Bulgarian** (default)
+- **English**
+- **Greek**
 
-## 🌐 Многоезична поддръжка
+All interface texts are translated and can be changed dynamically.
 
-Приложението поддържа три езика:
-- **Български** (по подразбиране)
-- **Английски**
-- **Гръцки**
+## 🏗️ Technology Stack
 
-Всички текстове в интерфейса са преведени и могат да се сменят динамично.
+### Frontend
+- **Next.js 16** - React framework with App Router
+- **TypeScript** - Type safety and better development experience
+- **React 19** - Modern React with functional components and Hooks
+- **Tailwind CSS 4** - Utility-first CSS framework for responsive design
+- **i18next** - Internationalization library for multi-language support
+- **Axios** - HTTP client for API requests
+- **react-datepicker** - Date picker component
+- **date-fns** - Date utility library
 
-## 🔒 Сигурност
+### Backend
+- **Spring Boot 3.3.0** - Java framework for building web applications
+- **Java 21** - Modern Java with latest features
+- **Spring Security** - Authentication and authorization with JWT
+- **Spring Data JPA** - Data persistence layer
+- **Hibernate** - ORM (Object-Relational Mapping)
+- **PostgreSQL** - Relational database management system
+- **JWT (JSON Web Tokens)** - Secure token-based authentication
+- **Lombok** - Reduces boilerplate code
+- **Maven** - Dependency management and build tool
 
-### Автентикация и авторизация
-- **JWT токени** за сигурна автентикация
-- **Роли** (USER, ADMIN) за контрол на достъпа
-- **Защитени маршрути** за лична и административна информация
-- **Валидация** на входни данни
+### Infrastructure & DevOps
+- **Docker** - Containerization
+- **Docker Compose** - Multi-container orchestration
+- **Nginx** - Reverse proxy and web server
+- **GitHub Actions** - CI/CD for automated deployment
+- **Hetzner Cloud** - Cloud hosting platform
 
-### Защита на данните
-- **Хеширане на пароли** с Spring Security
-- **Валидация на дати** (не може да се резервира за минало)
-- **Уникални кодове** за резервации
-- **Защита срещу SQL инжекции** чрез JPA
+### Third-party Services
+- **Cloudinary** - Cloud-based image storage and optimization
+- **Gmail SMTP** - Email service for booking confirmations
+
+## 🔒 Security
+
+### Authentication & Authorization
+- **JWT tokens** for secure authentication
+- **Role-based access control** (USER, ADMIN) for access management
+- **Protected routes** for personal and administrative information
+- **Input validation** on all endpoints
+
+### Data Protection
+- **Password hashing** with Spring Security BCrypt
+- **Date validation** (cannot book for past dates)
+- **Unique confirmation codes** for bookings
+- **SQL injection protection** through JPA
+- **CORS configuration** for secure cross-origin requests
 
 ## 📱 Responsive Design
 
-Приложението е напълно responsive и работи на:
-- **Desktop** компютри
+The application is fully responsive and works on:
+- **Desktop** computers
 - **Tablets**
-- **Smartphones** (оптимизирано за мобилни устройства)
+- **Smartphones** (optimized for mobile devices)
 
-## 🛠️ Технически детайли
+## 🗄️ Database Schema
 
-### База данни
-- **PostgreSQL** за съхранение на данни
-- **JPA/Hibernate** за ORM
-- **Автоматично генериране** на схемата
+### Users
+- Email, name, phone, password
+- Role (USER/ADMIN)
+- List of bookings
+- Preferred language
 
-### Файлово съхранение
-- **Cloudinary** за съхранение на снимки на стаи
-- **Автоматично оптимизиране** на изображения
+### Rooms
+- Room type, price, description
+- Image URL (stored in Cloudinary)
+- List of bookings
 
-### Email уведомления
-- **Автоматично изпращане** на потвърждения за резервации
-- **SMS уведомления** (конфигурируеми)
+### Bookings
+- Check-in/check-out dates
+- Number of adults and children
+- Confirmation code
+- Relationship with user and room
+- Optional holiday package
 
-## 🚀 Стартиране на приложението
+### Holiday Packages
+- Package name, description, price
+- Included services
+- Related bookings
 
-### Backend (Spring Boot)
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js >= 20.9.0
+- npm >= 10.0.0
+- Java 21
+- Maven 3.9+
+- PostgreSQL 16+
+- Docker & Docker Compose (for containerized deployment)
+
+### Development Setup
+
+#### Backend (Spring Boot)
 ```bash
 cd backend
 mvn spring-boot:run
 ```
-Backend ще се стартира на порт 8081
+Backend will run on port 8081
 
-### Frontend (React)
+#### Frontend (Next.js)
 ```bash
 cd frontend
 npm install
-npm start
+npm run dev
 ```
-Frontend ще се стартира на порт 3000
+Frontend will run on port 3000
 
-### Конфигурация
-- Настройте `application.properties` за база данни
-- Добавете Cloudinary credentials
-- Конфигурирайте email service
+### Docker Deployment
 
-## 📊 Структура на данните
+#### Development
+```bash
+cp env.example .env.development
+# Edit .env.development with your values
+cp .env.development .env
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build
+```
 
-### Потребители (Users)
-- Имейл, име, телефон, парола
-- Роля (USER/ADMIN)
-- Списък с резервации
+#### Production
+```bash
+cp env.example .env.production
+# Edit .env.production with your production values
+cp .env.production .env
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+```
 
-### Стаи (Rooms)
-- Тип стая, цена, описание
-- URL на снимката
-- Списък с резервации
+See `README-ENVIRONMENTS.md` for detailed environment configuration.
 
-### Резервации (Bookings)
-- Дати за настаняване/освобождаване
-- Брой възрастни и деца
-- Код за потвърждение
-- Връзка с потребител и стая
+### Configuration
+- Configure `application.properties` for database connection
+- Add Cloudinary credentials
+- Configure email service (SMTP)
+- Set up environment variables (see `env.example`)
 
-## 🎯 Предимства на приложението
+## 📊 Project Structure
 
-1. **Интуитивен интерфейс** - лесно за използване от гостите
-2. **Пълна административна функционалност** - управление на всички аспекти
-3. **Многоезична поддръжка** - достъпно за международни гости
-4. **Responsive design** - работи на всички устройства
-5. **Сигурност** - защитено с JWT и роли
-6. **Аналитика** - подробни отчети за управлението
-7. **Автоматизация** - автоматични уведомления и кодове
+```
+.
+├── backend/              # Spring Boot backend
+│   ├── src/
+│   │   └── main/java/com/phegondev/PhegonHotel/
+│   │       ├── controller/    # REST controllers
+│   │       ├── service/       # Business logic
+│   │       ├── entity/        # JPA entities
+│   │       ├── security/      # Security configuration
+│   │       └── utils/         # Utility classes
+│   └── pom.xml
+├── frontend/             # Next.js frontend
+│   ├── app/              # Next.js App Router
+│   │   ├── (public)/     # Public pages
+│   │   ├── (auth)/       # Authentication pages
+│   │   ├── (protected)/  # Protected user pages
+│   │   └── (admin)/     # Admin pages
+│   ├── components/       # React components
+│   ├── lib/              # Utilities and services
+│   └── package.json
+├── nginx/                # Nginx configuration
+├── database/             # Database scripts
+├── docker-compose.yml    # Docker Compose configuration
+└── .github/workflows/    # GitHub Actions CI/CD
+```
 
-## 🔮 Бъдещи подобрения
+## 🎯 Key Advantages
 
-- Интеграция с платежни системи
-- Система за отзиви и рейтинги
-- Интеграция с channel managers
-- Push уведомления
-- Mobile приложение
-- Интеграция с POS системи
+1. **Intuitive Interface** - Easy to use for guests
+2. **Complete Administrative Functionality** - Manage all aspects of the hotel
+3. **Multi-language Support** - Accessible for international guests
+4. **Responsive Design** - Works on all devices
+5. **Security** - Protected with JWT and role-based access
+6. **Analytics** - Detailed reports for management
+7. **Automation** - Automatic notifications and confirmation codes
+8. **Modern Stack** - Built with latest technologies
+9. **Containerized** - Easy deployment with Docker
+10. **CI/CD** - Automated deployment with GitHub Actions
+
+## 🔮 Future Enhancements
+
+- Payment system integration
+- Review and rating system
+- Channel manager integration
+- Push notifications
+- Mobile application
+- POS system integration
+- Real-time availability updates
+- Advanced reporting and analytics
+
+## 📚 Documentation
+
+- `README-ENVIRONMENTS.md` - Environment configuration guide
+- `SERVER-SETUP.md` - Server setup instructions
+- `DATABASE-MIGRATION.md` - Database migration guide
+- `HETZNER-DEPLOYMENT-GUIDE.md` - Hetzner deployment guide
+- `DOCKER-DEPLOYMENT.md` - Docker deployment guide
+
+## 🤝 Contributing
+
+This is a private project. For questions or suggestions, please contact the project maintainer.
+
+## 📄 License
+
+See LICENSE file for details.
 
 ---
 
-**Phegon Hotel** - Вашият надежден партньор за управление на хотелски бизнес! 🏨✨
+**Phegon Hotel** - Your reliable partner for hotel business management! 🏨✨
