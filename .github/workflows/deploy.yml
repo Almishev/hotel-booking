@@ -16,7 +16,7 @@ jobs:
           host: ${{ secrets.HETZNER_HOST }}
           username: ${{ secrets.HETZNER_USER }}
           key: ${{ secrets.HETZNER_SSH_KEY }}
-          port: ${{ secrets.HETZNER_PORT || 22 }}
+          port: ${{ secrets.HETZNER_PORT != '' && secrets.HETZNER_PORT || '22' }}
           script: |
             cd /root/hotel-booking
             git pull origin main
