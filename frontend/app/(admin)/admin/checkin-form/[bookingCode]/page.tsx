@@ -170,7 +170,7 @@ export default function CheckInFormPage() {
               {t('admin.numberOfChildren')}: ___________________________________ {booking.numOfChildren ?? 0}
             </p>
             <p>
-              {t('admin.bookingCode')}: __________ {booking.bookingConfirmationCode}
+              {t('admin.bookingCodeSystem')}: __________ {booking.bookingConfirmationCode}
             </p>
 
             {/* 4. Допълнителна информация */}
