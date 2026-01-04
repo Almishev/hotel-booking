@@ -167,7 +167,7 @@ export default function AddBookingPage() {
       return;
     }
 
-    const confirmMessage = t('admin.confirmAddBooking') || 'Да добавим ли тази резервация?';
+    const confirmMessage = t('admin.confirmAddBooking');
     if (!window.confirm(confirmMessage)) {
       return;
     }
@@ -199,11 +199,11 @@ export default function AddBookingPage() {
       } else {
         const msg: string = response.message || 'Error creating booking';
         if (msg.includes('Holiday package is no longer available')) {
-          setError(t('rooms.packageNoLongerAvailable') || 'Пакетът вече не е наличен за тези дати.');
+          setError(t('rooms.packageNoLongerAvailable'));
         } else if (msg.includes('holiday package') || msg.includes('These dates are part of a holiday package')) {
-          setError(t('rooms.datesPartOfPackage') || 'Тези дати са част от пакетно предложение. Моля, използвайте пакета или изберете други дати.');
+          setError(t('rooms.datesPartOfPackage'));
         } else if (msg.includes('Room not Available')) {
-          setError(t('rooms.roomNotAvailable') || 'Стаята не е налична за избрания период.');
+          setError(t('rooms.roomNotAvailable'));
         } else {
           setError(msg);
         }
@@ -213,11 +213,11 @@ export default function AddBookingPage() {
       console.error('Error creating booking:', err);
       const msg: string = err.response?.data?.message || err.message || 'Error creating booking';
       if (msg.includes('Holiday package is no longer available')) {
-        setError(t('rooms.packageNoLongerAvailable') || 'Пакетът вече не е наличен за тези дати.');
+        setError(t('rooms.packageNoLongerAvailable'));
       } else if (msg.includes('holiday package') || msg.includes('These dates are part of a holiday package')) {
-        setError(t('rooms.datesPartOfPackage') || 'Тези дати са част от пакетно предложение. Моля, използвайте пакета или изберете други дати.');
+        setError(t('rooms.datesPartOfPackage'));
       } else if (msg.includes('Room not Available')) {
-        setError(t('rooms.roomNotAvailable') || 'Стаята не е налична за избрания период.');
+        setError(t('rooms.roomNotAvailable'));
       } else {
         setError(msg);
       }
@@ -234,7 +234,7 @@ export default function AddBookingPage() {
 
     const selectedRoom = rooms.find((r) => String(r.id) === form.roomId);
     if (!selectedRoom) {
-      setError('Невалидна стая.');
+      setError(t('admin.invalidRoom'));
       setTimeout(() => setError(''), 4000);
       return;
     }
@@ -254,7 +254,7 @@ export default function AddBookingPage() {
         if (sameStart && sameEnd) {
           setAvailabilityStatus('available');
           setAvailabilityMessage(
-            'Стаята е част от избрания пакет за тези дати. Можете да продължите с пакетната резервация.'
+            t('admin.roomPartOfPackage')
           );
           return;
         }
@@ -277,24 +277,23 @@ export default function AddBookingPage() {
         if (isAvailable) {
           setAvailabilityStatus('available');
           setAvailabilityMessage(
-            t('admin.roomAvailableForDates') || 'Стаята е свободна за избраните дати.'
+            t('admin.roomAvailableForDates')
           );
         } else {
           setAvailabilityStatus('unavailable');
           setAvailabilityMessage(
-            t('admin.roomUnavailableForDates') ||
-              'Стаята е заета или блокирана от пакет за тези дати.'
+            t('admin.roomUnavailableForDates')
           );
         }
       } else {
         setAvailabilityStatus('error');
-        setAvailabilityMessage(response.message || 'Грешка при проверка на наличността.');
+        setAvailabilityMessage(response.message || t('admin.errorCheckingAvailability'));
       }
     } catch (err: any) {
       console.error('Error checking availability:', err);
       setAvailabilityStatus('error');
       setAvailabilityMessage(
-        err.response?.data?.message || err.message || 'Грешка при проверка на наличността.'
+        err.response?.data?.message || err.message || t('admin.errorCheckingAvailability')
       );
     }
   };
@@ -460,7 +459,7 @@ export default function AddBookingPage() {
     return (
       <StaffRoute>
         <div style={{ padding: '2rem' }}>
-          <p>{t('admin.loading') || 'Зареждане...'}</p>
+          <p>{t('admin.loading')}</p>
         </div>
       </StaffRoute>
     );
@@ -469,7 +468,7 @@ export default function AddBookingPage() {
   return (
     <StaffRoute>
       <div className="edit-room-container">
-        <h2>{t('admin.addBooking') || 'Нова резервация от рецепция'}</h2>
+        <h2>{t('admin.addBooking')}</h2>
         {error && <p className="error-message">{error}</p>}
         {success && <p className="success-message">{success}</p>}
 
@@ -481,7 +480,7 @@ export default function AddBookingPage() {
               className="home-search-button"
               onClick={() => setShowCalendarModal(true)}
             >
-              Календар за заетост по стаи
+              {t('admin.occupancyCalendarByRooms')}
             </button>
           </div>
 
@@ -496,7 +495,7 @@ export default function AddBookingPage() {
           </div>
 
           <div className="form-group">
-            <label>{t('admin.selectRoom') || 'Избери стая'}</label>
+            <label>{t('admin.selectRoom')}</label>
             <select
               name="roomId"
               value={form.roomId}
@@ -506,10 +505,10 @@ export default function AddBookingPage() {
             >
               <option value="">
                 {!form.checkInDate || !form.checkOutDate
-                  ? 'Първо изберете дати'
+                  ? t('admin.firstSelectDates')
                   : availableRooms.length === 0
-                  ? 'Няма свободни стаи за тези дати'
-                  : `-- ${t('admin.selectRoom') || 'Избери стая'} --`}
+                  ? t('admin.noAvailableRoomsForDates')
+                  : `-- ${t('admin.selectRoom')} --`}
               </option>
               {availableRooms.map((room) => (
                 <option key={room.id} value={room.id}>
@@ -520,7 +519,7 @@ export default function AddBookingPage() {
           </div>
 
           <div className="form-group">
-            <label>Пакетно предложение (по избор)</label>
+            <label>{t('admin.optionalPackage')}</label>
             <select
               name="holidayPackageId"
               value={selectedPackageId}
@@ -529,8 +528,8 @@ export default function AddBookingPage() {
             >
               <option value="">
                 {roomPackages.length > 0
-                  ? '-- Изберете пакет за тези дати --'
-                  : 'Няма активни пакети за избраните дати'}
+                  ? t('admin.selectPackageForDates')
+                  : t('admin.noActivePackagesForDates')}
               </option>
               {roomPackages.map((pkg: any) => (
                 <option key={pkg.id} value={pkg.id}>
@@ -561,13 +560,13 @@ export default function AddBookingPage() {
           </div>
 
           <div className="form-group">
-            <label>{t('register.phoneNumber') || 'Телефон'}</label>
+            <label>{t('register.phoneNumber')}</label>
             <input type="text" name="guestPhoneNumber" value={form.guestPhoneNumber} onChange={handleChange} required />
           </div>
 
           <div className="form-group" style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #eee' }}>
             <label style={{ fontWeight: 'bold' }}>
-              {t('admin.checkAvailabilityReception') || 'Провери наличност за избраната стая и дати'}
+              {t('admin.checkAvailabilityReception')}
             </label>
             <button
               type="button"
@@ -576,8 +575,8 @@ export default function AddBookingPage() {
               onClick={handleCheckAvailability}
             >
               {availabilityStatus === 'checking'
-                ? t('home.checkAvailability') || 'Проверка...'
-                : t('home.checkAvailability') || 'Провери за наличност'}
+                ? t('home.checkAvailability')
+                : t('home.checkAvailability')}
             </button>
             {availabilityMessage && (
               <p
@@ -598,7 +597,7 @@ export default function AddBookingPage() {
           </div>
 
           <button className="update-button" onClick={handleSubmit}>
-            {t('admin.add') || 'Създай резервация'}
+            {t('admin.createReservation')}
           </button>
         </div>
 
@@ -633,7 +632,7 @@ export default function AddBookingPage() {
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                <h2 style={{ margin: 0 }}>Календар за заетост по стаи (по избран период)</h2>
+                <h2 style={{ margin: 0 }}>{t('admin.occupancyCalendarTitle')}</h2>
                 <button
                   type="button"
                   onClick={() => setShowCalendarModal(false)}
@@ -648,7 +647,7 @@ export default function AddBookingPage() {
                     lineHeight: '30px',
                     textAlign: 'center'
                   }}
-                  aria-label="Затвори календара"
+                  aria-label={t('admin.closeCalendar')}
                 >
                   ×
                 </button>
@@ -656,7 +655,7 @@ export default function AddBookingPage() {
 
               <div className="calendar-date-inputs" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '0.25rem' }}>От дата</label>
+                  <label style={{ display: 'block', marginBottom: '0.25rem' }}>{t('admin.fromDate')}</label>
                   <input
                     type="date"
                     value={calendarStartDate}
@@ -664,7 +663,7 @@ export default function AddBookingPage() {
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '0.25rem' }}>До дата</label>
+                  <label style={{ display: 'block', marginBottom: '0.25rem' }}>{t('admin.toDate')}</label>
                   <input
                     type="date"
                     value={calendarEndDate}
@@ -673,7 +672,7 @@ export default function AddBookingPage() {
                 </div>
                 {(!calendarStartDate || !calendarEndDate || calendarDays.length === 0) && (
                   <span style={{ color: '#c62828', fontSize: '0.9rem' }}>
-                    Моля, изберете валиден период (От дата ≤ До дата)
+                    {t('admin.selectValidPeriod')}
                   </span>
                 )}
               </div>
@@ -683,7 +682,7 @@ export default function AddBookingPage() {
                   <thead>
                     <tr>
                       <th style={{ border: '1px solid #ddd', padding: '0.5rem', backgroundColor: '#f5f5f5' }}>
-                        Стая
+                        {t('admin.room')}
                       </th>
                       {calendarDays.map((day) => (
                         <th
@@ -714,9 +713,9 @@ export default function AddBookingPage() {
                                 color: '#333',
                                 fontSize: '0.8rem'
                               }}
-                            >
-                              {occupied ? 'Заето' : 'Свободно'}
-                            </td>
+                              >
+                                {occupied ? t('admin.occupied') : t('admin.available')}
+                              </td>
                           );
                         })}
                       </tr>
@@ -739,7 +738,7 @@ export default function AddBookingPage() {
                     fontWeight: 'bold'
                   }}
                 >
-                  Принтирай календара
+                  {t('admin.printCalendar')}
                 </button>
                 <button
                   type="button"
@@ -753,7 +752,7 @@ export default function AddBookingPage() {
                     cursor: 'pointer'
                   }}
                 >
-                  Затвори
+                  {t('admin.close')}
                 </button>
               </div>
             </div>

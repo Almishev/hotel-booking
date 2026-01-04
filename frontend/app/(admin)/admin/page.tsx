@@ -181,7 +181,7 @@ export default function AdminPage() {
                         {t('admin.manageBookings')}
                     </button>
                     <button className="admin-button" onClick={() => router.push('/admin/add-booking')}>
-                        {t('admin.addBooking') || 'Нова резервация от рецепция'}
+                        {t('admin.addBooking')}
                     </button>
                     {isAdmin && (
                         <button className="admin-button" onClick={() => router.push('/admin/manage-packages')}>
@@ -192,7 +192,7 @@ export default function AdminPage() {
                         className="admin-button"
                         onClick={() => setShowCalendarModal(true)}
                     >
-                        Календар за заетост
+                        {t('admin.occupancyCalendar')}
                     </button>
                 </div>
 
@@ -227,7 +227,7 @@ export default function AdminPage() {
                             }}
                         >
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                                <h2 style={{ margin: 0 }}>Календар за заетост по стаи (по избран период)</h2>
+                                <h2 style={{ margin: 0 }}>{t('admin.occupancyCalendarTitle')}</h2>
                                 <button
                                     type="button"
                                     onClick={() => setShowCalendarModal(false)}
@@ -242,7 +242,7 @@ export default function AdminPage() {
                                         lineHeight: '30px',
                                         textAlign: 'center'
                                     }}
-                                    aria-label="Затвори календара"
+                                    aria-label={t('admin.closeCalendar')}
                                 >
                                     ×
                                 </button>
@@ -250,7 +250,7 @@ export default function AdminPage() {
 
                             <div className="calendar-date-inputs" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
                                 <div>
-                                    <label style={{ display: 'block', marginBottom: '0.25rem' }}>От дата</label>
+                                    <label style={{ display: 'block', marginBottom: '0.25rem' }}>{t('admin.fromDate')}</label>
                                     <input
                                         type="date"
                                         value={startDate}
@@ -258,7 +258,7 @@ export default function AdminPage() {
                                     />
                                 </div>
                                 <div>
-                                    <label style={{ display: 'block', marginBottom: '0.25rem' }}>До дата</label>
+                                    <label style={{ display: 'block', marginBottom: '0.25rem' }}>{t('admin.toDate')}</label>
                                     <input
                                         type="date"
                                         value={endDate}
@@ -267,7 +267,7 @@ export default function AdminPage() {
                                 </div>
                                 {(!startDate || !endDate || days.length === 0) && (
                                     <span style={{ color: '#c62828', fontSize: '0.9rem' }}>
-                                        Моля, изберете валиден период (От дата ≤ До дата)
+                                        {t('admin.selectValidPeriod')}
                                     </span>
                                 )}
                             </div>
@@ -277,7 +277,7 @@ export default function AdminPage() {
                                     <thead>
                                         <tr>
                                             <th style={{ border: '1px solid #ddd', padding: '0.5rem', backgroundColor: '#f5f5f5' }}>
-                                                Стая
+                                                {t('admin.room')}
                                             </th>
                                             {days.map((day) => (
                                                 <th
@@ -309,7 +309,7 @@ export default function AdminPage() {
                                                                 fontSize: '0.8rem'
                                                             }}
                                                         >
-                                                            {occupied ? 'Заето' : 'Свободно'}
+                                                            {occupied ? t('admin.occupied') : t('admin.available')}
                                                         </td>
                                                     );
                                                 })}
@@ -334,7 +334,7 @@ export default function AdminPage() {
                                         fontWeight: 'bold'
                                     }}
                                 >
-                                    Принтирай календара
+                                    {t('admin.printCalendar')}
                                 </button>
                                 <button
                                     type="button"
@@ -347,7 +347,7 @@ export default function AdminPage() {
                                         cursor: 'pointer'
                                     }}
                                 >
-                                    Затвори
+                                    {t('admin.close')}
                                 </button>
                             </div>
                         </div>
@@ -356,10 +356,10 @@ export default function AdminPage() {
 
                 {/* Справки по дата */}
                 <div style={{ marginTop: '2rem', marginBottom: '2rem' }}>
-                    <h2 style={{ marginBottom: '1rem' }}>Справки за избрана дата</h2>
+                    <h2 style={{ marginBottom: '1rem' }}>{t('admin.reportsForDate')}</h2>
                     <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap', marginBottom: '1rem' }}>
                         <div>
-                            <label style={{ display: 'block', marginBottom: '0.25rem' }}>Дата за справка</label>
+                            <label style={{ display: 'block', marginBottom: '0.25rem' }}>{t('admin.dateForReport')}</label>
                             <input
                                 type="date"
                                 value={reportDate}
@@ -378,61 +378,61 @@ export default function AdminPage() {
                                 cursor: 'pointer'
                             }}
                         >
-                            Принтирай справката
+                            {t('admin.printReport')}
                         </button>
                     </div>
 
                     {/* Справка: колко човека и от кои стаи нощуват в хотела */}
                     <div style={{ marginBottom: '1.5rem', border: '1px solid #ddd', borderRadius: '8px', padding: '1rem', backgroundColor: '#fafafa' }}>
-                        <h3 style={{ marginBottom: '0.5rem' }}>Нощуващи гости за датата</h3>
+                        <h3 style={{ marginBottom: '0.5rem' }}>{t('admin.stayingGuests')}</h3>
                         <p style={{ marginBottom: '0.5rem' }}>
-                            Общо резервации: <strong>{report.stayingBookings.length}</strong>
+                            {t('admin.totalReservations')}: <strong>{report.stayingBookings.length}</strong>
                         </p>
                         <p style={{ marginBottom: '0.5rem' }}>
-                            Общо стаи: <strong>{new Set(report.stayingBookings.map(b => b.room?.id)).size}</strong>
+                            {t('admin.totalRooms')}: <strong>{new Set(report.stayingBookings.map(b => b.room?.id)).size}</strong>
                         </p>
                         <p style={{ marginBottom: '0.5rem' }}>
-                            (Броят гости може да се вземе от резервациите при нужда – тук основният акцент е по стаи.)
+                            {t('admin.guestCountNote')}
                         </p>
                         <ul style={{ paddingLeft: '1.2rem', margin: 0 }}>
                             {report.stayingBookings.map((b) => (
                                 <li key={b.id}>
-                                    Стая #{b.room?.id} ({b.room?.roomType}) – престой {b.checkInDate} до {b.checkOutDate}
+                                    {t('admin.roomStayInfo', { roomId: b.room?.id, roomType: b.room?.roomType, checkIn: b.checkInDate, checkOut: b.checkOutDate })}
                                 </li>
                             ))}
-                            {report.stayingBookings.length === 0 && <li>Няма нощуващи гости за избраната дата.</li>}
+                            {report.stayingBookings.length === 0 && <li>{t('admin.noStayingGuests')}</li>}
                         </ul>
                     </div>
 
                     {/* Справка: колко стаи се освобождават */}
                     <div style={{ marginBottom: '1.5rem', border: '1px solid #ddd', borderRadius: '8px', padding: '1rem', backgroundColor: '#fafafa' }}>
-                        <h3 style={{ marginBottom: '0.5rem' }}>Стаи, които се освобождават на датата</h3>
+                        <h3 style={{ marginBottom: '0.5rem' }}>{t('admin.departingRooms')}</h3>
                         <p style={{ marginBottom: '0.5rem' }}>
-                            Общо стаи за освобождаване: <strong>{new Set(report.departingBookings.map(b => b.room?.id)).size}</strong>
+                            {t('admin.totalDepartingRooms')}: <strong>{new Set(report.departingBookings.map(b => b.room?.id)).size}</strong>
                         </p>
                         <ul style={{ paddingLeft: '1.2rem', margin: 0 }}>
                             {report.departingBookings.map((b) => (
                                 <li key={b.id}>
-                                    Стая #{b.room?.id} ({b.room?.roomType}) – напускане на {b.checkOutDate}
+                                    {t('admin.roomDepartureInfo', { roomId: b.room?.id, roomType: b.room?.roomType, checkOut: b.checkOutDate })}
                                 </li>
                             ))}
-                            {report.departingBookings.length === 0 && <li>Няма стаи за освобождаване на избраната дата.</li>}
+                            {report.departingBookings.length === 0 && <li>{t('admin.noDepartingRooms')}</li>}
                         </ul>
                     </div>
 
                     {/* Справка: колко стаи пристигат */}
                     <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '1rem', backgroundColor: '#fafafa' }}>
-                        <h3 style={{ marginBottom: '0.5rem' }}>Стаи с настаняване на датата</h3>
+                        <h3 style={{ marginBottom: '0.5rem' }}>{t('admin.arrivingRooms')}</h3>
                         <p style={{ marginBottom: '0.5rem' }}>
-                            Общо стаи за настаняване: <strong>{new Set(report.arrivingBookings.map(b => b.room?.id)).size}</strong>
+                            {t('admin.totalArrivingRooms')}: <strong>{new Set(report.arrivingBookings.map(b => b.room?.id)).size}</strong>
                         </p>
                         <ul style={{ paddingLeft: '1.2rem', margin: 0 }}>
                             {report.arrivingBookings.map((b) => (
                                 <li key={b.id}>
-                                    Стая #{b.room?.id} ({b.room?.roomType}) – настаняване на {b.checkInDate}
+                                    {t('admin.roomArrivalInfo', { roomId: b.room?.id, roomType: b.room?.roomType, checkIn: b.checkInDate })}
                                 </li>
                             ))}
-                            {report.arrivingBookings.length === 0 && <li>Няма стаи за настаняване на избраната дата.</li>}
+                            {report.arrivingBookings.length === 0 && <li>{t('admin.noArrivingRooms')}</li>}
                         </ul>
                     </div>
                 </div>

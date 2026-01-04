@@ -104,7 +104,7 @@ export default function ManageBookingsPage() {
 
     const exportData = () => {
         if (!sortedBookings || sortedBookings.length === 0) {
-            alert('No data to export. Please apply filters or wait for data to load.');
+            alert(t('admin.noDataToExport') || 'No data to export. Please apply filters or wait for data to load.');
             return;
         }
 
@@ -535,7 +535,7 @@ export default function ManageBookingsPage() {
                                                 style={{ backgroundColor: '#00796b' }}
                                                 onClick={() => router.push(`/admin/checkin-form/${booking.bookingConfirmationCode}`)}
                                             >
-                                                {t('admin.printCheckInForm') || 'Формуляр за настаняване'}
+                                                {t('admin.printCheckInForm')}
                                             </button>
                                         </div>
                                     </td>
