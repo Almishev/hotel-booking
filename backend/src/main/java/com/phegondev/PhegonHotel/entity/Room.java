@@ -23,9 +23,15 @@ public class Room {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(length = 100)
     private String roomType;
+    
     private BigDecimal roomPrice;
+    
+    @Column(length = 1000)
     private String roomPhotoUrl;
+    
+    @Column(length = 2000)
     private String roomDescription;
     
     @OneToMany(mappedBy = "room", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
