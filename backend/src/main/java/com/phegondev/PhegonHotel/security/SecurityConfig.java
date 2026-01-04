@@ -41,6 +41,8 @@ public class SecurityConfig {
                         .requestMatchers("/rooms/available-rooms-by-date-and-type").permitAll()
                         .requestMatchers("/rooms/types").permitAll()
                         .requestMatchers("/rooms/room-by-id/**").permitAll()
+                        .requestMatchers("/rooms/price-calculation").permitAll() // Публично достъпен за изчисляване на цени
+                        .requestMatchers("/room-price-periods/price-calculation").permitAll() // Публично достъпен за изчисляване на цени
                         .requestMatchers("/bookings/get-by-confirmation-code/**").permitAll()
                         .requestMatchers("/users/get-by-id/**").permitAll()
                         .requestMatchers("/users/get-user-bookings/**").permitAll()

@@ -92,20 +92,54 @@ export default function RoomDetailsPage() {
       return;
     }
     
-    if (checkInDate && checkOutDate && roomDetails) {
-      const oneDay = 24 * 60 * 60 * 1000;
-      const startDate = new Date(checkInDate);
-      const endDate = new Date(checkOutDate);
-      // Calculate number of nights (not days) - check-in to check-out
-      // Example: 24/12 to 26/12 = 2 nights (24-25 and 25-26)
-      const totalNights = Math.round(Math.abs((endDate.getTime() - startDate.getTime()) / oneDay));
-      const totalGuests = numAdults + numChildren;
-      const roomPricePerNight = roomDetails.roomPrice;
-      const totalPrice = roomPricePerNight * totalNights;
-      setTotalPrice(totalPrice);
-      setTotalGuests(totalGuests);
+    // Calculate price with period pricing
+    if (checkInDate && checkOutDate && roomDetails && roomId) {
+      const calculatePrice = async () => {
+        try {
+          // Format dates for API
+          const formattedCheckIn = new Date(checkInDate);
+          const formattedCheckOut = new Date(checkOutDate);
+          const checkInStr = formattedCheckIn.toISOString().split('T')[0];
+          const checkOutStr = formattedCheckOut.toISOString().split('T')[0];
+          
+          // Call API to calculate price with period pricing
+          const response = await ApiService.calculateRoomPrice(roomId.toString(), checkInStr, checkOutStr);
+          
+          if (response.statusCode === 200 && response.priceCalculation) {
+            const calculation = response.priceCalculation;
+            setTotalPrice(parseFloat(calculation.totalPrice.toString()));
+            const totalGuests = numAdults + numChildren;
+            setTotalGuests(totalGuests);
+          } else {
+            // Fallback to simple calculation if API fails
+            const oneDay = 24 * 60 * 60 * 1000;
+            const startDate = new Date(checkInDate);
+            const endDate = new Date(checkOutDate);
+            const totalNights = Math.round(Math.abs((endDate.getTime() - startDate.getTime()) / oneDay));
+            const totalGuests = numAdults + numChildren;
+            const roomPricePerNight = roomDetails.roomPrice;
+            const totalPrice = roomPricePerNight * totalNights;
+            setTotalPrice(totalPrice);
+            setTotalGuests(totalGuests);
+          }
+        } catch (error) {
+          console.error('Error calculating price:', error);
+          // Fallback to simple calculation
+          const oneDay = 24 * 60 * 60 * 1000;
+          const startDate = new Date(checkInDate);
+          const endDate = new Date(checkOutDate);
+          const totalNights = Math.round(Math.abs((endDate.getTime() - startDate.getTime()) / oneDay));
+          const totalGuests = numAdults + numChildren;
+          const roomPricePerNight = roomDetails.roomPrice;
+          const totalPrice = roomPricePerNight * totalNights;
+          setTotalPrice(totalPrice);
+          setTotalGuests(totalGuests);
+        }
+      };
+      
+      calculatePrice();
     }
-  }, [checkInDate, checkOutDate, numAdults, numChildren, roomDetails, isPackageBooking, packageDetails]);
+  }, [checkInDate, checkOutDate, numAdults, numChildren, roomDetails, isPackageBooking, packageDetails, roomId]);
 
   const handleBookNow = () => {
     // Check if user is authenticated before showing date picker

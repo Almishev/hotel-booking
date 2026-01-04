@@ -26,6 +26,10 @@ public class Response {
     private List<BookingDTO> bookingList;
     private HolidayPackageDTO holidayPackage;
     private List<HolidayPackageDTO> holidayPackageList;
-
+    
+    // Room Price Period fields
+    private RoomPricePeriodDTO roomPricePeriod;
+    private List<RoomPricePeriodDTO> roomPricePeriodList;
+    private PriceCalculationDTO priceCalculation;
 
 }

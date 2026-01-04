@@ -1,7 +1,12 @@
 package com.phegondev.PhegonHotel.controller;
 
 
+import com.phegondev.PhegonHotel.dto.PriceCalculationDTO;
 import com.phegondev.PhegonHotel.dto.Response;
+import com.phegondev.PhegonHotel.entity.Room;
+import com.phegondev.PhegonHotel.exception.OurException;
+import com.phegondev.PhegonHotel.repo.RoomRepository;
+import com.phegondev.PhegonHotel.service.interfac.IRoomPricePeriodService;
 import com.phegondev.PhegonHotel.service.interfac.IRoomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -20,6 +25,12 @@ public class RoomController {
 
     @Autowired
     private IRoomService roomService;
+    
+    @Autowired
+    private IRoomPricePeriodService roomPricePeriodService;
+    
+    @Autowired
+    private RoomRepository roomRepository;
 
 
     @PostMapping("/add")
@@ -99,8 +110,35 @@ public class RoomController {
     public ResponseEntity<Response> deleteRoom(@PathVariable Long roomId) {
         Response response = roomService.deleteRoom(roomId);
         return ResponseEntity.status(response.getStatusCode()).body(response);
-
     }
 
+    @GetMapping("/price-calculation")
+    public ResponseEntity<Response> calculatePrice(
+            @RequestParam Long roomId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkIn,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkOut) {
+        
+        Response response = new Response();
+        try {
+            Room room = roomRepository.findById(roomId)
+                    .orElseThrow(() -> new OurException("Room not found"));
+            
+            PriceCalculationDTO calculation = roomPricePeriodService.calculatePriceWithBreakdown(room, checkIn, checkOut);
+            
+            response.setStatusCode(200);
+            response.setMessage("successful");
+            response.setPriceCalculation(calculation);
+        } catch (OurException e) {
+            response.setStatusCode(404);
+            response.setMessage(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            response.setStatusCode(400);
+            response.setMessage(e.getMessage());
+        } catch (Exception e) {
+            response.setStatusCode(500);
+            response.setMessage("Error calculating price: " + e.getMessage());
+        }
+        return ResponseEntity.status(response.getStatusCode()).body(response);
+    }
 
 }

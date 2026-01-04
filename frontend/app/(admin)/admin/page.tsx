@@ -187,6 +187,9 @@ export default function AdminPage() {
                         <button className="admin-button" onClick={() => router.push('/admin/manage-packages')}>
                             {t('admin.managePackages')}
                         </button>
+                        <button className="admin-button" onClick={() => router.push('/admin/manage-room-prices')}>
+                            {t('admin.manageRoomPrices') || 'Manage Room Prices'}
+                        </button>
                     )}
                     <button
                         className="admin-button"

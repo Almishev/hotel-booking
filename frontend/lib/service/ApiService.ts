@@ -300,5 +300,62 @@ export default class ApiService {
         );
         return result.data;
     }
+
+    /**ROOM PRICE PERIODS */
+    /* This adds a new room price period */
+    static async addRoomPricePeriod(period: any) {
+        const result = await axios.post(`${this.BASE_URL}/room-price-periods/add`, period, {
+            headers: this.getHeader()
+        });
+        return result.data;
+    }
+
+    /* This gets all room price periods */
+    static async getAllRoomPricePeriods() {
+        const result = await axios.get(`${this.BASE_URL}/room-price-periods/all`, {
+            headers: this.getHeader()
+        });
+        return result.data;
+    }
+
+    /* This gets room price periods by room type */
+    static async getRoomPricePeriodsByRoomType(roomType: string) {
+        const result = await axios.get(`${this.BASE_URL}/room-price-periods/by-room-type/${roomType}`, {
+            headers: this.getHeader()
+        });
+        return result.data;
+    }
+
+    /* This gets a room price period by id */
+    static async getRoomPricePeriodById(id: string) {
+        const result = await axios.get(`${this.BASE_URL}/room-price-periods/${id}`, {
+            headers: this.getHeader()
+        });
+        return result.data;
+    }
+
+    /* This updates a room price period */
+    static async updateRoomPricePeriod(id: string, period: any) {
+        const result = await axios.put(`${this.BASE_URL}/room-price-periods/update/${id}`, period, {
+            headers: this.getHeader()
+        });
+        return result.data;
+    }
+
+    /* This deletes a room price period */
+    static async deleteRoomPricePeriod(id: string) {
+        const result = await axios.delete(`${this.BASE_URL}/room-price-periods/delete/${id}`, {
+            headers: this.getHeader()
+        });
+        return result.data;
+    }
+
+    /* This calculates price for a room and date range */
+    static async calculateRoomPrice(roomId: string, checkIn: string, checkOut: string) {
+        const result = await axios.get(
+            `${this.BASE_URL}/rooms/price-calculation?roomId=${roomId}&checkIn=${checkIn}&checkOut=${checkOut}`
+        );
+        return result.data;
+    }
 }
 
