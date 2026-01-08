@@ -24,6 +24,11 @@ function AllRoomsContent() {
   const [searchCheckOut, setSearchCheckOut] = useState<string | undefined>(undefined);
 
   const handleSearchResult = (results: any[], checkInDate?: string, checkOutDate?: string) => {
+    console.log('AllRoomsPage - handleSearchResult called with:', {
+      roomCount: results.length,
+      checkInDate,
+      checkOutDate
+    });
     setRooms(results);
     setFilteredRooms(results);
     setSearchCheckIn(checkInDate);
@@ -37,6 +42,9 @@ function AllRoomsContent() {
         const allRooms = response.roomList;
         setRooms(allRooms);
         setFilteredRooms(allRooms);
+        // Изчисти датите при първоначално зареждане, защото няма търсене
+        setSearchCheckIn(undefined);
+        setSearchCheckOut(undefined);
       } catch (error: any) {
         console.error('Error fetching rooms:', error.message);
       }

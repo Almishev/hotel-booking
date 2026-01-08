@@ -113,6 +113,11 @@ export default function RoomSearch({ handleSearchResult }: RoomSearchProps) {
         return;
       }
 
+      console.log('RoomSearch - Calling handleSearchResult with:', {
+        roomCount: aggregatedRooms.length,
+        checkInDate: formattedStartDate,
+        checkOutDate: formattedEndDate
+      });
       handleSearchResult(aggregatedRooms, formattedStartDate!, formattedEndDate!);
       setError('');
     } catch (error: any) {
