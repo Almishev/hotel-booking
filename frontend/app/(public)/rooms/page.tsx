@@ -20,10 +20,14 @@ function AllRoomsContent() {
   const [selectedRoomType, setSelectedRoomType] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [roomsPerPage] = useState(5);
+  const [searchCheckIn, setSearchCheckIn] = useState<string | undefined>(undefined);
+  const [searchCheckOut, setSearchCheckOut] = useState<string | undefined>(undefined);
 
-  const handleSearchResult = (results: any[]) => {
+  const handleSearchResult = (results: any[], checkInDate?: string, checkOutDate?: string) => {
     setRooms(results);
     setFilteredRooms(results);
+    setSearchCheckIn(checkInDate);
+    setSearchCheckOut(checkOutDate);
   };
 
   useEffect(() => {
@@ -98,7 +102,12 @@ function AllRoomsContent() {
       {!(packageId && urlRoomType) && (
         <RoomSearch handleSearchResult={handleSearchResult} />
       )}
-      <RoomResult roomSearchResults={currentRooms} packageId={packageId || undefined} />
+      <RoomResult 
+        roomSearchResults={currentRooms} 
+        packageId={packageId || undefined}
+        checkInDate={searchCheckIn}
+        checkOutDate={searchCheckOut}
+      />
 
       <Pagination
         roomsPerPage={roomsPerPage}

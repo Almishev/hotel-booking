@@ -9,9 +9,11 @@ import '@/lib/i18n';
 interface RoomResultProps {
   roomSearchResults: any[];
   packageId?: string;
+  checkInDate?: string;
+  checkOutDate?: string;
 }
 
-export default function RoomResult({ roomSearchResults, packageId }: RoomResultProps) {
+export default function RoomResult({ roomSearchResults, packageId, checkInDate, checkOutDate }: RoomResultProps) {
     const { t } = useTranslation();
     const router = useRouter();
     const isAdmin = ApiService.isAdmin();
@@ -19,6 +21,8 @@ export default function RoomResult({ roomSearchResults, packageId }: RoomResultP
     const [availableRoomIds, setAvailableRoomIds] = useState<Set<number>>(new Set());
     const [loadingAvailability, setLoadingAvailability] = useState(false);
     const [availabilityChecked, setAvailabilityChecked] = useState(false);
+    const [roomPrices, setRoomPrices] = useState<Map<number, number>>(new Map());
+    const [loadingPrices, setLoadingPrices] = useState(false);
 
     // Зареждане на детайлите на пакета и проверка на наличност
     useEffect(() => {
@@ -88,6 +92,63 @@ export default function RoomResult({ roomSearchResults, packageId }: RoomResultP
         checkAvailability();
     }, [packageId, roomSearchResults]);
 
+    // Изчисли периодичните цени за стаите, ако има избрани дати
+    useEffect(() => {
+        const calculatePrices = async () => {
+            if (!checkInDate || !checkOutDate || !roomSearchResults || roomSearchResults.length === 0) {
+                setRoomPrices(new Map());
+                return;
+            }
+
+            try {
+                setLoadingPrices(true);
+                const priceMap = new Map<number, number>();
+
+                // Изчисли цената за всяка стая
+                await Promise.all(
+                    roomSearchResults.map(async (room: any) => {
+                        try {
+                            const response = await ApiService.calculateRoomPrice(
+                                room.id.toString(),
+                                checkInDate,
+                                checkOutDate
+                            );
+                            
+                            if (response.statusCode === 200 && response.priceCalculation) {
+                                // Използвай averagePricePerNight, ако е налично, иначе изчисли от totalPrice
+                                const calculation = response.priceCalculation;
+                                let pricePerNight: number;
+                                if (calculation.averagePricePerNight) {
+                                    pricePerNight = parseFloat(calculation.averagePricePerNight.toString());
+                                } else {
+                                    const totalPrice = parseFloat(calculation.totalPrice.toString());
+                                    const nights = calculation.numberOfNights || 1;
+                                    pricePerNight = totalPrice / nights;
+                                }
+                                priceMap.set(room.id, pricePerNight);
+                            } else {
+                                // Fallback към базовата цена
+                                priceMap.set(room.id, room.roomPrice);
+                            }
+                        } catch (error) {
+                            console.error(`Error calculating price for room ${room.id}:`, error);
+                            // Fallback към базовата цена
+                            priceMap.set(room.id, room.roomPrice);
+                        }
+                    })
+                );
+
+                setRoomPrices(priceMap);
+            } catch (error) {
+                console.error('Error calculating room prices:', error);
+            } finally {
+                setLoadingPrices(false);
+            }
+        };
+
+        calculatePrices();
+    }, [checkInDate, checkOutDate, roomSearchResults]);
+
     const isRoomAvailable = (roomId: number) => {
         if (!packageId) {
             return true; // Ако няма пакет, всички стаи са налични
@@ -108,13 +169,30 @@ export default function RoomResult({ roomSearchResults, packageId }: RoomResultP
                         const available = isRoomAvailable(room.id);
                         // Показваме "Резервирано" само ако има пакет, проверката е завършена, и стаята не е налична
                         const showReserved = packageId && availabilityChecked && !loadingAvailability && !available;
+                        
+                        // Използвай периодичната цена, ако е изчислена, иначе базовата цена
+                        const displayPrice = roomPrices.has(room.id) ? roomPrices.get(room.id)! : room.roomPrice;
+                        const showPeriodPrice = checkInDate && checkOutDate && roomPrices.has(room.id);
 
                         return (
                             <div key={room.id} className="room-list-item">
                                 <img className='room-list-item-image' src={room.roomPhotoUrl} alt={room.roomType} />
                                 <div className="room-details">
                                     <h3>{room.roomType}</h3>
-                                    <p>{t('rooms.price')}: €{room.roomPrice} {t('rooms.perNight')}</p>
+                                    {loadingPrices ? (
+                                        <p>{t('rooms.price')}: {t('rooms.loading')}...</p>
+                                    ) : showPeriodPrice && displayPrice !== room.roomPrice ? (
+                                        <p>
+                                            <span style={{ textDecoration: 'line-through', color: '#999', marginRight: '0.5rem' }}>
+                                                {t('rooms.price')}: €{room.roomPrice} {t('rooms.perNight')}
+                                            </span>
+                                            <span style={{ fontWeight: 'bold', color: '#00796b' }}>
+                                                {t('rooms.price')}: €{displayPrice.toFixed(2)} {t('rooms.perNight')}
+                                            </span>
+                                        </p>
+                                    ) : (
+                                        <p>{t('rooms.price')}: €{displayPrice} {t('rooms.perNight')}</p>
+                                    )}
                                     <p>{t('rooms.description')}: {room.roomDescription}</p>
                                 </div>
 

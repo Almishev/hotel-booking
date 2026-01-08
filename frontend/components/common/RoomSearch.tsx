@@ -9,7 +9,7 @@ import { addDays } from 'date-fns';
 import '@/lib/i18n';
 
 interface RoomSearchProps {
-  handleSearchResult: (results: any[]) => void;
+  handleSearchResult: (results: any[], checkInDate?: string, checkOutDate?: string) => void;
 }
 
 export default function RoomSearch({ handleSearchResult }: RoomSearchProps) {
@@ -113,7 +113,7 @@ export default function RoomSearch({ handleSearchResult }: RoomSearchProps) {
         return;
       }
 
-      handleSearchResult(aggregatedRooms);
+      handleSearchResult(aggregatedRooms, formattedStartDate!, formattedEndDate!);
       setError('');
     } catch (error: any) {
       showError(t('rooms.loading') + ': ' + (error.response?.data?.message || error.message));
