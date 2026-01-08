@@ -186,7 +186,9 @@ export default function RoomDetailsPage() {
       return;
     }
 
-    if (isNaN(numAdults) || numAdults < 1 || isNaN(numChildren) || numChildren < 0) {
+    const adultsNum = typeof numAdults === 'number' ? numAdults : (parseInt(String(numAdults), 10) || 0);
+    const childrenNum = typeof numChildren === 'number' ? numChildren : (parseInt(String(numChildren), 10) || 0);
+    if (isNaN(adultsNum) || adultsNum < 1 || isNaN(childrenNum) || childrenNum < 0) {
       setErrorMessage(t('rooms.booking') + ': ' + t('login.fillAllFields'));
       window.scrollTo({ top: 0, behavior: 'smooth' });
       setTimeout(() => setErrorMessage(''), 10000);
