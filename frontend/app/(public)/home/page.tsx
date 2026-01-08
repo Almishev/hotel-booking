@@ -10,9 +10,18 @@ import '@/lib/i18n';
 export default function HomePage() {
     const { t } = useTranslation();
     const [roomSearchResults, setRoomSearchResults] = useState<any[]>([]);
+    const [searchCheckIn, setSearchCheckIn] = useState<string | undefined>(undefined);
+    const [searchCheckOut, setSearchCheckOut] = useState<string | undefined>(undefined);
 
-    const handleSearchResult = (results: any[]) => {
+    const handleSearchResult = (results: any[], checkInDate?: string, checkOutDate?: string) => {
+        console.log('HomePage - handleSearchResult called with:', {
+            roomCount: results.length,
+            checkInDate,
+            checkOutDate
+        });
         setRoomSearchResults(results);
+        setSearchCheckIn(checkInDate);
+        setSearchCheckOut(checkOutDate);
     };
 
     return (
@@ -31,7 +40,11 @@ export default function HomePage() {
             </section>
 
             <RoomSearch handleSearchResult={handleSearchResult} />
-            <RoomResult roomSearchResults={roomSearchResults} />
+            <RoomResult 
+                roomSearchResults={roomSearchResults}
+                checkInDate={searchCheckIn}
+                checkOutDate={searchCheckOut}
+            />
 
             <h4><Link className="view-rooms-home" href="/rooms">{t('home.allRooms')}</Link></h4>
 
