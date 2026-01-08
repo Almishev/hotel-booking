@@ -316,7 +316,12 @@ export default function ManageBookingsPage() {
     };
 
     const calculateBookingTotalPrice = (booking: any) => {
-        // If booking is for a holiday package, use package price for the room type
+        // Използвай съхранената цена, ако е налична (включва периодичните цени)
+        if (booking.totalPrice != null) {
+            return parseFloat(booking.totalPrice.toString());
+        }
+        
+        // Fallback: If booking is for a holiday package, use package price for the room type
         if (booking.holidayPackage?.roomTypePrices && booking.room?.roomType) {
             const priceForRoomType = booking.holidayPackage.roomTypePrices[booking.room.roomType];
             if (priceForRoomType) {
@@ -324,7 +329,7 @@ export default function ManageBookingsPage() {
             }
         }
         
-        // Otherwise, calculate from room price and nights
+        // Fallback: Otherwise, calculate from room price and nights
         if (!booking.checkInDate || !booking.checkOutDate) {
             return 0;
         }

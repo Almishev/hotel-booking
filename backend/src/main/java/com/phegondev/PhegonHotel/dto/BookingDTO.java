@@ -4,6 +4,7 @@ package com.phegondev.PhegonHotel.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -19,6 +20,7 @@ public class BookingDTO {
     private int totalNumOfGuest;
     private String bookingConfirmationCode;
     private LocalDateTime bookingDate;
+    private BigDecimal totalPrice;
     private UserDTO user;
     private RoomDTO room;
     private HolidayPackageDTO holidayPackage;

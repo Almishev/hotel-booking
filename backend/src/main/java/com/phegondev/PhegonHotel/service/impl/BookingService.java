@@ -14,11 +14,13 @@ import com.phegondev.PhegonHotel.repo.RoomRepository;
 import com.phegondev.PhegonHotel.repo.UserRepository;
 import com.phegondev.PhegonHotel.service.interfac.IBookingService;
 import com.phegondev.PhegonHotel.service.EmailService;
+import com.phegondev.PhegonHotel.service.interfac.IRoomPricePeriodService;
 import com.phegondev.PhegonHotel.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -38,6 +40,9 @@ public class BookingService implements IBookingService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private IRoomPricePeriodService roomPricePeriodService;
 
 
     @Override
@@ -115,6 +120,24 @@ public class BookingService implements IBookingService {
             bookingRequest.setBookingDate(java.time.LocalDateTime.now());
             String bookingConfirmationCode = Utils.generateRandomConfirmationCode(10);
             bookingRequest.setBookingConfirmationCode(bookingConfirmationCode);
+            
+            // Изчисли и запиши общата цена
+            BigDecimal totalPrice;
+            if (bookingRequest.getHolidayPackage() != null && bookingRequest.getHolidayPackage().getId() != null) {
+                // Ако е резервация за пакет, използвай цената от пакета
+                HolidayPackage pkg = holidayPackageRepository.findById(bookingRequest.getHolidayPackage().getId())
+                        .orElseThrow(() -> new OurException("Holiday Package Not Found"));
+                String roomType = room.getRoomType();
+                var roomTypePrice = pkg.getRoomTypePrices().stream()
+                        .filter(rtp -> rtp.getRoomType().equals(roomType))
+                        .findFirst()
+                        .orElseThrow(() -> new OurException("Package price not found for room type: " + roomType));
+                totalPrice = roomTypePrice.getPackagePrice();
+            } else {
+                // Изчисли цената с периодичните цени
+                totalPrice = roomPricePeriodService.calculateRoomPrice(room, bookingRequest.getCheckInDate(), bookingRequest.getCheckOutDate());
+            }
+            bookingRequest.setTotalPrice(totalPrice);
             
             // Update user's preferred language if provided
             String finalLanguage = language; // Store language before saving

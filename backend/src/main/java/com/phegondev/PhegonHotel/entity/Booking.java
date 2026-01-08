@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -36,6 +37,8 @@ public class Booking {
     private String bookingConfirmationCode;
 
     private LocalDateTime bookingDate;
+
+    private BigDecimal totalPrice; // Изчислената цена с периодичните цени
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
