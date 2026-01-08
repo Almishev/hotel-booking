@@ -587,6 +587,8 @@ button[type="submit"]:hover {
     flex-wrap: wrap;
     gap: 10px;
     align-items: center;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .search-container input[type="text"] {
@@ -598,6 +600,7 @@ button[type="submit"]:hover {
     width: 300px;
     flex: 1;
     min-width: 200px;
+    box-sizing: border-box;
 }
 
 button {
@@ -636,8 +639,9 @@ button:hover {
 @media (max-width: 768px) {
     .find-booking-page {
         max-width: 100%;
-        margin: 10px 15px 40px 15px;
+        margin: 10px auto 40px auto;
         padding: 15px;
+        box-sizing: border-box;
     }
 
     .find-booking-page h2 {
@@ -650,6 +654,9 @@ button:hover {
         flex-direction: column;
         gap: 15px;
         align-items: stretch;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
     }
 
     .search-container input[type="text"] {
@@ -658,6 +665,7 @@ button:hover {
         min-width: unset;
         padding: 12px;
         font-size: 16px; /* Prevent zoom on iOS */
+        box-sizing: border-box;
     }
 
     .search-container button {
@@ -698,8 +706,10 @@ button:hover {
 
 @media (max-width: 480px) {
     .find-booking-page {
-        margin: 10px 10px 30px 10px;
+        margin: 10px auto 30px auto;
         padding: 12px;
+        max-width: 100%;
+        box-sizing: border-box;
     }
 
     .find-booking-page h2 {
@@ -707,9 +717,17 @@ button:hover {
         margin-bottom: 1.2rem;
     }
 
+    .search-container {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
     .search-container input[type="text"] {
         padding: 10px;
         font-size: 16px;
+        box-sizing: border-box;
+        width: 100%;
     }
 
     .search-container button {

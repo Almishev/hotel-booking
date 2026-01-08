@@ -21,8 +21,8 @@ export default function RoomDetailsPage() {
   const [error, setError] = useState<string | null>(null);
   const [checkInDate, setCheckInDate] = useState<Date | null>(null);
   const [checkOutDate, setCheckOutDate] = useState<Date | null>(null);
-  const [numAdults, setNumAdults] = useState(1);
-  const [numChildren, setNumChildren] = useState(0);
+  const [numAdults, setNumAdults] = useState<number | string>(1);
+  const [numChildren, setNumChildren] = useState<number | string>(0);
   const [totalPrice, setTotalPrice] = useState(0);
   const [pricePerNight, setPricePerNight] = useState<number | null>(null);
   const [totalGuests, setTotalGuests] = useState(1);
@@ -85,7 +85,8 @@ export default function RoomDetailsPage() {
   useEffect(() => {
     // If it's a package booking, use package price for the room type
     if (isPackageBooking && packageDetails && roomDetails) {
-      const totalGuests = numAdults + numChildren;
+      const totalGuests = (typeof numAdults === 'number' ? numAdults : parseInt(String(numAdults)) || 1) + 
+                          (typeof numChildren === 'number' ? numChildren : parseInt(String(numChildren)) || 0);
       setTotalGuests(totalGuests);
       
       // Set price from package - използвай цената за конкретния тип стая
@@ -122,7 +123,8 @@ export default function RoomDetailsPage() {
               const avgPrice = parseFloat(calculation.totalPrice.toString()) / nights;
               setPricePerNight(avgPrice);
             }
-            const totalGuests = numAdults + numChildren;
+            const totalGuests = (typeof numAdults === 'number' ? numAdults : parseInt(String(numAdults)) || 1) + 
+                                (typeof numChildren === 'number' ? numChildren : parseInt(String(numChildren)) || 0);
             setTotalGuests(totalGuests);
           } else {
             // Fallback to simple calculation if API fails
@@ -246,8 +248,8 @@ export default function RoomDetailsPage() {
       const booking: any = {
         checkInDate: formattedCheckInDate,
         checkOutDate: formattedCheckOutDate,
-        numOfAdults: numAdults,
-        numOfChildren: numChildren,
+        numOfAdults: typeof numAdults === 'number' ? numAdults : parseInt(String(numAdults)) || 1,
+        numOfChildren: typeof numChildren === 'number' ? numChildren : parseInt(String(numChildren)) || 0,
         language: i18n.language || 'en' // Add current language
       };
       
@@ -501,7 +503,8 @@ export default function RoomDetailsPage() {
                       const inputValue = e.target.value;
                       // Позволи празна стойност по време на въвеждане
                       if (inputValue === '') {
-                        return; // Не задавай стойност веднага, позволи празно поле
+                        setNumAdults(''); // Задай празна стойност, за да може да се изтрие
+                        return;
                       }
                       // Провери дали е число
                       const numValue = parseInt(inputValue, 10);
