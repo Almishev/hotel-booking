@@ -35,13 +35,15 @@ public class JWTAuthFilter extends OncePerRequestFilter {
                requestURI.equals("/rooms/all-available-rooms") ||
                requestURI.equals("/rooms/types") ||
                requestURI.equals("/rooms/available-rooms-by-date-and-type") ||
+               requestURI.equals("/rooms/price-calculation") ||
                requestURI.startsWith("/rooms/room-by-id/") ||
                requestURI.startsWith("/bookings/get-by-confirmation-code/") ||
                requestURI.startsWith("/users/get-by-id/") ||
                requestURI.startsWith("/users/get-user-bookings/") ||
                requestURI.equals("/holiday-packages/all") ||
                requestURI.matches("/holiday-packages/\\d+") ||
-               requestURI.startsWith("/holiday-packages/available");
+               requestURI.startsWith("/holiday-packages/available") ||
+               requestURI.equals("/room-price-periods/price-calculation");
     }
 
     @Override
