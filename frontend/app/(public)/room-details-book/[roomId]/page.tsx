@@ -132,7 +132,8 @@ export default function RoomDetailsPage() {
             const startDate = new Date(checkInDate);
             const endDate = new Date(checkOutDate);
             const totalNights = Math.round(Math.abs((endDate.getTime() - startDate.getTime()) / oneDay));
-            const totalGuests = numAdults + numChildren;
+            const totalGuests = (typeof numAdults === 'number' ? numAdults : parseInt(String(numAdults)) || 1) + 
+                                (typeof numChildren === 'number' ? numChildren : parseInt(String(numChildren)) || 0);
             const roomPricePerNight = roomDetails.roomPrice;
             const totalPrice = roomPricePerNight * totalNights;
             setTotalPrice(totalPrice);
@@ -146,7 +147,8 @@ export default function RoomDetailsPage() {
           const startDate = new Date(checkInDate);
           const endDate = new Date(checkOutDate);
           const totalNights = Math.round(Math.abs((endDate.getTime() - startDate.getTime()) / oneDay));
-          const totalGuests = numAdults + numChildren;
+          const totalGuests = (typeof numAdults === 'number' ? numAdults : parseInt(String(numAdults)) || 1) + 
+                              (typeof numChildren === 'number' ? numChildren : parseInt(String(numChildren)) || 0);
           const roomPricePerNight = roomDetails.roomPrice;
           const totalPrice = roomPricePerNight * totalNights;
           setTotalPrice(totalPrice);
