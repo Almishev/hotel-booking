@@ -24,6 +24,7 @@ export default function RoomDetailsPage() {
   const [numAdults, setNumAdults] = useState(1);
   const [numChildren, setNumChildren] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0);
+  const [pricePerNight, setPricePerNight] = useState<number | null>(null);
   const [totalGuests, setTotalGuests] = useState(1);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [userId, setUserId] = useState('');
@@ -108,6 +109,14 @@ export default function RoomDetailsPage() {
           if (response.statusCode === 200 && response.priceCalculation) {
             const calculation = response.priceCalculation;
             setTotalPrice(parseFloat(calculation.totalPrice.toString()));
+            // Използвай averagePricePerNight, ако е налично
+            if (calculation.averagePricePerNight) {
+              setPricePerNight(parseFloat(calculation.averagePricePerNight.toString()));
+            } else {
+              const nights = calculation.numberOfNights || 1;
+              const avgPrice = parseFloat(calculation.totalPrice.toString()) / nights;
+              setPricePerNight(avgPrice);
+            }
             const totalGuests = numAdults + numChildren;
             setTotalGuests(totalGuests);
           } else {
@@ -120,6 +129,7 @@ export default function RoomDetailsPage() {
             const roomPricePerNight = roomDetails.roomPrice;
             const totalPrice = roomPricePerNight * totalNights;
             setTotalPrice(totalPrice);
+            setPricePerNight(roomPricePerNight);
             setTotalGuests(totalGuests);
           }
         } catch (error) {
@@ -133,11 +143,15 @@ export default function RoomDetailsPage() {
           const roomPricePerNight = roomDetails.roomPrice;
           const totalPrice = roomPricePerNight * totalNights;
           setTotalPrice(totalPrice);
+          setPricePerNight(roomPricePerNight);
           setTotalGuests(totalGuests);
         }
       };
       
       calculatePrice();
+    } else {
+      // Ако няма избрани дати, изчисти периодичната цена
+      setPricePerNight(null);
     }
   }, [checkInDate, checkOutDate, numAdults, numChildren, roomDetails, isPackageBooking, packageDetails, roomId]);
 
@@ -339,6 +353,8 @@ export default function RoomDetailsPage() {
   // Safely extract room details with defaults using optional chaining
   const roomType = roomDetails?.roomType || '';
   const roomPrice = roomDetails?.roomPrice || 0;
+  const displayPricePerNight = pricePerNight !== null ? pricePerNight : roomPrice;
+  const hasPeriodPrice = pricePerNight !== null && Math.abs(pricePerNight - roomPrice) > 0.01;
   const roomPhotoUrl = roomDetails?.roomPhotoUrl || '';
   const roomDescription = roomDetails?.roomDescription || '';
   const bookings = Array.isArray(roomDetails?.bookings) ? roomDetails.bookings : [];
@@ -381,6 +397,15 @@ export default function RoomDetailsPage() {
               </p>
             ) : null}
           </>
+        ) : hasPeriodPrice ? (
+          <p>
+            <span style={{ textDecoration: 'line-through', color: '#999', marginRight: '0.5rem' }}>
+              {t('rooms.price')}: €{roomPrice} {t('rooms.perNight')}
+            </span>
+            <span style={{ fontWeight: 'bold', color: '#00796b' }}>
+              {t('rooms.price')}: €{displayPricePerNight.toFixed(2)} {t('rooms.perNight')}
+            </span>
+          </p>
         ) : (
           <p>{t('rooms.price')}: €{roomPrice} {t('rooms.perNight')}</p>
         )}

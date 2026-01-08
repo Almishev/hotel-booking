@@ -10,6 +10,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
@@ -121,19 +122,26 @@ public class EmailService {
         emailContent.append("==============\n");
         emailContent.append(getMessage.apply("email.roomType"))
                     .append(": ").append(room.getRoomType()).append("\n");
+        
+        // Calculate number of nights
+        long days = java.time.temporal.ChronoUnit.DAYS.between(booking.getCheckInDate(), booking.getCheckOutDate());
+        
+        // Use the calculated total price from booking (includes period pricing)
+        BigDecimal totalPriceBD = booking.getTotalPrice();
+        double totalPrice = totalPriceBD != null ? totalPriceBD.doubleValue() : room.getRoomPrice().doubleValue() * days;
+        
+        // Calculate average price per night
+        double pricePerNight = days > 0 ? totalPrice / days : room.getRoomPrice().doubleValue();
+        
         emailContent.append(getMessage.apply("email.roomPricePerNight"))
-                    .append(": €").append(room.getRoomPrice()).append("\n");
+                    .append(": €").append(String.format("%.2f", pricePerNight)).append("\n");
         emailContent.append(getMessage.apply("email.roomDescription"))
                     .append(": ").append(room.getRoomDescription()).append("\n\n");
-        
-        // Calculate total price
-        long days = java.time.temporal.ChronoUnit.DAYS.between(booking.getCheckInDate(), booking.getCheckOutDate());
-        double totalPrice = room.getRoomPrice().doubleValue() * days;
         
         emailContent.append(getMessage.apply("email.pricing")).append(":\n");
         emailContent.append("========\n");
         emailContent.append(getMessage.apply("email.pricePerNight"))
-                    .append(": €").append(room.getRoomPrice()).append("\n");
+                    .append(": €").append(String.format("%.2f", pricePerNight)).append("\n");
         emailContent.append(getMessage.apply("email.numberOfNights"))
                     .append(": ").append(days).append("\n");
         emailContent.append(getMessage.apply("email.totalPrice"))
