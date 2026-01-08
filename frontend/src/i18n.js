@@ -16,7 +16,7 @@ const resources = {
         admin: 'Админ'
       },
       home: {
-        welcome: 'Добре дошли в нашия хотел!',
+        welcome: '',
         stepInto: 'Потопете се в оазис на комфорт и грижа',
         allRooms: 'Всички стаи',
         services: 'Услуги в Phegon Hotel',
@@ -204,7 +204,7 @@ const resources = {
         admin: 'Διαχειριστής'
       },
       home: {
-        welcome: 'Καλώς ήρθατε στο ξενοδοχείο μας!',
+        welcome: '',
         stepInto: 'Βυθιστείτε σε μια όαση άνεσης και φροντίδας',
         allRooms: 'Όλα τα δωμάτια',
         services: 'Υπηρεσίες στο Phegon Hotel',
@@ -392,7 +392,7 @@ const resources = {
         admin: 'Admin'
       },
       home: {
-        welcome: 'Welcome to',
+        welcome: '',
         stepInto: 'Step into a haven of comfort and care',
         allRooms: 'All Rooms',
         services: 'Services at',

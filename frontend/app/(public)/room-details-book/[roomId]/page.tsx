@@ -487,14 +487,32 @@ export default function RoomDetailsPage() {
                 <div className="guest-input-group">
                   <label>{t('rooms.adults')}:</label>
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     min="1"
                     max="10"
                     value={numAdults}
                     onChange={(e) => {
-                      const value = parseInt(e.target.value) || 1;
-                      if (value >= 1 && value <= 10) {
-                        setNumAdults(value);
+                      const inputValue = e.target.value;
+                      // Позволи празна стойност по време на въвеждане
+                      if (inputValue === '') {
+                        setNumAdults(1);
+                        return;
+                      }
+                      // Провери дали е число
+                      const numValue = parseInt(inputValue, 10);
+                      if (!isNaN(numValue) && numValue >= 1 && numValue <= 10) {
+                        setNumAdults(numValue);
+                      }
+                    }}
+                    onBlur={(e) => {
+                      // При загуба на фокус, ако е празно или невалидно, задай минимална стойност
+                      const value = parseInt(e.target.value, 10);
+                      if (isNaN(value) || value < 1) {
+                        setNumAdults(1);
+                      } else if (value > 10) {
+                        setNumAdults(10);
                       }
                     }}
                     placeholder="1"
@@ -503,14 +521,32 @@ export default function RoomDetailsPage() {
                 <div className="guest-input-group">
                   <label>{t('rooms.children')}:</label>
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     min="0"
                     max="10"
                     value={numChildren}
                     onChange={(e) => {
-                      const value = parseInt(e.target.value) || 0;
-                      if (value >= 0 && value <= 10) {
-                        setNumChildren(value);
+                      const inputValue = e.target.value;
+                      // Позволи празна стойност по време на въвеждане
+                      if (inputValue === '') {
+                        setNumChildren(0);
+                        return;
+                      }
+                      // Провери дали е число
+                      const numValue = parseInt(inputValue, 10);
+                      if (!isNaN(numValue) && numValue >= 0 && numValue <= 10) {
+                        setNumChildren(numValue);
+                      }
+                    }}
+                    onBlur={(e) => {
+                      // При загуба на фокус, ако е празно или невалидно, задай минимална стойност
+                      const value = parseInt(e.target.value, 10);
+                      if (isNaN(value) || value < 0) {
+                        setNumChildren(0);
+                      } else if (value > 10) {
+                        setNumChildren(10);
                       }
                     }}
                     placeholder="0"

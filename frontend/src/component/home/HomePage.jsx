@@ -22,7 +22,7 @@ const HomePage = () => {
                     <div className="overlay"></div>
                     <div className="animated-texts overlay-content">
                         <h1>
-                            {t('home.welcome')} <span className="phegon-color">Phegon Hotel</span>
+                            <span className="phegon-color">Phegon Hotel</span>
                         </h1><br />
                         <h3>{t('home.stepInto')}</h3>
                     </div>
