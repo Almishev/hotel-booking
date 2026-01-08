@@ -34,6 +34,11 @@ export default function RoomDetailsPage() {
   const [packageDetails, setPackageDetails] = useState<any>(null);
   const [isPackageBooking, setIsPackageBooking] = useState(false);
 
+  // Check if user can view bookings (only ADMIN and EDITOR)
+  const isAdmin = ApiService.isAdmin();
+  const isEditor = ApiService.isEditor();
+  const canViewBookings = isAdmin || isEditor;
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -415,7 +420,7 @@ export default function RoomDetailsPage() {
           <p><strong>{t('rooms.description')}:</strong> <em>{t('rooms.noDescription')}</em></p>
         )}
       </div>
-      {bookings && bookings.length > 0 && (
+      {canViewBookings && bookings && bookings.length > 0 && (
         <div>
           <h3>{t('rooms.existingBookings')}</h3>
           <ul className="booking-list">
