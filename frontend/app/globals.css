@@ -582,6 +582,13 @@ button[type="submit"]:hover {
     padding: 20px;
 }
 
+.search-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+
 .search-container input[type="text"] {
     padding: 10px;
     font-size: 16px;
@@ -589,6 +596,8 @@ button[type="submit"]:hover {
     border-radius: 4px;
     margin-right: 10px;
     width: 300px;
+    flex: 1;
+    min-width: 200px;
 }
 
 button {
@@ -621,6 +630,109 @@ button:hover {
     height: auto;
     border-radius: 10px;
     object-fit: cover;
+}
+
+/* MOBILE RESPONSIVE - FIND BOOKING PAGE */
+@media (max-width: 768px) {
+    .find-booking-page {
+        max-width: 100%;
+        margin: 10px 15px 40px 15px;
+        padding: 15px;
+    }
+
+    .find-booking-page h2 {
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+
+    .search-container {
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
+    }
+
+    .search-container input[type="text"] {
+        width: 100%;
+        margin-right: 0;
+        min-width: unset;
+        padding: 12px;
+        font-size: 16px; /* Prevent zoom on iOS */
+    }
+
+    .search-container button {
+        width: 100%;
+        padding: 12px;
+        font-size: 16px;
+    }
+
+    .booking-details {
+        margin-top: 20px;
+        padding: 15px;
+        border-radius: 8px;
+    }
+
+    .booking-details h3 {
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+        margin-top: 1rem;
+    }
+
+    .booking-details p {
+        font-size: 0.95rem;
+        margin: 8px 0;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+
+    .booking-details img {
+        max-width: 100%;
+        max-height: 250px;
+        margin: 1rem auto;
+    }
+
+    .booking-details hr {
+        margin: 1rem 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .find-booking-page {
+        margin: 10px 10px 30px 10px;
+        padding: 12px;
+    }
+
+    .find-booking-page h2 {
+        font-size: 1.3rem;
+        margin-bottom: 1.2rem;
+    }
+
+    .search-container input[type="text"] {
+        padding: 10px;
+        font-size: 16px;
+    }
+
+    .search-container button {
+        padding: 10px;
+        font-size: 16px;
+    }
+
+    .booking-details {
+        padding: 12px;
+    }
+
+    .booking-details h3 {
+        font-size: 1.1rem;
+    }
+
+    .booking-details p {
+        font-size: 0.9rem;
+        margin: 6px 0;
+    }
+
+    .booking-details img {
+        max-height: 200px;
+    }
 }
 
 p {

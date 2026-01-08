@@ -493,17 +493,25 @@ export default function RoomDetailsPage() {
                     min="1"
                     max="10"
                     value={numAdults}
+                    onFocus={(e) => {
+                      // Избери целия текст при фокус за лесно редактиране
+                      e.target.select();
+                    }}
                     onChange={(e) => {
                       const inputValue = e.target.value;
                       // Позволи празна стойност по време на въвеждане
                       if (inputValue === '') {
-                        setNumAdults(1);
-                        return;
+                        return; // Не задавай стойност веднага, позволи празно поле
                       }
                       // Провери дали е число
                       const numValue = parseInt(inputValue, 10);
-                      if (!isNaN(numValue) && numValue >= 1 && numValue <= 10) {
-                        setNumAdults(numValue);
+                      if (!isNaN(numValue)) {
+                        if (numValue >= 1 && numValue <= 10) {
+                          setNumAdults(numValue);
+                        } else if (numValue > 10) {
+                          setNumAdults(10);
+                        }
+                        // Ако е по-малко от 1, не прави нищо - потребителят все още пише
                       }
                     }}
                     onBlur={(e) => {

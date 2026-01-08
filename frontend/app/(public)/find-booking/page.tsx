@@ -37,36 +37,37 @@ export default function FindBookingPage() {
                     placeholder={t('findBooking.enterCode')}
                     value={confirmationCode}
                     onChange={(e) => setConfirmationCode(e.target.value)}
+                    onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                            handleSearch();
+                        }
+                    }}
                 />
                 <button onClick={handleSearch}>{t('findBooking.find')}</button>
             </div>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
+            {error && <p className="error-message">{error}</p>}
             {bookingDetails && (
                 <div className="booking-details">
                     <h3>{t('findBooking.bookingDetails')}</h3>
-                    <p>{t('findBooking.confirmationCode')}: {bookingDetails.bookingConfirmationCode}</p>
-                    <p>{t('findBooking.checkInDate')}: {bookingDetails.checkInDate}</p>
-                    <p>{t('findBooking.checkOutDate')}: {bookingDetails.checkOutDate}</p>
-                    <p>{t('findBooking.numOfAdults')}: {bookingDetails.numOfAdults}</p>
-                    <p>{t('findBooking.numOfChildren')}: {bookingDetails.numOfChildren}</p>
+                    <p><strong>{t('findBooking.confirmationCode')}:</strong> {bookingDetails.bookingConfirmationCode}</p>
+                    <p><strong>{t('findBooking.checkInDate')}:</strong> {bookingDetails.checkInDate}</p>
+                    <p><strong>{t('findBooking.checkOutDate')}:</strong> {bookingDetails.checkOutDate}</p>
+                    <p><strong>{t('findBooking.numOfAdults')}:</strong> {bookingDetails.numOfAdults}</p>
+                    <p><strong>{t('findBooking.numOfChildren')}:</strong> {bookingDetails.numOfChildren}</p>
 
-                    <br />
                     <hr />
-                    <br />
                     <h3>{t('findBooking.bookerDetails')}</h3>
                     <div>
-                        <p> {t('findBooking.name')}: {bookingDetails.user.name}</p>
-                        <p> {t('findBooking.email')}: {bookingDetails.user.email}</p>
-                        <p> {t('findBooking.phoneNumber')}: {bookingDetails.user.phoneNumber}</p>
+                        <p><strong>{t('findBooking.name')}:</strong> {bookingDetails.user.name}</p>
+                        <p><strong>{t('findBooking.email')}:</strong> {bookingDetails.user.email}</p>
+                        <p><strong>{t('findBooking.phoneNumber')}:</strong> {bookingDetails.user.phoneNumber}</p>
                     </div>
 
-                    <br />
                     <hr />
-                    <br />
                     <h3>{t('findBooking.roomDetails')}</h3>
                     <div>
-                        <p> {t('findBooking.roomType')}: {bookingDetails.room.roomType}</p>
-                        <img src={bookingDetails.room.roomPhotoUrl} alt="" />
+                        <p><strong>{t('findBooking.roomType')}:</strong> {bookingDetails.room.roomType}</p>
+                        <img src={bookingDetails.room.roomPhotoUrl} alt={bookingDetails.room.roomType} />
                     </div>
                 </div>
             )}
